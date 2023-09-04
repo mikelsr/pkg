@@ -66,10 +66,17 @@ func (r Runtime) Exec(ctx context.Context, call api.Executor_exec) error {
 	}
 
 	ppid := r.Tree.PpidOrInit(call.Args().Ppid())
+
+	args, _ := csp.BootCtx(bCtx).Args(ctx)
 	pArgs := procArgs{
 		bc:   bc,
 		ppid: ppid,
 		bCtx: bCtx,
+		info: &info{
+			ppid: ppid,
+			args: args,
+			cid:  cid.Bytes(),
+		},
 	}
 
 	p, err := r.mkproc(ctx, pArgs)
@@ -111,10 +118,17 @@ func (r Runtime) ExecCached(ctx context.Context, call api.Executor_execCached) e
 	}
 
 	ppid := r.Tree.PpidOrInit(call.Args().Ppid())
+
+	args, _ := csp.BootCtx(bCtx).Args(ctx)
 	pArgs := procArgs{
 		bc:   bc,
 		ppid: ppid,
 		bCtx: bCtx,
+		info: &info{
+			ppid: ppid,
+			args: args,
+			cid:  cid.Bytes(),
+		},
 	}
 
 	p, err := r.mkproc(ctx, pArgs)
@@ -123,6 +137,22 @@ func (r Runtime) ExecCached(ctx context.Context, call api.Executor_execCached) e
 	}
 
 	return res.SetProcess(api.Process_ServerToClient(p))
+}
+
+func (r Runtime) Ps(ctx context.Context, call api.Executor_ps) error {
+	res, err := call.AllocResults()
+	if err != nil {
+		return err
+	}
+	_, seg := capnp.NewSingleSegmentMessage(nil)
+	procs, _ := api.NewProcessInfo_List(seg, int32(len(r.Tree.Map)))
+	i := 0
+	for _, proc := range r.Tree.Map {
+		p := proc.(*process)
+		procs.Set(i, p.msg())
+		i++
+	}
+	return res.SetProcs(procs)
 }
 
 func (r Runtime) mkproc(ctx context.Context, args procArgs) (*process, error) {
@@ -141,10 +171,11 @@ func (r Runtime) mkproc(ctx context.Context, args procArgs) (*process, error) {
 		return nil, errors.New("ww: missing export: _start")
 	}
 
-	proc := r.spawn(fn, pid)
+	args.info.pid = pid
+	proc := r.spawn(fn, args.info)
 
 	// Register new process.
-	r.Tree.Insert(proc.pid, args.ppid)
+	r.Tree.Insert(proc.info.pid, proc.info.ppid)
 	r.Tree.AddToMap(proc.pid, proc)
 
 	return proc, nil
@@ -197,7 +228,7 @@ func (r Runtime) mkmod(ctx context.Context, args procArgs) (wasm.Module, error) 
 	return mod, nil
 }
 
-func (r Runtime) spawn(fn wasm.Function, pid uint32) *process {
+func (r Runtime) spawn(fn wasm.Function, inf *info) *process {
 	done := make(chan execResult, 1)
 
 	// NOTE:  we use context.Background instead of the context obtained from the
@@ -207,7 +238,7 @@ func (r Runtime) spawn(fn wasm.Function, pid uint32) *process {
 	ctx, cancel := context.WithCancel(context.Background())
 	killFunc := r.Tree.Kill
 	proc := &process{
-		pid:      pid,
+		info:     inf,
 		killFunc: killFunc,
 		done:     done,
 		cancel:   cancel,
@@ -217,6 +248,7 @@ func (r Runtime) spawn(fn wasm.Function, pid uint32) *process {
 		defer close(done)
 		defer proc.killFunc(proc.pid)
 
+		proc.info.creation = uint64(time.Now().UnixMilli())
 		vs, err := fn.Call(ctx)
 
 		done <- execResult{
@@ -232,6 +264,7 @@ type procArgs struct {
 	bc   []byte
 	ppid uint32
 	bCtx api.BootContext
+	*info
 }
 
 // ServeModule ensures the host side of the TCP connection with addr=addr

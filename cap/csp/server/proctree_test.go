@@ -23,6 +23,10 @@ func (p *testProc) Wait(ctx context.Context, call api.Process_wait) error {
 	return nil
 }
 
+func (p *testProc) Info(ctx context.Context, call api.Process_info) error {
+	return nil
+}
+
 func testProcTree() csp.ProcTree {
 	/*
 	        0

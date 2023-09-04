@@ -19,6 +19,7 @@ interface Executor {
     # Same as Exec, but the bytecode is directly from the BytecodeRegistry.
     # Provides a significant performance improvement for medium to large
     # WASM streams.
+    ps @2 () -> (procs :List(ProcessInfo));
 }
 
 interface BytecodeCache {
@@ -38,6 +39,15 @@ interface Process {
     # Wait until a process finishes running.
     kill   @1 () -> ();
     # Kill the process.
+    info   @2 () -> (info :ProcessInfo);
+}
+
+struct ProcessInfo {
+    pid      @0 :UInt32;
+    ppid     @1 :UInt32;
+    cid      @2 :Data;
+    args     @3 :List(Text) = [];
+    creation @4 :UInt64;
 }
 
 interface BootContext {
