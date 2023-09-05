@@ -40,11 +40,12 @@ require (
 	github.com/lthibault/util v0.0.12
 	github.com/mattn/go-isatty v0.0.19
 	github.com/mr-tron/base58 v1.2.0
+	github.com/multiformats/go-multibase v0.2.0
 	github.com/multiformats/go-multihash v0.2.3
 	github.com/pkg/errors v0.9.1
 	github.com/stealthrocket/wazergo v0.19.1
 	github.com/stretchr/testify v1.8.4
-	github.com/tetratelabs/wazero v1.3.1
+	github.com/tetratelabs/wazero v1.5.0
 	go.uber.org/multierr v1.11.0
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
 	golang.org/x/sync v0.3.0
@@ -109,7 +110,6 @@ require (
 	github.com/multiformats/go-base36 v0.2.0 // indirect
 	github.com/multiformats/go-multiaddr-dns v0.3.1 // indirect
 	github.com/multiformats/go-multiaddr-fmt v0.1.0 // indirect
-	github.com/multiformats/go-multibase v0.2.0 // indirect
 	github.com/multiformats/go-multicodec v0.9.0 // indirect
 	github.com/multiformats/go-multistream v0.4.1 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
@@ -145,6 +145,4 @@ require (
 	zenhack.net/go/util v0.0.0-20230607025951-8b02fee814ae // indirect
 )
 
-replace (
-	github.com/wetware/pkg => /home/mikel/Code/github.com/mikelsr/pkg
-)
+replace github.com/wetware/pkg => /home/mikel/Code/github.com/mikelsr/pkg
