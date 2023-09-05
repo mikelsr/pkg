@@ -52,6 +52,7 @@ func runAction() cli.ActionFunc {
 		go func() {
 			waitChan <- proc.Wait(ctx)
 		}()
+
 		select {
 		case err = <-waitChan:
 			return err

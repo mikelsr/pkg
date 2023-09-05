@@ -2,9 +2,6 @@ package cluster
 
 import (
 	"log/slog"
-	"path"
-	"runtime"
-	"time"
 
 	"github.com/libp2p/go-libp2p"
 	local "github.com/libp2p/go-libp2p/core/host"
@@ -23,40 +20,11 @@ var (
 	closes   *[]func() error
 )
 
-var flags = []cli.Flag{
-	&cli.StringSliceFlag{
-		Name:    "addr",
-		Aliases: []string{"a"},
-		Usage:   "static bootstrap `ADDR`",
-		EnvVars: []string{"WW_ADDR"},
-	},
-	&cli.StringFlag{
-		Name:    "discover",
-		Aliases: []string{"d"},
-		Usage:   "bootstrap discovery `ADDR`",
-		Value:   bootstrapAddr(),
-		EnvVars: []string{"WW_DISCOVER"},
-	},
-	&cli.StringFlag{
-		Name:    "ns",
-		Usage:   "cluster namespace",
-		Value:   "ww",
-		EnvVars: []string{"WW_NS"},
-	},
-	&cli.DurationFlag{
-		Name:    "timeout",
-		Usage:   "dial timeout",
-		Value:   time.Second * 15,
-		EnvVars: []string{"WW_CLIENT_TIMEOUT"},
-	},
-}
-
 func Command() *cli.Command {
 	return &cli.Command{
 		Name:    "cluster",
 		Usage:   "cli client for wetware clusters",
 		Aliases: []string{"client"}, // TODO(soon):  deprecate
-		Flags:   flags,
 		Subcommands: []*cli.Command{
 			run(),
 		},
@@ -65,16 +33,18 @@ func Command() *cli.Command {
 
 func setup() cli.BeforeFunc {
 	return func(c *cli.Context) (err error) {
-		*releases = make([]func(), 0)
-		*closes = make([]func() error, 0)
+		rs := make([]func(), 0)
+		releases = &rs
+		cs := make([]func() error, 0)
+		closes = &cs
 
-		h, err := clientHost(c)
+		ch, err := clientHost(c)
 		if err != nil {
 			return err
 		}
-		*closes = append(*closes, h.Close)
+		*closes = append(*closes, ch.Close)
 
-		host, err := system.Bootstrap[host.Host](c.Context, h, client.Dialer{
+		h, err = system.Bootstrap[host.Host](c.Context, ch, client.Dialer{
 			Logger:   slog.Default(),
 			NS:       c.String("ns"),
 			Peers:    c.StringSlice("peer"),
@@ -83,8 +53,7 @@ func setup() cli.BeforeFunc {
 		if err != nil {
 			return err
 		}
-		*releases = append(*releases, host.Release)
-
+		*releases = append(*releases, h.Release)
 		return nil
 	}
 }
@@ -107,17 +76,4 @@ func clientHost(c *cli.Context) (local.Host, error) {
 		libp2p.NoListenAddrs,
 		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.Transport(quic.NewTransport))
-}
-
-func bootstrapAddr() string {
-	return path.Join("/ip4/228.8.8.8/udp/8822/multicast", loopback())
-}
-
-func loopback() string {
-	switch runtime.GOOS {
-	case "darwin":
-		return "lo0"
-	default:
-		return "lo"
-	}
 }
