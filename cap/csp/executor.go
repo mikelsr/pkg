@@ -66,3 +66,28 @@ func (ex Executor) ExecFromCache(ctx context.Context, cid cid.Cid, ppid uint32, 
 		})
 	return Proc(f.Process()), release
 }
+
+func (ex Executor) Ps(ctx context.Context) ([]Pinfo, capnp.ReleaseFunc, error) {
+	f, release := api.Executor(ex).Ps(ctx, nil)
+	s, err := f.Struct()
+	if err != nil {
+		return nil, release, err
+	}
+
+	procCaps, err := s.Procs()
+	if err != nil {
+		return nil, release, err
+	}
+
+	procs := make([]Pinfo, procCaps.Len())
+	for i := 0; i < procCaps.Len(); i++ {
+		cap := procCaps.At(i)
+		proc := &Pinfo{}
+		err = proc.FromMsg(cap)
+		if err != nil {
+			break
+		}
+		procs[i] = *proc
+	}
+	return procs, release, nil
+}

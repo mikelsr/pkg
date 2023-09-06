@@ -17,6 +17,61 @@ var (
 
 type Proc api.Process
 
+type Pinfo struct {
+	Pid      uint32
+	Ppid     uint32
+	Cid      []byte
+	Args     []string
+	Creation uint64
+}
+
+func (i Pinfo) argsMsg() capnp.TextList {
+	_, seg := capnp.NewSingleSegmentMessage(nil)
+	tl, _ := capnp.NewTextList(seg, int32(len(i.Args)))
+	for i, arg := range i.Args {
+		tl.Set(i, arg)
+	}
+	return tl
+}
+
+func (i Pinfo) Msg() api.ProcessInfo {
+	_, seg := capnp.NewSingleSegmentMessage(nil)
+	pi, _ := api.NewProcessInfo(seg)
+	pi.SetArgs(i.argsMsg())
+	pi.SetCreation(i.Creation)
+	pi.SetCid(i.Cid)
+	pi.SetPid(i.Pid)
+	pi.SetPpid(i.Ppid)
+	return pi
+}
+
+func (i *Pinfo) FromMsg(inf api.ProcessInfo) error {
+
+	tl, err := inf.Args()
+	if err != nil {
+		return err
+	}
+	args := make([]string, tl.Len())
+	for i := 0; i < tl.Len(); i++ {
+		arg, err := tl.At(i)
+		if err != nil {
+			return err
+		}
+		args[i] = arg
+	}
+
+	i.Cid, err = inf.Cid()
+	if err != nil {
+		return err
+	}
+
+	i.Creation = inf.Creation()
+	i.Pid = inf.Pid()
+	i.Ppid = inf.Ppid()
+
+	return nil
+}
+
 func (p Proc) AddRef() Proc {
 	return Proc(api.Process(p).AddRef())
 }

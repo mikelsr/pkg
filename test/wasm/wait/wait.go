@@ -5,28 +5,30 @@ import (
 	"context"
 	"fmt"
 	"time"
-	// ww "github.com/wetware/pkg/guest/system"
+
+	ww "github.com/wetware/pkg/guest/system"
 )
 
 func main() {
 	ctx := context.Background()
 
 	// if false {
-	// 	self, err := ww.Init(ctx)
-	// 	if err != nil {
-	// 		panic(err)
+	_, err := ww.Init(ctx)
+	if err != nil {
+		panic(err)
+	}
+	// defer func() {
+	// 	for _, cap := range self.Caps {
+	// 		cap.Release()
 	// 	}
-	// 	defer func() {
-	// 		for _, cap := range self.Caps {
-	// 			cap.Release()
-	// 		}
-	// 	}()
+	// }()
 	// }
 
 	for {
 		select {
 		case <-ctx.Done():
 			fmt.Println(ctx.Err())
+			return
 		case <-time.After(1 * time.Second):
 			continue
 		}

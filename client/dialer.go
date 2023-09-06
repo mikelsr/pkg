@@ -45,7 +45,7 @@ func (d Dialer) DialRPC(ctx context.Context, h host.Host) (*rpc.Conn, error) {
 		return nil, fmt.Errorf("upgrade: %w", err)
 	}
 
-	conn := rpc.NewConn(transport(s), &rpc.Options{
+	conn := rpc.NewConn(Transport(s), &rpc.Options{
 		ErrorReporter: system.ErrorReporter{
 			Logger: d.Logger,
 		},
@@ -79,7 +79,7 @@ func (d Dialer) connect(ctx context.Context, h host.Host) (peer.ID, error) {
 	return "", err
 }
 
-func transport(s network.Stream) rpc.Transport {
+func Transport(s network.Stream) rpc.Transport {
 	if strings.HasSuffix(string(s.Protocol()), "/packed") {
 		return rpc.NewPackedStreamTransport(s)
 	}

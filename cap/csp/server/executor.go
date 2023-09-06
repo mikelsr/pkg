@@ -72,10 +72,10 @@ func (r Runtime) Exec(ctx context.Context, call api.Executor_exec) error {
 		bc:   bc,
 		ppid: ppid,
 		bCtx: bCtx,
-		info: &info{
-			ppid: ppid,
-			args: args,
-			cid:  cid.Bytes(),
+		Pinfo: &csp.Pinfo{
+			Ppid: ppid,
+			Args: args,
+			Cid:  cid.Bytes(),
 		},
 	}
 
@@ -124,10 +124,10 @@ func (r Runtime) ExecCached(ctx context.Context, call api.Executor_execCached) e
 		bc:   bc,
 		ppid: ppid,
 		bCtx: bCtx,
-		info: &info{
-			ppid: ppid,
-			args: args,
-			cid:  cid.Bytes(),
+		Pinfo: &csp.Pinfo{
+			Ppid: ppid,
+			Args: args,
+			Cid:  cid.Bytes(),
 		},
 	}
 
@@ -149,7 +149,7 @@ func (r Runtime) Ps(ctx context.Context, call api.Executor_ps) error {
 	i := 0
 	for _, proc := range r.Tree.Map {
 		p := proc.(*process)
-		procs.Set(i, p.msg())
+		procs.Set(i, p.Msg())
 		i++
 	}
 	return res.SetProcs(procs)
@@ -171,12 +171,12 @@ func (r Runtime) mkproc(ctx context.Context, args procArgs) (*process, error) {
 		return nil, errors.New("ww: missing export: _start")
 	}
 
-	args.info.pid = pid
-	proc := r.spawn(fn, args.info)
+	args.Pinfo.Pid = pid
+	proc := r.spawn(fn, args.Pinfo)
 
 	// Register new process.
-	r.Tree.Insert(proc.info.pid, proc.info.ppid)
-	r.Tree.AddToMap(proc.pid, proc)
+	r.Tree.Insert(proc.Pinfo.Pid, proc.Pinfo.Ppid)
+	r.Tree.AddToMap(proc.Pid, proc)
 
 	return proc, nil
 }
@@ -215,7 +215,8 @@ func (r Runtime) mkmod(ctx context.Context, args procArgs) (wasm.Module, error) 
 		WithEnv("ns", name).
 		WithStdin(os.Stdin).
 		WithStdout(os.Stdout).
-		WithStderr(os.Stderr)
+		WithStderr(os.Stderr).
+		WithArgs("foo", "bar", "baz")
 
 	l.Close()
 	mod, err := r.Runtime.InstantiateModule(sockCtx, compiled, modCfg)
@@ -228,7 +229,7 @@ func (r Runtime) mkmod(ctx context.Context, args procArgs) (wasm.Module, error) 
 	return mod, nil
 }
 
-func (r Runtime) spawn(fn wasm.Function, inf *info) *process {
+func (r Runtime) spawn(fn wasm.Function, inf *csp.Pinfo) *process {
 	done := make(chan execResult, 1)
 
 	// NOTE:  we use context.Background instead of the context obtained from the
@@ -238,7 +239,7 @@ func (r Runtime) spawn(fn wasm.Function, inf *info) *process {
 	ctx, cancel := context.WithCancel(context.Background())
 	killFunc := r.Tree.Kill
 	proc := &process{
-		info:     inf,
+		Pinfo:    inf,
 		killFunc: killFunc,
 		done:     done,
 		cancel:   cancel,
@@ -246,9 +247,9 @@ func (r Runtime) spawn(fn wasm.Function, inf *info) *process {
 
 	go func() {
 		defer close(done)
-		defer proc.killFunc(proc.pid)
+		defer proc.killFunc(proc.Pid)
 
-		proc.info.creation = uint64(time.Now().UnixMilli())
+		proc.Pinfo.Creation = uint64(time.Now().UnixMilli())
 		vs, err := fn.Call(ctx)
 
 		done <- execResult{
@@ -264,7 +265,7 @@ type procArgs struct {
 	bc   []byte
 	ppid uint32
 	bCtx api.BootContext
-	*info
+	*csp.Pinfo
 }
 
 // ServeModule ensures the host side of the TCP connection with addr=addr
