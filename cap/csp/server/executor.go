@@ -338,6 +338,7 @@ func (r Runtime) Ps(ctx context.Context, call core_api.Executor_ps) error {
 		if err = pl.Set(i, info); err != nil {
 			return err
 		}
+		i++
 	}
 	return res.SetProcs(pl)
 }
