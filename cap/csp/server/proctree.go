@@ -114,7 +114,7 @@ func stop(ctx context.Context, p api.Process_Server) {
 	// thus we must avoid infinite recursivity. The process is
 	// killed with p.cancel() instead.
 	if ps, ok := p.(*process); ok {
-		fmt.Printf("killing process %d\n", p.(*process).pid)
+		fmt.Printf("killing process %d\n", p.(*process).Pid)
 		ps.cancel()
 	} else {
 		// Generic implementation.

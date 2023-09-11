@@ -9,6 +9,7 @@ import (
 
 	"github.com/ipfs/go-cid"
 	core_api "github.com/wetware/pkg/api/core"
+	proc_api "github.com/wetware/pkg/api/process"
 )
 
 // ByteCode is a representation of arbitrary executable data.
@@ -89,6 +90,27 @@ func (ex Executor) ExecCached(
 			return ps.SetSession(core_api.Session(sess))
 		})
 	return Proc(f.Process()), release
+}
+
+// Get information about every running process in an executor.
+func (ex Executor) Ps(ctx context.Context) ([]proc_api.Info, capnp.ReleaseFunc, error) {
+	f, release := core_api.Executor(ex).Ps(ctx, nil)
+	<-f.Done()
+	s, err := f.Struct()
+	if err != nil {
+		return nil, release, err
+	}
+
+	pl, err := s.Procs()
+	if err != nil {
+		return nil, release, err
+	}
+	procs := make([]proc_api.Info, pl.Len())
+	for i := 0; i < pl.Len(); i++ {
+		procs[i] = pl.At(i)
+	}
+
+	return procs, release, nil
 }
 
 // DecodeTextList creates a string slice from a capnp.TextList.

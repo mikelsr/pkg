@@ -43,9 +43,10 @@ interface Executor {
     # Exec creates an runs a process from the provided bytecode.
     #
     # The Process capability is associated to the created process.
-    execCached @1 (session :Session, cid :Data, ppid :UInt32, args :List(Text)) -> (process :Process.Process);
+    execCached @1 (session :Session, cid :Process.Cid, ppid :UInt32, args :List(Text)) -> (process :Process.Process);
     # Same as Exec, but the bytecode is directly from the BytecodeRegistry.
     # Provides a significant performance improvement for medium to large
     # WASM streams.
+    ps @2 () -> (procs :List(Process.Info));
 }
 

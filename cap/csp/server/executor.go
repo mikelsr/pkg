@@ -228,7 +228,8 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 
 	killFunc := r.Tree.Kill
 	proc := &process{
-		pid:      c.args.Pid,
+		Args:     c.args,
+		time:     time.Now().UnixMilli(),
 		killFunc: killFunc,
 		done:     done,
 		cancel:   c.cancel,
@@ -312,4 +313,31 @@ func DialLoop(ctx context.Context, addr *net.TCPAddr, retries int) (net.Conn, er
 	}
 
 	return conn, err
+}
+
+// Ps returns the info of every running processes.
+func (r Runtime) Ps(ctx context.Context, call core_api.Executor_ps) error {
+	res, err := call.AllocResults()
+	if err != nil {
+		return err
+	}
+
+	snap := r.Tree.MapSnapshot()
+	_, seg := capnp.NewSingleSegmentMessage(nil)
+	pl, err := proc_api.NewInfo_List(seg, int32(len(snap)))
+	if err != nil {
+		return err
+	}
+
+	i := 0
+	for _, v := range snap {
+		info, err := v.(*process).info()
+		if err != nil {
+			return err
+		}
+		if err = pl.Set(i, info); err != nil {
+			return err
+		}
+	}
+	return res.SetProcs(pl)
 }

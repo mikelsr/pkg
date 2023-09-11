@@ -24,6 +24,7 @@ import (
 
 	"github.com/wetware/pkg/cmd/ww/cluster"
 	"github.com/wetware/pkg/cmd/ww/ls"
+	"github.com/wetware/pkg/cmd/ww/ps"
 	"github.com/wetware/pkg/cmd/ww/run"
 	"github.com/wetware/pkg/cmd/ww/start"
 	"github.com/wetware/pkg/util/proto"
@@ -67,6 +68,7 @@ var flags = []cli.Flag{
 
 var commands = []*cli.Command{
 	ls.Command(),
+	ps.Command(),
 	run.Command(),
 	start.Command(),
 	cluster.Command(),

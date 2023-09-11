@@ -229,7 +229,7 @@ func (svr *Server) Dial(pid rpc.PeerID, opt *rpc.Options) (*rpc.Conn, error) {
 		return nil, err
 	}
 
-	conn := rpc.NewConn(transport(s), opt)
+	conn := rpc.NewConn(Transport(s), opt)
 	return conn, nil
 }
 
@@ -251,7 +251,7 @@ func (svr *Server) Accept(ctx context.Context, opt *rpc.Options) (*rpc.Conn, err
 		}
 		opt.Network = svr
 
-		conn := rpc.NewConn(transport(s), opt)
+		conn := rpc.NewConn(Transport(s), opt)
 		return conn, nil
 
 	case <-ctx.Done():
