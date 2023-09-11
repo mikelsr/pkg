@@ -2,6 +2,7 @@ package csp_server
 
 import (
 	"context"
+	"errors"
 
 	"capnproto.org/go/capnp/v3"
 	"github.com/tetratelabs/wazero/sys"
@@ -12,11 +13,14 @@ import (
 // process is the main implementation of the Process capability.
 type process struct {
 	csp.Args
-	time     int64
+	time int64
+
 	done     <-chan execResult
 	killFunc func(uint32) // killFunc must call cancel()
 	cancel   context.CancelFunc
 	result   execResult
+
+	events *api.Events
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
@@ -43,6 +47,36 @@ func (p *process) Wait(ctx context.Context, call api.Process_wait) error {
 
 	return err
 }
+
+func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
+	if p.events == nil {
+		return errors.New("event handler not initialized")
+	}
+
+	p.events.Pause(ctx, nil)
+
+	return nil
+}
+
+func (p *process) Resume(ctx context.Context, call api.Process_resume) error {
+	if p.events == nil {
+		return errors.New("event handler not initialized")
+	}
+
+	p.events.Resume(ctx, nil)
+
+	return nil
+}
+
+// func (p *process) Stop(ctx context.Context, call api.Process_stop) error {
+// 	if p.events == nil {
+// 		return errors.New("event handler not initialized")
+// 	}
+
+// 	p.events.Resume(ctx, nil)
+
+// 	return nil
+// }
 
 // Create an info struct from the process meta.
 func (p *process) info() (api.Info, error) {

@@ -50,3 +50,11 @@ interface Executor {
     ps @2 () -> (procs :List(Process.Info));
 }
 
+interface ProcessInit {
+    # Aggregates the capabilities passed onto a process so they can be passed
+    # through the same channel.
+    terminal @0 () -> (terminal :Terminal);
+    events   @1 (handler :Process.Events) -> ();
+    # The WASM process should send the events capability through a call to events().
+}
+

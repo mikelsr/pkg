@@ -776,6 +776,46 @@ func (c Process) Kill(ctx context.Context, params func(Process_kill_Params) erro
 
 }
 
+func (c Process) Pause(ctx context.Context, params func(Process_pause_Params) error) (Process_pause_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      2,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "pause",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_pause_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_pause_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Process) Resume(ctx context.Context, params func(Process_resume_Params) error) (Process_resume_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      3,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "resume",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_resume_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_resume_Results_Future{Future: ans.Future()}, release
+
+}
+
 func (c Process) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
@@ -852,6 +892,10 @@ type Process_Server interface {
 	Wait(context.Context, Process_wait) error
 
 	Kill(context.Context, Process_kill) error
+
+	Pause(context.Context, Process_pause) error
+
+	Resume(context.Context, Process_resume) error
 }
 
 // Process_NewServer creates a new Server from an implementation of Process_Server.
@@ -870,7 +914,7 @@ func Process_ServerToClient(s Process_Server) Process {
 // This can be used to create a more complicated Server.
 func Process_Methods(methods []server.Method, s Process_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 2)
+		methods = make([]server.Method, 0, 4)
 	}
 
 	methods = append(methods, server.Method{
@@ -894,6 +938,30 @@ func Process_Methods(methods []server.Method, s Process_Server) []server.Method 
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
 			return s.Kill(ctx, Process_kill{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      2,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "pause",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Pause(ctx, Process_pause{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      3,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "resume",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Resume(ctx, Process_resume{call})
 		},
 	})
 
@@ -932,6 +1000,40 @@ func (c Process_kill) Args() Process_kill_Params {
 func (c Process_kill) AllocResults() (Process_kill_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
 	return Process_kill_Results(r), err
+}
+
+// Process_pause holds the state for a server call to Process.pause.
+// See server.Call for documentation.
+type Process_pause struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_pause) Args() Process_pause_Params {
+	return Process_pause_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_pause) AllocResults() (Process_pause_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(r), err
+}
+
+// Process_resume holds the state for a server call to Process.resume.
+// See server.Call for documentation.
+type Process_resume struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_resume) Args() Process_resume_Params {
+	return Process_resume_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_resume) AllocResults() (Process_resume_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(r), err
 }
 
 // Process_List is a list of Process.
@@ -1210,6 +1312,266 @@ func (f Process_kill_Results_Future) Struct() (Process_kill_Results, error) {
 	return Process_kill_Results(p.Struct()), err
 }
 
+type Process_pause_Params capnp.Struct
+
+// Process_pause_Params_TypeID is the unique identifier for the type Process_pause_Params.
+const Process_pause_Params_TypeID = 0xd22f75df06c187e8
+
+func NewProcess_pause_Params(s *capnp.Segment) (Process_pause_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Params(st), err
+}
+
+func NewRootProcess_pause_Params(s *capnp.Segment) (Process_pause_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Params(st), err
+}
+
+func ReadRootProcess_pause_Params(msg *capnp.Message) (Process_pause_Params, error) {
+	root, err := msg.Root()
+	return Process_pause_Params(root.Struct()), err
+}
+
+func (s Process_pause_Params) String() string {
+	str, _ := text.Marshal(0xd22f75df06c187e8, capnp.Struct(s))
+	return str
+}
+
+func (s Process_pause_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_pause_Params) DecodeFromPtr(p capnp.Ptr) Process_pause_Params {
+	return Process_pause_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_pause_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_pause_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_pause_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_pause_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_pause_Params_List is a list of Process_pause_Params.
+type Process_pause_Params_List = capnp.StructList[Process_pause_Params]
+
+// NewProcess_pause_Params creates a new list of Process_pause_Params.
+func NewProcess_pause_Params_List(s *capnp.Segment, sz int32) (Process_pause_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_pause_Params](l), err
+}
+
+// Process_pause_Params_Future is a wrapper for a Process_pause_Params promised by a client call.
+type Process_pause_Params_Future struct{ *capnp.Future }
+
+func (f Process_pause_Params_Future) Struct() (Process_pause_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_pause_Params(p.Struct()), err
+}
+
+type Process_pause_Results capnp.Struct
+
+// Process_pause_Results_TypeID is the unique identifier for the type Process_pause_Results.
+const Process_pause_Results_TypeID = 0x9d6074459fa0602b
+
+func NewProcess_pause_Results(s *capnp.Segment) (Process_pause_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(st), err
+}
+
+func NewRootProcess_pause_Results(s *capnp.Segment) (Process_pause_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(st), err
+}
+
+func ReadRootProcess_pause_Results(msg *capnp.Message) (Process_pause_Results, error) {
+	root, err := msg.Root()
+	return Process_pause_Results(root.Struct()), err
+}
+
+func (s Process_pause_Results) String() string {
+	str, _ := text.Marshal(0x9d6074459fa0602b, capnp.Struct(s))
+	return str
+}
+
+func (s Process_pause_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_pause_Results) DecodeFromPtr(p capnp.Ptr) Process_pause_Results {
+	return Process_pause_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_pause_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_pause_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_pause_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_pause_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_pause_Results_List is a list of Process_pause_Results.
+type Process_pause_Results_List = capnp.StructList[Process_pause_Results]
+
+// NewProcess_pause_Results creates a new list of Process_pause_Results.
+func NewProcess_pause_Results_List(s *capnp.Segment, sz int32) (Process_pause_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_pause_Results](l), err
+}
+
+// Process_pause_Results_Future is a wrapper for a Process_pause_Results promised by a client call.
+type Process_pause_Results_Future struct{ *capnp.Future }
+
+func (f Process_pause_Results_Future) Struct() (Process_pause_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_pause_Results(p.Struct()), err
+}
+
+type Process_resume_Params capnp.Struct
+
+// Process_resume_Params_TypeID is the unique identifier for the type Process_resume_Params.
+const Process_resume_Params_TypeID = 0x86e3410d1abd406b
+
+func NewProcess_resume_Params(s *capnp.Segment) (Process_resume_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Params(st), err
+}
+
+func NewRootProcess_resume_Params(s *capnp.Segment) (Process_resume_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Params(st), err
+}
+
+func ReadRootProcess_resume_Params(msg *capnp.Message) (Process_resume_Params, error) {
+	root, err := msg.Root()
+	return Process_resume_Params(root.Struct()), err
+}
+
+func (s Process_resume_Params) String() string {
+	str, _ := text.Marshal(0x86e3410d1abd406b, capnp.Struct(s))
+	return str
+}
+
+func (s Process_resume_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_resume_Params) DecodeFromPtr(p capnp.Ptr) Process_resume_Params {
+	return Process_resume_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_resume_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_resume_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_resume_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_resume_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_resume_Params_List is a list of Process_resume_Params.
+type Process_resume_Params_List = capnp.StructList[Process_resume_Params]
+
+// NewProcess_resume_Params creates a new list of Process_resume_Params.
+func NewProcess_resume_Params_List(s *capnp.Segment, sz int32) (Process_resume_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_resume_Params](l), err
+}
+
+// Process_resume_Params_Future is a wrapper for a Process_resume_Params promised by a client call.
+type Process_resume_Params_Future struct{ *capnp.Future }
+
+func (f Process_resume_Params_Future) Struct() (Process_resume_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_resume_Params(p.Struct()), err
+}
+
+type Process_resume_Results capnp.Struct
+
+// Process_resume_Results_TypeID is the unique identifier for the type Process_resume_Results.
+const Process_resume_Results_TypeID = 0xd93c9aa0627bc93c
+
+func NewProcess_resume_Results(s *capnp.Segment) (Process_resume_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(st), err
+}
+
+func NewRootProcess_resume_Results(s *capnp.Segment) (Process_resume_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(st), err
+}
+
+func ReadRootProcess_resume_Results(msg *capnp.Message) (Process_resume_Results, error) {
+	root, err := msg.Root()
+	return Process_resume_Results(root.Struct()), err
+}
+
+func (s Process_resume_Results) String() string {
+	str, _ := text.Marshal(0xd93c9aa0627bc93c, capnp.Struct(s))
+	return str
+}
+
+func (s Process_resume_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_resume_Results) DecodeFromPtr(p capnp.Ptr) Process_resume_Results {
+	return Process_resume_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_resume_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_resume_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_resume_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_resume_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_resume_Results_List is a list of Process_resume_Results.
+type Process_resume_Results_List = capnp.StructList[Process_resume_Results]
+
+// NewProcess_resume_Results creates a new list of Process_resume_Results.
+func NewProcess_resume_Results_List(s *capnp.Segment, sz int32) (Process_resume_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_resume_Results](l), err
+}
+
+// Process_resume_Results_Future is a wrapper for a Process_resume_Results promised by a client call.
+type Process_resume_Results_Future struct{ *capnp.Future }
+
+func (f Process_resume_Results_Future) Struct() (Process_resume_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_resume_Results(p.Struct()), err
+}
+
 type Info capnp.Struct
 
 // Info_TypeID is the unique identifier for the type Info.
@@ -1334,132 +1696,72 @@ func (f Info_Future) Struct() (Info, error) {
 	return Info(p.Struct()), err
 }
 
-type BootContext capnp.Client
+type Events capnp.Client
 
-// BootContext_TypeID is the unique identifier for the type BootContext.
-const BootContext_TypeID = 0xef622b23fee0980e
+// Events_TypeID is the unique identifier for the type Events.
+const Events_TypeID = 0xe9b5ea42655a6266
 
-func (c BootContext) Pid(ctx context.Context, params func(BootContext_pid_Params) error) (BootContext_pid_Results_Future, capnp.ReleaseFunc) {
+func (c Events) Pause(ctx context.Context, params func(Events_pause_Params) error) (Events_pause_Results_Future, capnp.ReleaseFunc) {
 
 	s := capnp.Send{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      0,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "pid",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "pause",
 		},
 	}
 	if params != nil {
 		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_pid_Params(s)) }
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_pause_Params(s)) }
 	}
 
 	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_pid_Results_Future{Future: ans.Future()}, release
+	return Events_pause_Results_Future{Future: ans.Future()}, release
 
 }
 
-func (c BootContext) Cid(ctx context.Context, params func(BootContext_cid_Params) error) (BootContext_cid_Results_Future, capnp.ReleaseFunc) {
+func (c Events) Resume(ctx context.Context, params func(Events_resume_Params) error) (Events_resume_Results_Future, capnp.ReleaseFunc) {
 
 	s := capnp.Send{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      1,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "cid",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "resume",
 		},
 	}
 	if params != nil {
 		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_cid_Params(s)) }
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_resume_Params(s)) }
 	}
 
 	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_cid_Results_Future{Future: ans.Future()}, release
+	return Events_resume_Results_Future{Future: ans.Future()}, release
 
 }
 
-func (c BootContext) Args(ctx context.Context, params func(BootContext_args_Params) error) (BootContext_args_Results_Future, capnp.ReleaseFunc) {
+func (c Events) Stop(ctx context.Context, params func(Events_stop_Params) error) (Events_stop_Results_Future, capnp.ReleaseFunc) {
 
 	s := capnp.Send{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      2,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "args",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "stop",
 		},
 	}
 	if params != nil {
 		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_args_Params(s)) }
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_stop_Params(s)) }
 	}
 
 	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_args_Results_Future{Future: ans.Future()}, release
+	return Events_stop_Results_Future{Future: ans.Future()}, release
 
 }
 
-func (c BootContext) Caps(ctx context.Context, params func(BootContext_caps_Params) error) (BootContext_caps_Results_Future, capnp.ReleaseFunc) {
-
-	s := capnp.Send{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      3,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "caps",
-		},
-	}
-	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_caps_Params(s)) }
-	}
-
-	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_caps_Results_Future{Future: ans.Future()}, release
-
-}
-
-func (c BootContext) SetPid(ctx context.Context, params func(BootContext_setPid_Params) error) (BootContext_setPid_Results_Future, capnp.ReleaseFunc) {
-
-	s := capnp.Send{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      4,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "setPid",
-		},
-	}
-	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_setPid_Params(s)) }
-	}
-
-	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_setPid_Results_Future{Future: ans.Future()}, release
-
-}
-
-func (c BootContext) SetCid(ctx context.Context, params func(BootContext_setCid_Params) error) (BootContext_setCid_Results_Future, capnp.ReleaseFunc) {
-
-	s := capnp.Send{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      5,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "setCid",
-		},
-	}
-	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 1}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(BootContext_setCid_Params(s)) }
-	}
-
-	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return BootContext_setCid_Results_Future{Future: ans.Future()}, release
-
-}
-
-func (c BootContext) WaitStreaming() error {
+func (c Events) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
 
@@ -1467,14 +1769,14 @@ func (c BootContext) WaitStreaming() error {
 // purposes.  Its format should not be depended on: in particular, it
 // should not be used to compare clients.  Use IsSame to compare clients
 // for equality.
-func (c BootContext) String() string {
-	return "BootContext(" + capnp.Client(c).String() + ")"
+func (c Events) String() string {
+	return "Events(" + capnp.Client(c).String() + ")"
 }
 
 // AddRef creates a new Client that refers to the same capability as c.
 // If c is nil or has resolved to null, then AddRef returns nil.
-func (c BootContext) AddRef() BootContext {
-	return BootContext(capnp.Client(c).AddRef())
+func (c Events) AddRef() Events {
+	return Events(capnp.Client(c).AddRef())
 }
 
 // Release releases a capability reference.  If this is the last
@@ -1483,28 +1785,28 @@ func (c BootContext) AddRef() BootContext {
 //
 // Release will panic if c has already been released, but not if c is
 // nil or resolved to null.
-func (c BootContext) Release() {
+func (c Events) Release() {
 	capnp.Client(c).Release()
 }
 
 // Resolve blocks until the capability is fully resolved or the Context
 // expires.
-func (c BootContext) Resolve(ctx context.Context) error {
+func (c Events) Resolve(ctx context.Context) error {
 	return capnp.Client(c).Resolve(ctx)
 }
 
-func (c BootContext) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (c Events) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Client(c).EncodeAsPtr(seg)
 }
 
-func (BootContext) DecodeFromPtr(p capnp.Ptr) BootContext {
-	return BootContext(capnp.Client{}.DecodeFromPtr(p))
+func (Events) DecodeFromPtr(p capnp.Ptr) Events {
+	return Events(capnp.Client{}.DecodeFromPtr(p))
 }
 
 // IsValid reports whether c is a valid reference to a capability.
 // A reference is invalid if it is nil, has resolved to null, or has
 // been released.
-func (c BootContext) IsValid() bool {
+func (c Events) IsValid() bool {
 	return capnp.Client(c).IsValid()
 }
 
@@ -1512,7 +1814,7 @@ func (c BootContext) IsValid() bool {
 // same call to NewClient.  This can return false negatives if c or other
 // are not fully resolved: use Resolve if this is an issue.  If either
 // c or other are released, then IsSame panics.
-func (c BootContext) IsSame(other BootContext) bool {
+func (c Events) IsSame(other Events) bool {
 	return capnp.Client(c).IsSame(capnp.Client(other))
 }
 
@@ -1520,1209 +1822,632 @@ func (c BootContext) IsSame(other BootContext) bool {
 // this client. This affects all future calls, but not calls already
 // waiting to send. Passing nil sets the value to flowcontrol.NopLimiter,
 // which is also the default.
-func (c BootContext) SetFlowLimiter(lim fc.FlowLimiter) {
+func (c Events) SetFlowLimiter(lim fc.FlowLimiter) {
 	capnp.Client(c).SetFlowLimiter(lim)
 }
 
 // Get the current flowcontrol.FlowLimiter used to manage flow control
 // for this client.
-func (c BootContext) GetFlowLimiter() fc.FlowLimiter {
+func (c Events) GetFlowLimiter() fc.FlowLimiter {
 	return capnp.Client(c).GetFlowLimiter()
 }
 
-// A BootContext_Server is a BootContext with a local implementation.
-type BootContext_Server interface {
-	Pid(context.Context, BootContext_pid) error
+// A Events_Server is a Events with a local implementation.
+type Events_Server interface {
+	Pause(context.Context, Events_pause) error
 
-	Cid(context.Context, BootContext_cid) error
+	Resume(context.Context, Events_resume) error
 
-	Args(context.Context, BootContext_args) error
-
-	Caps(context.Context, BootContext_caps) error
-
-	SetPid(context.Context, BootContext_setPid) error
-
-	SetCid(context.Context, BootContext_setCid) error
+	Stop(context.Context, Events_stop) error
 }
 
-// BootContext_NewServer creates a new Server from an implementation of BootContext_Server.
-func BootContext_NewServer(s BootContext_Server) *server.Server {
+// Events_NewServer creates a new Server from an implementation of Events_Server.
+func Events_NewServer(s Events_Server) *server.Server {
 	c, _ := s.(server.Shutdowner)
-	return server.New(BootContext_Methods(nil, s), s, c)
+	return server.New(Events_Methods(nil, s), s, c)
 }
 
-// BootContext_ServerToClient creates a new Client from an implementation of BootContext_Server.
+// Events_ServerToClient creates a new Client from an implementation of Events_Server.
 // The caller is responsible for calling Release on the returned Client.
-func BootContext_ServerToClient(s BootContext_Server) BootContext {
-	return BootContext(capnp.NewClient(BootContext_NewServer(s)))
+func Events_ServerToClient(s Events_Server) Events {
+	return Events(capnp.NewClient(Events_NewServer(s)))
 }
 
-// BootContext_Methods appends Methods to a slice that invoke the methods on s.
+// Events_Methods appends Methods to a slice that invoke the methods on s.
 // This can be used to create a more complicated Server.
-func BootContext_Methods(methods []server.Method, s BootContext_Server) []server.Method {
+func Events_Methods(methods []server.Method, s Events_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 6)
+		methods = make([]server.Method, 0, 3)
 	}
 
 	methods = append(methods, server.Method{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      0,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "pid",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "pause",
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.Pid(ctx, BootContext_pid{call})
+			return s.Pause(ctx, Events_pause{call})
 		},
 	})
 
 	methods = append(methods, server.Method{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      1,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "cid",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "resume",
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.Cid(ctx, BootContext_cid{call})
+			return s.Resume(ctx, Events_resume{call})
 		},
 	})
 
 	methods = append(methods, server.Method{
 		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
+			InterfaceID:   0xe9b5ea42655a6266,
 			MethodID:      2,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "args",
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "stop",
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.Args(ctx, BootContext_args{call})
-		},
-	})
-
-	methods = append(methods, server.Method{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      3,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "caps",
-		},
-		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.Caps(ctx, BootContext_caps{call})
-		},
-	})
-
-	methods = append(methods, server.Method{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      4,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "setPid",
-		},
-		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.SetPid(ctx, BootContext_setPid{call})
-		},
-	})
-
-	methods = append(methods, server.Method{
-		Method: capnp.Method{
-			InterfaceID:   0xef622b23fee0980e,
-			MethodID:      5,
-			InterfaceName: "process.capnp:BootContext",
-			MethodName:    "setCid",
-		},
-		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.SetCid(ctx, BootContext_setCid{call})
+			return s.Stop(ctx, Events_stop{call})
 		},
 	})
 
 	return methods
 }
 
-// BootContext_pid holds the state for a server call to BootContext.pid.
+// Events_pause holds the state for a server call to Events.pause.
 // See server.Call for documentation.
-type BootContext_pid struct {
+type Events_pause struct {
 	*server.Call
 }
 
 // Args returns the call's arguments.
-func (c BootContext_pid) Args() BootContext_pid_Params {
-	return BootContext_pid_Params(c.Call.Args())
+func (c Events_pause) Args() Events_pause_Params {
+	return Events_pause_Params(c.Call.Args())
 }
 
 // AllocResults allocates the results struct.
-func (c BootContext_pid) AllocResults() (BootContext_pid_Results, error) {
-	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 8, PointerCount: 0})
-	return BootContext_pid_Results(r), err
-}
-
-// BootContext_cid holds the state for a server call to BootContext.cid.
-// See server.Call for documentation.
-type BootContext_cid struct {
-	*server.Call
-}
-
-// Args returns the call's arguments.
-func (c BootContext_cid) Args() BootContext_cid_Params {
-	return BootContext_cid_Params(c.Call.Args())
-}
-
-// AllocResults allocates the results struct.
-func (c BootContext_cid) AllocResults() (BootContext_cid_Results, error) {
-	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_cid_Results(r), err
-}
-
-// BootContext_args holds the state for a server call to BootContext.args.
-// See server.Call for documentation.
-type BootContext_args struct {
-	*server.Call
-}
-
-// Args returns the call's arguments.
-func (c BootContext_args) Args() BootContext_args_Params {
-	return BootContext_args_Params(c.Call.Args())
-}
-
-// AllocResults allocates the results struct.
-func (c BootContext_args) AllocResults() (BootContext_args_Results, error) {
-	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_args_Results(r), err
-}
-
-// BootContext_caps holds the state for a server call to BootContext.caps.
-// See server.Call for documentation.
-type BootContext_caps struct {
-	*server.Call
-}
-
-// Args returns the call's arguments.
-func (c BootContext_caps) Args() BootContext_caps_Params {
-	return BootContext_caps_Params(c.Call.Args())
-}
-
-// AllocResults allocates the results struct.
-func (c BootContext_caps) AllocResults() (BootContext_caps_Results, error) {
-	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_caps_Results(r), err
-}
-
-// BootContext_setPid holds the state for a server call to BootContext.setPid.
-// See server.Call for documentation.
-type BootContext_setPid struct {
-	*server.Call
-}
-
-// Args returns the call's arguments.
-func (c BootContext_setPid) Args() BootContext_setPid_Params {
-	return BootContext_setPid_Params(c.Call.Args())
-}
-
-// AllocResults allocates the results struct.
-func (c BootContext_setPid) AllocResults() (BootContext_setPid_Results, error) {
+func (c Events_pause) AllocResults() (Events_pause_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setPid_Results(r), err
+	return Events_pause_Results(r), err
 }
 
-// BootContext_setCid holds the state for a server call to BootContext.setCid.
+// Events_resume holds the state for a server call to Events.resume.
 // See server.Call for documentation.
-type BootContext_setCid struct {
+type Events_resume struct {
 	*server.Call
 }
 
 // Args returns the call's arguments.
-func (c BootContext_setCid) Args() BootContext_setCid_Params {
-	return BootContext_setCid_Params(c.Call.Args())
+func (c Events_resume) Args() Events_resume_Params {
+	return Events_resume_Params(c.Call.Args())
 }
 
 // AllocResults allocates the results struct.
-func (c BootContext_setCid) AllocResults() (BootContext_setCid_Results, error) {
+func (c Events_resume) AllocResults() (Events_resume_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setCid_Results(r), err
+	return Events_resume_Results(r), err
 }
 
-// BootContext_List is a list of BootContext.
-type BootContext_List = capnp.CapList[BootContext]
+// Events_stop holds the state for a server call to Events.stop.
+// See server.Call for documentation.
+type Events_stop struct {
+	*server.Call
+}
 
-// NewBootContext creates a new list of BootContext.
-func NewBootContext_List(s *capnp.Segment, sz int32) (BootContext_List, error) {
+// Args returns the call's arguments.
+func (c Events_stop) Args() Events_stop_Params {
+	return Events_stop_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Events_stop) AllocResults() (Events_stop_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Results(r), err
+}
+
+// Events_List is a list of Events.
+type Events_List = capnp.CapList[Events]
+
+// NewEvents creates a new list of Events.
+func NewEvents_List(s *capnp.Segment, sz int32) (Events_List, error) {
 	l, err := capnp.NewPointerList(s, sz)
-	return capnp.CapList[BootContext](l), err
+	return capnp.CapList[Events](l), err
 }
 
-type BootContext_pid_Params capnp.Struct
+type Events_pause_Params capnp.Struct
 
-// BootContext_pid_Params_TypeID is the unique identifier for the type BootContext_pid_Params.
-const BootContext_pid_Params_TypeID = 0xa7600db255bca0c7
+// Events_pause_Params_TypeID is the unique identifier for the type Events_pause_Params.
+const Events_pause_Params_TypeID = 0xa62fe22feb63d82e
 
-func NewBootContext_pid_Params(s *capnp.Segment) (BootContext_pid_Params, error) {
+func NewEvents_pause_Params(s *capnp.Segment) (Events_pause_Params, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_pid_Params(st), err
+	return Events_pause_Params(st), err
 }
 
-func NewRootBootContext_pid_Params(s *capnp.Segment) (BootContext_pid_Params, error) {
+func NewRootEvents_pause_Params(s *capnp.Segment) (Events_pause_Params, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_pid_Params(st), err
+	return Events_pause_Params(st), err
 }
 
-func ReadRootBootContext_pid_Params(msg *capnp.Message) (BootContext_pid_Params, error) {
+func ReadRootEvents_pause_Params(msg *capnp.Message) (Events_pause_Params, error) {
 	root, err := msg.Root()
-	return BootContext_pid_Params(root.Struct()), err
+	return Events_pause_Params(root.Struct()), err
 }
 
-func (s BootContext_pid_Params) String() string {
-	str, _ := text.Marshal(0xa7600db255bca0c7, capnp.Struct(s))
+func (s Events_pause_Params) String() string {
+	str, _ := text.Marshal(0xa62fe22feb63d82e, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_pid_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_pause_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_pid_Params) DecodeFromPtr(p capnp.Ptr) BootContext_pid_Params {
-	return BootContext_pid_Params(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_pause_Params) DecodeFromPtr(p capnp.Ptr) Events_pause_Params {
+	return Events_pause_Params(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_pid_Params) ToPtr() capnp.Ptr {
+func (s Events_pause_Params) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_pid_Params) IsValid() bool {
+func (s Events_pause_Params) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_pid_Params) Message() *capnp.Message {
+func (s Events_pause_Params) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_pid_Params) Segment() *capnp.Segment {
+func (s Events_pause_Params) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_pid_Params_List is a list of BootContext_pid_Params.
-type BootContext_pid_Params_List = capnp.StructList[BootContext_pid_Params]
+// Events_pause_Params_List is a list of Events_pause_Params.
+type Events_pause_Params_List = capnp.StructList[Events_pause_Params]
 
-// NewBootContext_pid_Params creates a new list of BootContext_pid_Params.
-func NewBootContext_pid_Params_List(s *capnp.Segment, sz int32) (BootContext_pid_Params_List, error) {
+// NewEvents_pause_Params creates a new list of Events_pause_Params.
+func NewEvents_pause_Params_List(s *capnp.Segment, sz int32) (Events_pause_Params_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_pid_Params](l), err
+	return capnp.StructList[Events_pause_Params](l), err
 }
 
-// BootContext_pid_Params_Future is a wrapper for a BootContext_pid_Params promised by a client call.
-type BootContext_pid_Params_Future struct{ *capnp.Future }
+// Events_pause_Params_Future is a wrapper for a Events_pause_Params promised by a client call.
+type Events_pause_Params_Future struct{ *capnp.Future }
 
-func (f BootContext_pid_Params_Future) Struct() (BootContext_pid_Params, error) {
+func (f Events_pause_Params_Future) Struct() (Events_pause_Params, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_pid_Params(p.Struct()), err
+	return Events_pause_Params(p.Struct()), err
 }
 
-type BootContext_pid_Results capnp.Struct
+type Events_pause_Results capnp.Struct
 
-// BootContext_pid_Results_TypeID is the unique identifier for the type BootContext_pid_Results.
-const BootContext_pid_Results_TypeID = 0xe84ba4855da630b6
+// Events_pause_Results_TypeID is the unique identifier for the type Events_pause_Results.
+const Events_pause_Results_TypeID = 0x82f79d7adbdcdd6f
 
-func NewBootContext_pid_Results(s *capnp.Segment) (BootContext_pid_Results, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
-	return BootContext_pid_Results(st), err
-}
-
-func NewRootBootContext_pid_Results(s *capnp.Segment) (BootContext_pid_Results, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
-	return BootContext_pid_Results(st), err
-}
-
-func ReadRootBootContext_pid_Results(msg *capnp.Message) (BootContext_pid_Results, error) {
-	root, err := msg.Root()
-	return BootContext_pid_Results(root.Struct()), err
-}
-
-func (s BootContext_pid_Results) String() string {
-	str, _ := text.Marshal(0xe84ba4855da630b6, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_pid_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_pid_Results) DecodeFromPtr(p capnp.Ptr) BootContext_pid_Results {
-	return BootContext_pid_Results(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_pid_Results) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_pid_Results) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_pid_Results) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_pid_Results) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_pid_Results) Pid() uint32 {
-	return capnp.Struct(s).Uint32(0)
-}
-
-func (s BootContext_pid_Results) SetPid(v uint32) {
-	capnp.Struct(s).SetUint32(0, v)
-}
-
-// BootContext_pid_Results_List is a list of BootContext_pid_Results.
-type BootContext_pid_Results_List = capnp.StructList[BootContext_pid_Results]
-
-// NewBootContext_pid_Results creates a new list of BootContext_pid_Results.
-func NewBootContext_pid_Results_List(s *capnp.Segment, sz int32) (BootContext_pid_Results_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_pid_Results](l), err
-}
-
-// BootContext_pid_Results_Future is a wrapper for a BootContext_pid_Results promised by a client call.
-type BootContext_pid_Results_Future struct{ *capnp.Future }
-
-func (f BootContext_pid_Results_Future) Struct() (BootContext_pid_Results, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_pid_Results(p.Struct()), err
-}
-
-type BootContext_cid_Params capnp.Struct
-
-// BootContext_cid_Params_TypeID is the unique identifier for the type BootContext_cid_Params.
-const BootContext_cid_Params_TypeID = 0x8dbc523bcfdca829
-
-func NewBootContext_cid_Params(s *capnp.Segment) (BootContext_cid_Params, error) {
+func NewEvents_pause_Results(s *capnp.Segment) (Events_pause_Results, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_cid_Params(st), err
+	return Events_pause_Results(st), err
 }
 
-func NewRootBootContext_cid_Params(s *capnp.Segment) (BootContext_cid_Params, error) {
+func NewRootEvents_pause_Results(s *capnp.Segment) (Events_pause_Results, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_cid_Params(st), err
+	return Events_pause_Results(st), err
 }
 
-func ReadRootBootContext_cid_Params(msg *capnp.Message) (BootContext_cid_Params, error) {
+func ReadRootEvents_pause_Results(msg *capnp.Message) (Events_pause_Results, error) {
 	root, err := msg.Root()
-	return BootContext_cid_Params(root.Struct()), err
+	return Events_pause_Results(root.Struct()), err
 }
 
-func (s BootContext_cid_Params) String() string {
-	str, _ := text.Marshal(0x8dbc523bcfdca829, capnp.Struct(s))
+func (s Events_pause_Results) String() string {
+	str, _ := text.Marshal(0x82f79d7adbdcdd6f, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_cid_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_pause_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_cid_Params) DecodeFromPtr(p capnp.Ptr) BootContext_cid_Params {
-	return BootContext_cid_Params(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_pause_Results) DecodeFromPtr(p capnp.Ptr) Events_pause_Results {
+	return Events_pause_Results(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_cid_Params) ToPtr() capnp.Ptr {
+func (s Events_pause_Results) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_cid_Params) IsValid() bool {
+func (s Events_pause_Results) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_cid_Params) Message() *capnp.Message {
+func (s Events_pause_Results) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_cid_Params) Segment() *capnp.Segment {
+func (s Events_pause_Results) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_cid_Params_List is a list of BootContext_cid_Params.
-type BootContext_cid_Params_List = capnp.StructList[BootContext_cid_Params]
+// Events_pause_Results_List is a list of Events_pause_Results.
+type Events_pause_Results_List = capnp.StructList[Events_pause_Results]
 
-// NewBootContext_cid_Params creates a new list of BootContext_cid_Params.
-func NewBootContext_cid_Params_List(s *capnp.Segment, sz int32) (BootContext_cid_Params_List, error) {
+// NewEvents_pause_Results creates a new list of Events_pause_Results.
+func NewEvents_pause_Results_List(s *capnp.Segment, sz int32) (Events_pause_Results_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_cid_Params](l), err
+	return capnp.StructList[Events_pause_Results](l), err
 }
 
-// BootContext_cid_Params_Future is a wrapper for a BootContext_cid_Params promised by a client call.
-type BootContext_cid_Params_Future struct{ *capnp.Future }
+// Events_pause_Results_Future is a wrapper for a Events_pause_Results promised by a client call.
+type Events_pause_Results_Future struct{ *capnp.Future }
 
-func (f BootContext_cid_Params_Future) Struct() (BootContext_cid_Params, error) {
+func (f Events_pause_Results_Future) Struct() (Events_pause_Results, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_cid_Params(p.Struct()), err
+	return Events_pause_Results(p.Struct()), err
 }
 
-type BootContext_cid_Results capnp.Struct
+type Events_resume_Params capnp.Struct
 
-// BootContext_cid_Results_TypeID is the unique identifier for the type BootContext_cid_Results.
-const BootContext_cid_Results_TypeID = 0xda227d43770b4d13
+// Events_resume_Params_TypeID is the unique identifier for the type Events_resume_Params.
+const Events_resume_Params_TypeID = 0xb8521a0e0dcb52d8
 
-func NewBootContext_cid_Results(s *capnp.Segment) (BootContext_cid_Results, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_cid_Results(st), err
-}
-
-func NewRootBootContext_cid_Results(s *capnp.Segment) (BootContext_cid_Results, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_cid_Results(st), err
-}
-
-func ReadRootBootContext_cid_Results(msg *capnp.Message) (BootContext_cid_Results, error) {
-	root, err := msg.Root()
-	return BootContext_cid_Results(root.Struct()), err
-}
-
-func (s BootContext_cid_Results) String() string {
-	str, _ := text.Marshal(0xda227d43770b4d13, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_cid_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_cid_Results) DecodeFromPtr(p capnp.Ptr) BootContext_cid_Results {
-	return BootContext_cid_Results(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_cid_Results) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_cid_Results) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_cid_Results) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_cid_Results) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_cid_Results) Cid() ([]byte, error) {
-	p, err := capnp.Struct(s).Ptr(0)
-	return []byte(p.Data()), err
-}
-
-func (s BootContext_cid_Results) HasCid() bool {
-	return capnp.Struct(s).HasPtr(0)
-}
-
-func (s BootContext_cid_Results) SetCid(v []byte) error {
-	return capnp.Struct(s).SetData(0, v)
-}
-
-// BootContext_cid_Results_List is a list of BootContext_cid_Results.
-type BootContext_cid_Results_List = capnp.StructList[BootContext_cid_Results]
-
-// NewBootContext_cid_Results creates a new list of BootContext_cid_Results.
-func NewBootContext_cid_Results_List(s *capnp.Segment, sz int32) (BootContext_cid_Results_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
-	return capnp.StructList[BootContext_cid_Results](l), err
-}
-
-// BootContext_cid_Results_Future is a wrapper for a BootContext_cid_Results promised by a client call.
-type BootContext_cid_Results_Future struct{ *capnp.Future }
-
-func (f BootContext_cid_Results_Future) Struct() (BootContext_cid_Results, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_cid_Results(p.Struct()), err
-}
-
-type BootContext_args_Params capnp.Struct
-
-// BootContext_args_Params_TypeID is the unique identifier for the type BootContext_args_Params.
-const BootContext_args_Params_TypeID = 0xdd266b5e92d80bb6
-
-func NewBootContext_args_Params(s *capnp.Segment) (BootContext_args_Params, error) {
+func NewEvents_resume_Params(s *capnp.Segment) (Events_resume_Params, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_args_Params(st), err
+	return Events_resume_Params(st), err
 }
 
-func NewRootBootContext_args_Params(s *capnp.Segment) (BootContext_args_Params, error) {
+func NewRootEvents_resume_Params(s *capnp.Segment) (Events_resume_Params, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_args_Params(st), err
+	return Events_resume_Params(st), err
 }
 
-func ReadRootBootContext_args_Params(msg *capnp.Message) (BootContext_args_Params, error) {
+func ReadRootEvents_resume_Params(msg *capnp.Message) (Events_resume_Params, error) {
 	root, err := msg.Root()
-	return BootContext_args_Params(root.Struct()), err
+	return Events_resume_Params(root.Struct()), err
 }
 
-func (s BootContext_args_Params) String() string {
-	str, _ := text.Marshal(0xdd266b5e92d80bb6, capnp.Struct(s))
+func (s Events_resume_Params) String() string {
+	str, _ := text.Marshal(0xb8521a0e0dcb52d8, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_args_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_resume_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_args_Params) DecodeFromPtr(p capnp.Ptr) BootContext_args_Params {
-	return BootContext_args_Params(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_resume_Params) DecodeFromPtr(p capnp.Ptr) Events_resume_Params {
+	return Events_resume_Params(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_args_Params) ToPtr() capnp.Ptr {
+func (s Events_resume_Params) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_args_Params) IsValid() bool {
+func (s Events_resume_Params) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_args_Params) Message() *capnp.Message {
+func (s Events_resume_Params) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_args_Params) Segment() *capnp.Segment {
+func (s Events_resume_Params) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_args_Params_List is a list of BootContext_args_Params.
-type BootContext_args_Params_List = capnp.StructList[BootContext_args_Params]
+// Events_resume_Params_List is a list of Events_resume_Params.
+type Events_resume_Params_List = capnp.StructList[Events_resume_Params]
 
-// NewBootContext_args_Params creates a new list of BootContext_args_Params.
-func NewBootContext_args_Params_List(s *capnp.Segment, sz int32) (BootContext_args_Params_List, error) {
+// NewEvents_resume_Params creates a new list of Events_resume_Params.
+func NewEvents_resume_Params_List(s *capnp.Segment, sz int32) (Events_resume_Params_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_args_Params](l), err
+	return capnp.StructList[Events_resume_Params](l), err
 }
 
-// BootContext_args_Params_Future is a wrapper for a BootContext_args_Params promised by a client call.
-type BootContext_args_Params_Future struct{ *capnp.Future }
+// Events_resume_Params_Future is a wrapper for a Events_resume_Params promised by a client call.
+type Events_resume_Params_Future struct{ *capnp.Future }
 
-func (f BootContext_args_Params_Future) Struct() (BootContext_args_Params, error) {
+func (f Events_resume_Params_Future) Struct() (Events_resume_Params, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_args_Params(p.Struct()), err
+	return Events_resume_Params(p.Struct()), err
 }
 
-type BootContext_args_Results capnp.Struct
+type Events_resume_Results capnp.Struct
 
-// BootContext_args_Results_TypeID is the unique identifier for the type BootContext_args_Results.
-const BootContext_args_Results_TypeID = 0xda9aeb6068ce2f08
+// Events_resume_Results_TypeID is the unique identifier for the type Events_resume_Results.
+const Events_resume_Results_TypeID = 0xe990db10c77bbcb7
 
-func NewBootContext_args_Results(s *capnp.Segment) (BootContext_args_Results, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_args_Results(st), err
-}
-
-func NewRootBootContext_args_Results(s *capnp.Segment) (BootContext_args_Results, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_args_Results(st), err
-}
-
-func ReadRootBootContext_args_Results(msg *capnp.Message) (BootContext_args_Results, error) {
-	root, err := msg.Root()
-	return BootContext_args_Results(root.Struct()), err
-}
-
-func (s BootContext_args_Results) String() string {
-	str, _ := text.Marshal(0xda9aeb6068ce2f08, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_args_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_args_Results) DecodeFromPtr(p capnp.Ptr) BootContext_args_Results {
-	return BootContext_args_Results(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_args_Results) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_args_Results) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_args_Results) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_args_Results) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_args_Results) Args() (capnp.TextList, error) {
-	p, err := capnp.Struct(s).Ptr(0)
-	return capnp.TextList(p.List()), err
-}
-
-func (s BootContext_args_Results) HasArgs() bool {
-	return capnp.Struct(s).HasPtr(0)
-}
-
-func (s BootContext_args_Results) SetArgs(v capnp.TextList) error {
-	return capnp.Struct(s).SetPtr(0, v.ToPtr())
-}
-
-// NewArgs sets the args field to a newly
-// allocated capnp.TextList, preferring placement in s's segment.
-func (s BootContext_args_Results) NewArgs(n int32) (capnp.TextList, error) {
-	l, err := capnp.NewTextList(capnp.Struct(s).Segment(), n)
-	if err != nil {
-		return capnp.TextList{}, err
-	}
-	err = capnp.Struct(s).SetPtr(0, l.ToPtr())
-	return l, err
-}
-
-// BootContext_args_Results_List is a list of BootContext_args_Results.
-type BootContext_args_Results_List = capnp.StructList[BootContext_args_Results]
-
-// NewBootContext_args_Results creates a new list of BootContext_args_Results.
-func NewBootContext_args_Results_List(s *capnp.Segment, sz int32) (BootContext_args_Results_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
-	return capnp.StructList[BootContext_args_Results](l), err
-}
-
-// BootContext_args_Results_Future is a wrapper for a BootContext_args_Results promised by a client call.
-type BootContext_args_Results_Future struct{ *capnp.Future }
-
-func (f BootContext_args_Results_Future) Struct() (BootContext_args_Results, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_args_Results(p.Struct()), err
-}
-
-type BootContext_caps_Params capnp.Struct
-
-// BootContext_caps_Params_TypeID is the unique identifier for the type BootContext_caps_Params.
-const BootContext_caps_Params_TypeID = 0xb4c6412facf739e9
-
-func NewBootContext_caps_Params(s *capnp.Segment) (BootContext_caps_Params, error) {
+func NewEvents_resume_Results(s *capnp.Segment) (Events_resume_Results, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_caps_Params(st), err
+	return Events_resume_Results(st), err
 }
 
-func NewRootBootContext_caps_Params(s *capnp.Segment) (BootContext_caps_Params, error) {
+func NewRootEvents_resume_Results(s *capnp.Segment) (Events_resume_Results, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_caps_Params(st), err
+	return Events_resume_Results(st), err
 }
 
-func ReadRootBootContext_caps_Params(msg *capnp.Message) (BootContext_caps_Params, error) {
+func ReadRootEvents_resume_Results(msg *capnp.Message) (Events_resume_Results, error) {
 	root, err := msg.Root()
-	return BootContext_caps_Params(root.Struct()), err
+	return Events_resume_Results(root.Struct()), err
 }
 
-func (s BootContext_caps_Params) String() string {
-	str, _ := text.Marshal(0xb4c6412facf739e9, capnp.Struct(s))
+func (s Events_resume_Results) String() string {
+	str, _ := text.Marshal(0xe990db10c77bbcb7, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_caps_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_resume_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_caps_Params) DecodeFromPtr(p capnp.Ptr) BootContext_caps_Params {
-	return BootContext_caps_Params(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_resume_Results) DecodeFromPtr(p capnp.Ptr) Events_resume_Results {
+	return Events_resume_Results(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_caps_Params) ToPtr() capnp.Ptr {
+func (s Events_resume_Results) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_caps_Params) IsValid() bool {
+func (s Events_resume_Results) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_caps_Params) Message() *capnp.Message {
+func (s Events_resume_Results) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_caps_Params) Segment() *capnp.Segment {
+func (s Events_resume_Results) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_caps_Params_List is a list of BootContext_caps_Params.
-type BootContext_caps_Params_List = capnp.StructList[BootContext_caps_Params]
+// Events_resume_Results_List is a list of Events_resume_Results.
+type Events_resume_Results_List = capnp.StructList[Events_resume_Results]
 
-// NewBootContext_caps_Params creates a new list of BootContext_caps_Params.
-func NewBootContext_caps_Params_List(s *capnp.Segment, sz int32) (BootContext_caps_Params_List, error) {
+// NewEvents_resume_Results creates a new list of Events_resume_Results.
+func NewEvents_resume_Results_List(s *capnp.Segment, sz int32) (Events_resume_Results_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_caps_Params](l), err
+	return capnp.StructList[Events_resume_Results](l), err
 }
 
-// BootContext_caps_Params_Future is a wrapper for a BootContext_caps_Params promised by a client call.
-type BootContext_caps_Params_Future struct{ *capnp.Future }
+// Events_resume_Results_Future is a wrapper for a Events_resume_Results promised by a client call.
+type Events_resume_Results_Future struct{ *capnp.Future }
 
-func (f BootContext_caps_Params_Future) Struct() (BootContext_caps_Params, error) {
+func (f Events_resume_Results_Future) Struct() (Events_resume_Results, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_caps_Params(p.Struct()), err
+	return Events_resume_Results(p.Struct()), err
 }
 
-type BootContext_caps_Results capnp.Struct
+type Events_stop_Params capnp.Struct
 
-// BootContext_caps_Results_TypeID is the unique identifier for the type BootContext_caps_Results.
-const BootContext_caps_Results_TypeID = 0xccc01fd29eb6c672
+// Events_stop_Params_TypeID is the unique identifier for the type Events_stop_Params.
+const Events_stop_Params_TypeID = 0xfa45ca5ec6290c9f
 
-func NewBootContext_caps_Results(s *capnp.Segment) (BootContext_caps_Results, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_caps_Results(st), err
-}
-
-func NewRootBootContext_caps_Results(s *capnp.Segment) (BootContext_caps_Results, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_caps_Results(st), err
-}
-
-func ReadRootBootContext_caps_Results(msg *capnp.Message) (BootContext_caps_Results, error) {
-	root, err := msg.Root()
-	return BootContext_caps_Results(root.Struct()), err
-}
-
-func (s BootContext_caps_Results) String() string {
-	str, _ := text.Marshal(0xccc01fd29eb6c672, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_caps_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_caps_Results) DecodeFromPtr(p capnp.Ptr) BootContext_caps_Results {
-	return BootContext_caps_Results(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_caps_Results) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_caps_Results) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_caps_Results) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_caps_Results) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_caps_Results) Caps() (capnp.PointerList, error) {
-	p, err := capnp.Struct(s).Ptr(0)
-	return capnp.PointerList(p.List()), err
-}
-
-func (s BootContext_caps_Results) HasCaps() bool {
-	return capnp.Struct(s).HasPtr(0)
-}
-
-func (s BootContext_caps_Results) SetCaps(v capnp.PointerList) error {
-	return capnp.Struct(s).SetPtr(0, v.ToPtr())
-}
-
-// NewCaps sets the caps field to a newly
-// allocated capnp.PointerList, preferring placement in s's segment.
-func (s BootContext_caps_Results) NewCaps(n int32) (capnp.PointerList, error) {
-	l, err := capnp.NewPointerList(capnp.Struct(s).Segment(), n)
-	if err != nil {
-		return capnp.PointerList{}, err
-	}
-	err = capnp.Struct(s).SetPtr(0, l.ToPtr())
-	return l, err
-}
-
-// BootContext_caps_Results_List is a list of BootContext_caps_Results.
-type BootContext_caps_Results_List = capnp.StructList[BootContext_caps_Results]
-
-// NewBootContext_caps_Results creates a new list of BootContext_caps_Results.
-func NewBootContext_caps_Results_List(s *capnp.Segment, sz int32) (BootContext_caps_Results_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
-	return capnp.StructList[BootContext_caps_Results](l), err
-}
-
-// BootContext_caps_Results_Future is a wrapper for a BootContext_caps_Results promised by a client call.
-type BootContext_caps_Results_Future struct{ *capnp.Future }
-
-func (f BootContext_caps_Results_Future) Struct() (BootContext_caps_Results, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_caps_Results(p.Struct()), err
-}
-
-type BootContext_setPid_Params capnp.Struct
-
-// BootContext_setPid_Params_TypeID is the unique identifier for the type BootContext_setPid_Params.
-const BootContext_setPid_Params_TypeID = 0x9a476b9f1a755580
-
-func NewBootContext_setPid_Params(s *capnp.Segment) (BootContext_setPid_Params, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
-	return BootContext_setPid_Params(st), err
-}
-
-func NewRootBootContext_setPid_Params(s *capnp.Segment) (BootContext_setPid_Params, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
-	return BootContext_setPid_Params(st), err
-}
-
-func ReadRootBootContext_setPid_Params(msg *capnp.Message) (BootContext_setPid_Params, error) {
-	root, err := msg.Root()
-	return BootContext_setPid_Params(root.Struct()), err
-}
-
-func (s BootContext_setPid_Params) String() string {
-	str, _ := text.Marshal(0x9a476b9f1a755580, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_setPid_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_setPid_Params) DecodeFromPtr(p capnp.Ptr) BootContext_setPid_Params {
-	return BootContext_setPid_Params(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_setPid_Params) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_setPid_Params) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_setPid_Params) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_setPid_Params) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_setPid_Params) Pid() uint32 {
-	return capnp.Struct(s).Uint32(0)
-}
-
-func (s BootContext_setPid_Params) SetPid(v uint32) {
-	capnp.Struct(s).SetUint32(0, v)
-}
-
-// BootContext_setPid_Params_List is a list of BootContext_setPid_Params.
-type BootContext_setPid_Params_List = capnp.StructList[BootContext_setPid_Params]
-
-// NewBootContext_setPid_Params creates a new list of BootContext_setPid_Params.
-func NewBootContext_setPid_Params_List(s *capnp.Segment, sz int32) (BootContext_setPid_Params_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_setPid_Params](l), err
-}
-
-// BootContext_setPid_Params_Future is a wrapper for a BootContext_setPid_Params promised by a client call.
-type BootContext_setPid_Params_Future struct{ *capnp.Future }
-
-func (f BootContext_setPid_Params_Future) Struct() (BootContext_setPid_Params, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_setPid_Params(p.Struct()), err
-}
-
-type BootContext_setPid_Results capnp.Struct
-
-// BootContext_setPid_Results_TypeID is the unique identifier for the type BootContext_setPid_Results.
-const BootContext_setPid_Results_TypeID = 0xf96299218f4522e8
-
-func NewBootContext_setPid_Results(s *capnp.Segment) (BootContext_setPid_Results, error) {
+func NewEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setPid_Results(st), err
+	return Events_stop_Params(st), err
 }
 
-func NewRootBootContext_setPid_Results(s *capnp.Segment) (BootContext_setPid_Results, error) {
+func NewRootEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setPid_Results(st), err
+	return Events_stop_Params(st), err
 }
 
-func ReadRootBootContext_setPid_Results(msg *capnp.Message) (BootContext_setPid_Results, error) {
+func ReadRootEvents_stop_Params(msg *capnp.Message) (Events_stop_Params, error) {
 	root, err := msg.Root()
-	return BootContext_setPid_Results(root.Struct()), err
+	return Events_stop_Params(root.Struct()), err
 }
 
-func (s BootContext_setPid_Results) String() string {
-	str, _ := text.Marshal(0xf96299218f4522e8, capnp.Struct(s))
+func (s Events_stop_Params) String() string {
+	str, _ := text.Marshal(0xfa45ca5ec6290c9f, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_setPid_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_stop_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_setPid_Results) DecodeFromPtr(p capnp.Ptr) BootContext_setPid_Results {
-	return BootContext_setPid_Results(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_stop_Params) DecodeFromPtr(p capnp.Ptr) Events_stop_Params {
+	return Events_stop_Params(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_setPid_Results) ToPtr() capnp.Ptr {
+func (s Events_stop_Params) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_setPid_Results) IsValid() bool {
+func (s Events_stop_Params) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_setPid_Results) Message() *capnp.Message {
+func (s Events_stop_Params) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_setPid_Results) Segment() *capnp.Segment {
+func (s Events_stop_Params) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_setPid_Results_List is a list of BootContext_setPid_Results.
-type BootContext_setPid_Results_List = capnp.StructList[BootContext_setPid_Results]
+// Events_stop_Params_List is a list of Events_stop_Params.
+type Events_stop_Params_List = capnp.StructList[Events_stop_Params]
 
-// NewBootContext_setPid_Results creates a new list of BootContext_setPid_Results.
-func NewBootContext_setPid_Results_List(s *capnp.Segment, sz int32) (BootContext_setPid_Results_List, error) {
+// NewEvents_stop_Params creates a new list of Events_stop_Params.
+func NewEvents_stop_Params_List(s *capnp.Segment, sz int32) (Events_stop_Params_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_setPid_Results](l), err
+	return capnp.StructList[Events_stop_Params](l), err
 }
 
-// BootContext_setPid_Results_Future is a wrapper for a BootContext_setPid_Results promised by a client call.
-type BootContext_setPid_Results_Future struct{ *capnp.Future }
+// Events_stop_Params_Future is a wrapper for a Events_stop_Params promised by a client call.
+type Events_stop_Params_Future struct{ *capnp.Future }
 
-func (f BootContext_setPid_Results_Future) Struct() (BootContext_setPid_Results, error) {
+func (f Events_stop_Params_Future) Struct() (Events_stop_Params, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_setPid_Results(p.Struct()), err
+	return Events_stop_Params(p.Struct()), err
 }
 
-type BootContext_setCid_Params capnp.Struct
+type Events_stop_Results capnp.Struct
 
-// BootContext_setCid_Params_TypeID is the unique identifier for the type BootContext_setCid_Params.
-const BootContext_setCid_Params_TypeID = 0x97a28cda532de0ff
+// Events_stop_Results_TypeID is the unique identifier for the type Events_stop_Results.
+const Events_stop_Results_TypeID = 0xa66966629ce6e8e9
 
-func NewBootContext_setCid_Params(s *capnp.Segment) (BootContext_setCid_Params, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_setCid_Params(st), err
-}
-
-func NewRootBootContext_setCid_Params(s *capnp.Segment) (BootContext_setCid_Params, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
-	return BootContext_setCid_Params(st), err
-}
-
-func ReadRootBootContext_setCid_Params(msg *capnp.Message) (BootContext_setCid_Params, error) {
-	root, err := msg.Root()
-	return BootContext_setCid_Params(root.Struct()), err
-}
-
-func (s BootContext_setCid_Params) String() string {
-	str, _ := text.Marshal(0x97a28cda532de0ff, capnp.Struct(s))
-	return str
-}
-
-func (s BootContext_setCid_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (BootContext_setCid_Params) DecodeFromPtr(p capnp.Ptr) BootContext_setCid_Params {
-	return BootContext_setCid_Params(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s BootContext_setCid_Params) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s BootContext_setCid_Params) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s BootContext_setCid_Params) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s BootContext_setCid_Params) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-func (s BootContext_setCid_Params) Cid() ([]byte, error) {
-	p, err := capnp.Struct(s).Ptr(0)
-	return []byte(p.Data()), err
-}
-
-func (s BootContext_setCid_Params) HasCid() bool {
-	return capnp.Struct(s).HasPtr(0)
-}
-
-func (s BootContext_setCid_Params) SetCid(v []byte) error {
-	return capnp.Struct(s).SetData(0, v)
-}
-
-// BootContext_setCid_Params_List is a list of BootContext_setCid_Params.
-type BootContext_setCid_Params_List = capnp.StructList[BootContext_setCid_Params]
-
-// NewBootContext_setCid_Params creates a new list of BootContext_setCid_Params.
-func NewBootContext_setCid_Params_List(s *capnp.Segment, sz int32) (BootContext_setCid_Params_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
-	return capnp.StructList[BootContext_setCid_Params](l), err
-}
-
-// BootContext_setCid_Params_Future is a wrapper for a BootContext_setCid_Params promised by a client call.
-type BootContext_setCid_Params_Future struct{ *capnp.Future }
-
-func (f BootContext_setCid_Params_Future) Struct() (BootContext_setCid_Params, error) {
-	p, err := f.Future.Ptr()
-	return BootContext_setCid_Params(p.Struct()), err
-}
-
-type BootContext_setCid_Results capnp.Struct
-
-// BootContext_setCid_Results_TypeID is the unique identifier for the type BootContext_setCid_Results.
-const BootContext_setCid_Results_TypeID = 0xaab0eb92d588b81e
-
-func NewBootContext_setCid_Results(s *capnp.Segment) (BootContext_setCid_Results, error) {
+func NewEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setCid_Results(st), err
+	return Events_stop_Results(st), err
 }
 
-func NewRootBootContext_setCid_Results(s *capnp.Segment) (BootContext_setCid_Results, error) {
+func NewRootEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
 	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return BootContext_setCid_Results(st), err
+	return Events_stop_Results(st), err
 }
 
-func ReadRootBootContext_setCid_Results(msg *capnp.Message) (BootContext_setCid_Results, error) {
+func ReadRootEvents_stop_Results(msg *capnp.Message) (Events_stop_Results, error) {
 	root, err := msg.Root()
-	return BootContext_setCid_Results(root.Struct()), err
+	return Events_stop_Results(root.Struct()), err
 }
 
-func (s BootContext_setCid_Results) String() string {
-	str, _ := text.Marshal(0xaab0eb92d588b81e, capnp.Struct(s))
+func (s Events_stop_Results) String() string {
+	str, _ := text.Marshal(0xa66966629ce6e8e9, capnp.Struct(s))
 	return str
 }
 
-func (s BootContext_setCid_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+func (s Events_stop_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
 	return capnp.Struct(s).EncodeAsPtr(seg)
 }
 
-func (BootContext_setCid_Results) DecodeFromPtr(p capnp.Ptr) BootContext_setCid_Results {
-	return BootContext_setCid_Results(capnp.Struct{}.DecodeFromPtr(p))
+func (Events_stop_Results) DecodeFromPtr(p capnp.Ptr) Events_stop_Results {
+	return Events_stop_Results(capnp.Struct{}.DecodeFromPtr(p))
 }
 
-func (s BootContext_setCid_Results) ToPtr() capnp.Ptr {
+func (s Events_stop_Results) ToPtr() capnp.Ptr {
 	return capnp.Struct(s).ToPtr()
 }
-func (s BootContext_setCid_Results) IsValid() bool {
+func (s Events_stop_Results) IsValid() bool {
 	return capnp.Struct(s).IsValid()
 }
 
-func (s BootContext_setCid_Results) Message() *capnp.Message {
+func (s Events_stop_Results) Message() *capnp.Message {
 	return capnp.Struct(s).Message()
 }
 
-func (s BootContext_setCid_Results) Segment() *capnp.Segment {
+func (s Events_stop_Results) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
 
-// BootContext_setCid_Results_List is a list of BootContext_setCid_Results.
-type BootContext_setCid_Results_List = capnp.StructList[BootContext_setCid_Results]
+// Events_stop_Results_List is a list of Events_stop_Results.
+type Events_stop_Results_List = capnp.StructList[Events_stop_Results]
 
-// NewBootContext_setCid_Results creates a new list of BootContext_setCid_Results.
-func NewBootContext_setCid_Results_List(s *capnp.Segment, sz int32) (BootContext_setCid_Results_List, error) {
+// NewEvents_stop_Results creates a new list of Events_stop_Results.
+func NewEvents_stop_Results_List(s *capnp.Segment, sz int32) (Events_stop_Results_List, error) {
 	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[BootContext_setCid_Results](l), err
+	return capnp.StructList[Events_stop_Results](l), err
 }
 
-// BootContext_setCid_Results_Future is a wrapper for a BootContext_setCid_Results promised by a client call.
-type BootContext_setCid_Results_Future struct{ *capnp.Future }
+// Events_stop_Results_Future is a wrapper for a Events_stop_Results promised by a client call.
+type Events_stop_Results_Future struct{ *capnp.Future }
 
-func (f BootContext_setCid_Results_Future) Struct() (BootContext_setCid_Results, error) {
+func (f Events_stop_Results_Future) Struct() (Events_stop_Results, error) {
 	p, err := f.Future.Ptr()
-	return BootContext_setCid_Results(p.Struct()), err
+	return Events_stop_Results(p.Struct()), err
 }
 
-const schema_9a51e53177277763 = "x\xda\x9cV\x7fhS\xd7\x17?\xe7\xfd\xc8M\xbe\x9a" +
-	"\x86\xdb\x17\xfdjqv\xad\xad\xc3l\xd6V\xd9\x1fv" +
-	"l\xcd\x0c\"u\x13\xf2\x1cel\xa3\xe23}kB" +
-	"k\x13\xf3^\xd6\x0a\x16\x14,\xea\xb0\x8c\xca@[\xdc" +
-	"\xd6\x0d\x9d\xdd\x90\xe1:)\x1b\xc8\x18\x13+\x83\xb1a" +
-	"\xdd\xd8\xd6m\xe0\xdc\x0f,\x057av\x14\xa6\x19\xf7" +
-	"\xbe\xbe\xe7K\x93\x98\xe2?\xe1\xdd\xdc\xcf=\x9fs>" +
-	"\xe7\xdcsn\xfd\x1e1,5\xf8\x9f\xff\x1f\x08j\x8f" +
-	"\xec\xc9\xae\x19\xf9\xe9\xeb'\xb6_\xe8\x07Z\x81\x00\x12" +
-	"\x01\xd8@\xe5\x10\x82\x94\xfd\xf4\xa9\xbaP\xa0|l\x00" +
-	"\xe8\x0a\x04\x90\x91m\xcdJ\x8d\x08\xa8\xa0\xdc\x04\x98\xcd" +
-	"^[\xfb\xdc\xe4\xd1w\x8e[G-@\xad\xbc\x89\x01" +
-	"\xd6r\xc0\xfe\x96L\xc5[\x1d[\x86@\xad@\xdb\xf8" +
-	"6\x0b\xd0\xc2\x01\x97\x87/\xb4\x8c\xfaw\x9eq\x91g" +
-	",\xf2\x95\x1f\x1f\xfe\xf6\xd8\xf4\xb9\xf7];\xad\xf2V" +
-	"\xb6\xf3\xb7h\xbet\xe9\xd6\xf8\xa8\xdb\xadf\xcb\xa8\xca" +
-	"\x8dNm\xfc\xe7\xec\xba\xa7\xc7\xcf\xe7\x18]\xcf\x8e\xb6" +
-	"\xdc=\xd9<\xf2\xff\x17?w\x1fm\x95yD:?" +
-	"\xba\xfa\xd5'\xdf>\xdd\xb4\xe4\"\xa8e(dc\xdd" +
-	"\x8ft7\xfc\xae\x0e\x81,\x10\x00\xa5O\x1eR\xfae" +
-	"v\xe6\x88\\\x89\x80\xd9\x9b\xc7\xbf1F\xe3\x0d\x97\x80" +
-	".\xb5\x89\xde\xf3T0\xa2\xf4\xf8\xd8\x9b\x13\x95\x9f}" +
-	"\xe9Vf\xc0\xc3\x89\x06=\x8c\xe8\xec\x96\xfa\x9a\xe1\xf3" +
-	"\xa1\xef@]\xea(\xf3\x05;\x8b\xca\x15\x0eP\xb6-" +
-	"\xea\x8e\xf4VO\xba-\xdc\xf6\xacg\x80;\x1c\xb0\xc1" +
-	"S;r\xf5\xafU\x93@\xcb\xc4{\x9e\x02*\x0f\x91" +
-	"Q\xa5\x960\x87\xab\xc8!e\x0f\xfb\xcaz\xd7}\x15" +
-	"\xdf9=\x94c\xed\x05\xc2\xfd\xd1\x08\xb36\xb6\xe8\xfb" +
-	"c;:V\xff\xec\xd2l\x80p\xcdL\xf4\xcd\x88\xbf" +
-	"=\xfbG\x1e\xcf^r]\xe9\xe3<\x07\xc8ee\x96" +
-	"\xf3\x8c\xd5\xbf\xdb\xdaw\xea\x99\x1b\xee\x84\xffB\xb8\xd7" +
-	"S\x9cgK\xeb\xbas\xcb?8s\xd3%\x99\xcf[" +
-	"\xcex\xcaN\\\xbb\xbb\xea\xd1]\x7f\xe6\xf1\xdc\"\x13" +
-	"\xca\x1d\xc2\x8b\x8f\x1cBe\xca\xcb\x88\xe2\x9f<\xfc\xef" +
-	"\xd5\xde\x95\xb7\xdd\x99\xbc\xe2\xe5E\xf0\x83\x97\x11\xed\x1b" +
-	"\x99\xce\x9c,\x7f}&\xa7x\xbdV\xf1\xfa\x18 \xb0" +
-	"c\xe6\xe2\xc4c;gA]\xe1\xb8Z\xe5\xe3\x16\xd6" +
-	"p\xc0\x8d\xea\xcd\xafU\x0d\xee\x9auI\xd2\xec\xe3\x15" +
-	"\xf8\xebG?z\xafoM\xcc\xba\x82x\xdcW\x8eP" +
-	"\x9fM\xa5\x931\xdd0\xea\xc4\x98\x96\xeaJ5nJ" +
-	"&\xcdH\xb2\xcb\xd4{\xcc\xbaX\xa2\xad&\xaa\x05\xd2" +
-	"\xdan#\x0f\xb6\xd7\xd4c\xc96=\xa2\xc5\xe2z]" +
-	"*c\xd64E5\x06T%Q\x02\x90\x10\x80\xfa\xb7" +
-	"\x02\xa8\x8bET\x97\x09\x98\xdd5w\x00\x00\xd0\x0f\x02" +
-	"\xfa\x01\x1d\x9bR>\xb5\xa1\x9b\x11\xce\xcel\x82\xdbh" +
-	"5\x80\xea\x15Q\x0d\x0aHb\x89\xb6\x05\x1a\x8b\x966" +
-	"\x96J\xb4\xa1\x17\x04\xf4\xba\x8c\x15\x10%U@\x94\xe2" +
-	"\x01l\xd7\x8dL\xa7i\x00\xe4as\x04l\xd7M\x07" +
-	"\xfa \x0a\x16J\x9e\x962j\xa2\x95Z\xe9\xec\xc55" +
-	"\xa3P\xf6J\x09\x8d\x96\xad\xe6.\xf1\xe5d\x14Q\x0d" +
-	":G{\xd9\xd1\x1e\x11\xd5\x83\x02R\xc4 +Vz" +
-	" \x04\xa0\xee\x13Q=, \x0aA\x14\x00h\x1f\x03" +
-	"\xee\x17Q=* \x151\x88\"\x00=\xc2\x80\x07E" +
-	"T\x87\x05\xa4\x12\x06Q\x02\xa0o\xb0?O\x88\xa8\x9e" +
-	"\xca\xcdT \xe5Z\xb8\xdd\x0ch\xe9\xf6W\xb0\x0c0" +
-	"*\".\x06\x81}\x06\xcc\xc4n\x1de\x10P\xce\xd7" +
-	".:\xb7\xecHtvZ\xb9\x10M\xa3\xa4\xc0\xdb\x9b" +
-	"\xac\xac\xb9\x85\x0b\xcd\x09W#`\x80\x81l/\xca%" +
-	"\x11\x90-\x8aQwk\x09\xd3\xa1.V\x06zO\xc2" +
-	"\x8c\xcc\x95\xc1\x02\xca5\xc6\x8b\xb02\xcf\xc9\x05f7" +
-	"\x9a\xae\xe4k\x96`\xaf(\x038\x9d\x04\xedy@\x1b" +
-	"B \xd0Z\x82\xf7Z%\xdac\x86.g{~\x12" +
-	"`\xa1\x851\xc0\xc4\x0dc\x14\xef\xeb\xb2\x96n/-" +
-	",\x03\xcdKoI\x9b\xf3o\x830\xff6\x90X\\" +
-	"g\x91.\xe6\x91\xda\x8f\x09\xb4;7U\xabA\xa0\x9b" +
-	"Y\xa4v\xafF{\xb4\xd3\x8dlo-A\xc1\x19\xd9" +
-	"h\xf7kZ\xc5\xf6\x96\x10\x92\xca\x98a$\xed:\xfb" +
-	"\x8dkFI%R\x0bH\xde}\xdaVNI\xf3\x0b" +
-	"\x8e\xf9\xc1;th\xb2\xd0\x97\xf1\xd0\xedG\x0e\xda\xd3" +
-	"\x91~\xc8B8\xcdB\xb7__h\xcf{:\xc8\xf6" +
-	"\xfaY\xe8\xf6LF{z\xb3k/\xd0\x0cA\xd1y" +
-	"\xe3\xa0\xfd\xd2\xa0\x09\xb6\xd7JPr^]hO0" +
-	"\xaa6ZR\xcb\xce\x93\x0d\xed\xf7\x15\xdd\xd8\xc8\xa5f" +
-	"\xa1\x87y\xf5\x86\xadz\x08[\xf7-\x8cMV\xc7\xb7" +
-	">\"\xec\xc3-\xb4Tl\x84\x15\xea\xc0\xa5\xee\x89X" +
-	"\xac\x9d?@G\x95\x8au\xe7R\x8e\xc55\x03\x11\x04" +
-	"\xc4\x05\xcd\xc1\xfc\x99T\xa8\x0f\xcd\xd5\xcb\x7f\x01\x00\x00" +
-	"\xff\xff\x93\xe4\x1e\x0d"
+const schema_9a51e53177277763 = "x\xda\xa4Uoh\x1cU\x10\x9fyow_\"\xb9" +
+	"\\_\xf7R5TccTrj\xfe\xb4\xf8!\xa1" +
+	"5\xd7\x94PR\x14n\x03\xfd`\xc5\x92\xcde\x93;" +
+	"\x9a?gv\xaf\xa9\xb6\x05+\xad\x1aQ0\xa0\xa8!" +
+	"\xa1)\x18\x1bE\xc5F\xab\x06\xac\xa0\xa5\x0dU\xfc\xd2" +
+	"\x0a\xb6\xa6\"\xa6Z\x1a\x0b\xc5\x82F*\xe2\xc9\xdb\xbb" +
+	"w\xb7\xc9\xddq\xa2_B\xf6\xe673\xbf\x99y\xf3" +
+	"\x9b\x86\x8b$\xa44\xfa\x8e\x96\x021\xe2\xaa\x96\x1c\xfc" +
+	"\xfe\xe2\xfc\x93\x13\x7f<\x0d\xbc\x02\x01\x14\x06\xb0aV" +
+	"\xa9DP\x92\xbbB'*}\x9b/=\x03|\x8d\xb4" +
+	"\x1cQ\xaa\x85\xe5\xb3\x07\xeb\x82\xfe\xd5\x1f\x8d\x02_\x8b" +
+	"\x00*\x0a\xd3\x88\xd2\x8c\x80\xfa\xa8\xd2\x02\x98\xbc\xb7s" +
+	"\xf2p\x9b\xd39\xe1q=\x9er\xad;\x1f\xb9Z\xbf" +
+	"P\xff\xa6'\xdd\x84\xb2ZX\x16\xaf\\\x1e\xef\xea\x89" +
+	"y-\x87R\x96\xdf\xa8\xf3\xe8\xa9\xeb\xa7g\xbc\xe9\xfa" +
+	"\x95V\x91.\xe1\xa6;\xdf\xf1\x95\xaf\xbc\xb2\xe3\x13\x8f" +
+	"\xeb\xeb\xa9\x1a\xb6\xff=\xde>}\xf3\x8e/\xbc\xae\x07" +
+	"RLG\\\xd7\xbb\x9f\xdftd\xaa\xa5\xe2$\x18\xe5" +
+	"H\x92\x91\xe1{\x86\x1b\x7f6\xc6@%\x0c@\x7fK" +
+	"\x19\xd3\x8f\xb9\xe1\xdeU\xaa\x100y\xed\xd5o\xec\x99" +
+	"h\xe3)O]_\xabn\xa2+\xcf~\xae\xfd\x90\xa8" +
+	"?\xeb\xad8eygkC\xcd\xe4\x87\xc1o\xc1X" +
+	"\x83\x99\x92\x85\x09\xf5)UP\xd8xfo\xd7\xe4\xd8" +
+	"\xc6\x0b\x1e\xd73jP\xb8n\xd0\xee\x9a>\xf7\xeb\x9d" +
+	"\xdf\x01/\xa7Yn\x80\xfa1uF\x9fUSI\x18" +
+	"\xea\xdb5\x06\x90t\xb0t\x89\xfe\xf4\xd0\xe5\x1c\xf4&" +
+	"mAo\x17\x10\xbdM\x9b\xd3O\xb8\xe0\x8f?\xdd;" +
+	"\xb7j\xfe\xa5EO\xcb\xa64wB=];\xac\xd6" +
+	"_\x8e/\xe6\x84yQ{[\x7f\xc5\x0d3\xaa\xcd\xe9" +
+	"\xa5L\x84\xd9\xfaX\xfd\xfb\xb7\xbew\xf4\x9a\x87\xfbu" +
+	"\xcd\x1dZt\xf6\x8e\xbf\xce\xed\xbf\xfdwo\xe7/h" +
+	"\xee\xd0~\xd4D\xd9\xfb\xa6\xaf&\xc6W\xbf\xbc\xe4\x05" +
+	" sGS\xca\x04\xc0\xbfs\xe9\xe4\xd9\xfb:o\x80" +
+	"\xb16\xd3\xb8Z\xe6Fht\x01\x97>\x98/Y\xd8" +
+	"\x16\xbb\xe1In07\xf9\xe1\xb2\xda\xd3;\xbfl\xfb" +
+	"\xd3S]\x13\xbb\x09\xa1!\x19\x1f\x1a\x8cX\xb6]G" +
+	"#f| \xde\xdc\xb6\xdb\x1ap\xec\xba\xb8\x99\xb0\xad" +
+	"\x9a\x0e\xcbN\xf4Q\xc7^\x09\x0a\xa7?\x87,;\xd1" +
+	"o\xd5\x84\xcd!f\xf6\xe7\xa0Z\x9fp\xac\xc8`\xb7" +
+	"\xb5\xc5\x8cD\xad\xbax\xc2\xa9i\x09\x9bCf\xbfm" +
+	"(T\x01P\x10\x80\xfb\xb6\x01\x18e\x14\x8d[\x08&" +
+	"\xbb\xd2\x0e\x00\x80> \xe8\x03,\x949\xcb\x8f\xf5\xe5" +
+	"\xf2[V\x84\x9b\x13\x0balg0\x9e\xaa\xd3\xf1`" +
+	"\x94|\x15\xf4ZN\x1ai\xc3\xff(!\x9d8\xdb;" +
+	"\x93\x16\xeb]\xd4\xb4\xf3\xf5\xae\x1a\xc0(\xa1h\x04\x08" +
+	"\xb2H\xac;'!\xa6b\xb5\x0f\xd0\x9e\xc10\xa2\x11" +
+	"\xc8\xb8\xee\x17\xae{(\x1a\x07\x09r\xc4\x80xN\xfc" +
+	"@\x10\xc0\xd8G\xd1x\x8e \x92\x00\x12\x00~H\x00" +
+	"\x9f\xa2h\xbc@\x90S\x0c \x05\xe0#\x02x\x90\xa2" +
+	"1I\x90+\x18@\x05\x80O\x88\x1f_\xa3h\xbcA" +
+	"\x90\xc5c\xddX\x02\x04K\x00\xfdq\xcf\x87\x97\xa6\xdf" +
+	"\x1c\xea\xdd\x8d\xe5\x80a\x8aX\x06D\xfc\xebwb\xfd" +
+	"\x16\xaa@P-<\xfb]\xb1\xbe\xbe\xa2O3;\xfb" +
+	"<\xdd\x95\xa0a3\xe6d\"\x15\x1a\xa9\xb5'\xe6l" +
+	"I\x8f4]F\x91}\xe8\xb0l\x7f\xc2\xfb,Q\xc2" +
+	"\xaa\xdco1\x8bUT\x05\xc8,,JM\xe4\x8f\x07" +
+	"\x81p\x8b!f\x94\x04\xa5\xc6\xf2G\x84\xeda\x86$" +
+	"#\xae(\xef\x0a\xdf\xbc\x1e\x08\x7f\x80!\xcd\\)\x94" +
+	"2\xcak\x9b\x81\xf0\xdb\x98_\x94\x1bB\xbf\xe8_\x08" +
+	"\xab\xdc\x0e\x85\xb0%E:\x84a\xcc\xd6EV\xbeB" +
+	"\x16\x89Z\x82v\x99K[\x9e;\x94\x9a\xc6\x8dj " +
+	"\xbcM\xd0\x96*\x86\xf2H\xf1&a\xbb_\xd0\x96\xc7" +
+	"\x07\xa5\x92\xf1u\xc2V\xc1X<\xe1\x84\x90\xf5Z\xe2" +
+	"o\xd4\xb4\x97\xb3\xc9\xbb89\xbb\x8f\x12\xe5\x17\xb0," +
+	"Yy`Q\x1evn\xac\x97d\xe5\x9dD\xa9\xfe\xbc" +
+	"\xa9Y\x92\x95\x92\x89\xf2\x0e\xf3uA\x97lN\xe7\xfc" +
+	"BD\xf2R^\xf6dW\x0a\x91RH&\xf3\x89L" +
+	"\xb1]\xa7\x85\x14\xeb?\xe8\x86RH\x83\x8a\x11\x8b\x9a" +
+	"6\"\x10\xc4\xc2+\xe2\xae\xdc\xbf\x90\xe4\x14k\x80\x7f" +
+	"\x02\x00\x00\xff\xfff\x15\xbe\xd2"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
 		String: schema_9a51e53177277763,
 		Nodes: []uint64{
-			0x8dbc523bcfdca829,
+			0x82f79d7adbdcdd6f,
+			0x86e3410d1abd406b,
 			0x91b6120f2a2e3ebe,
-			0x97a28cda532de0ff,
-			0x9a476b9f1a755580,
-			0xa7600db255bca0c7,
-			0xaab0eb92d588b81e,
+			0x9d6074459fa0602b,
+			0xa62fe22feb63d82e,
+			0xa66966629ce6e8e9,
 			0xb2c6f1c55b7403f4,
-			0xb4c6412facf739e9,
+			0xb8521a0e0dcb52d8,
 			0xc25a17a8499cfe55,
 			0xc3153fa5a13d8a26,
 			0xc53168b273d497ee,
-			0xccc01fd29eb6c672,
+			0xd22f75df06c187e8,
 			0xd72ab4a0243047ac,
-			0xda227d43770b4d13,
+			0xd93c9aa0627bc93c,
 			0xda23f0d3a8250633,
-			0xda9aeb6068ce2f08,
-			0xdd266b5e92d80bb6,
 			0xe64ce403f6090174,
-			0xe84ba4855da630b6,
+			0xe990db10c77bbcb7,
+			0xe9b5ea42655a6266,
 			0xeea7ae19b02f5d47,
-			0xef622b23fee0980e,
 			0xf51e7dd3fc20b968,
 			0xf694129c75eba87c,
 			0xf9602cd2c3f65e0f,
-			0xf96299218f4522e8,
 			0xf9694ae208dbb3e3,
+			0xfa45ca5ec6290c9f,
 		},
 		Compressed: true,
 	})
