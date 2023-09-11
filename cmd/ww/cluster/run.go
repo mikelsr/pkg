@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/urfave/cli/v2"
 
 	api "github.com/wetware/pkg/api/core"
-	"github.com/wetware/pkg/auth"
 	"github.com/wetware/pkg/vat"
 )
 
@@ -34,33 +32,21 @@ func runAction() cli.ActionFunc {
 			return err
 		}
 
-		// Set up the wetware client and dial into the cluster.
-		h, err := vat.DialP2P()
-		if err != nil {
-			return err
-		}
-		defer h.Close()
-
-		// Connect to peers.
-		bootstrap, err := newBootstrap(c, h)
-		if err != nil {
-			return fmt.Errorf("discovery: %w", err)
-		}
-		defer bootstrap.Close()
-
-		// Login into the wetware cluster.
-		sess, err = vat.Dialer{
-			Host:    h,
-			Account: auth.SignerFromHost(h),
-		}.DialDiscover(c.Context, bootstrap, c.String("ns"))
-		if err != nil {
-			return err
-		}
-
 		// Prepare argv for the process.
 		args := []string{}
 		if c.Args().Len() > 1 {
 			args = append(args, c.Args().Slice()[1:]...)
+		}
+
+		// Get a session.
+		h, err := vat.DialP2P()
+		if err != nil {
+			return err
+		}
+		sess, close, err := BootstrapSession(c, h)
+		defer close()
+		if err != nil {
+			return err
 		}
 
 		// Run remote process.
