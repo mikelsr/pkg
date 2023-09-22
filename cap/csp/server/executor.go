@@ -233,6 +233,7 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 		killFunc: killFunc,
 		done:     done,
 		cancel:   c.cancel,
+		getProc:  r.getLocalProc,
 	}
 
 	// Register new process.
@@ -241,8 +242,8 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 
 	go func() {
 		defer close(done)
-		defer c.cancel()                // stop the rpc provider
-		defer proc.killFunc(c.args.Pid) // terminate the process
+		defer c.cancel()  // stop the rpc provider
+		defer proc.kill() // terminate the process
 		vs, err := fn.Call(c.ctx)
 
 		done <- execResult{
@@ -341,4 +342,12 @@ func (r Runtime) Ps(ctx context.Context, call core_api.Executor_ps) error {
 		i++
 	}
 	return res.SetProcs(pl)
+}
+
+func (r Runtime) getLocalProc(pid uint32) (*process, bool) {
+	p, ok := r.Tree.Map.Load(pid)
+	if !ok {
+		return nil, ok
+	}
+	return p.(*process), ok
 }
