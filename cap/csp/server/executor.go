@@ -46,10 +46,6 @@ type execArgs interface {
 	Session() (core_api.Session, error)
 }
 
-type execRes interface {
-	SetProcess(v proc_api.Process) error
-}
-
 // Runtime is the main Executor implementation.  It spawns WebAssembly-
 // based processes.  The zero-value Runtime panics.
 type Runtime struct {
@@ -83,7 +79,12 @@ func (r Runtime) Exec(ctx context.Context, call core_api.Executor_exec) error {
 	r.Log.Info("cached bytecode",
 		"cid", cid.Encode(multibase.MustNewEncoder(multibase.Base58BTC)))
 
-	return r.exec(ctx, cid, bc, call.Args(), res)
+	p, err := r.exec(ctx, cid, bc, call.Args())
+	if err != nil {
+		return err
+	}
+
+	return res.SetProcess(p)
 }
 
 func (r Runtime) ExecCached(ctx context.Context, call core_api.Executor_execCached) error {
@@ -106,22 +107,32 @@ func (r Runtime) ExecCached(ctx context.Context, call core_api.Executor_execCach
 		return fmt.Errorf("bytecode for cid %s not found", cid)
 	}
 
-	return r.exec(ctx, cid, bc, call.Args(), res)
-}
+	p, err := r.exec(ctx, cid, bc, call.Args())
 
-func (r Runtime) exec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs, er execRes) error {
-	sess, err := ea.Session()
 	if err != nil {
 		return err
+	}
+
+	return res.SetProcess(p)
+}
+
+func (r Runtime) ExposedExec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs) (proc_api.Process, error) {
+	return r.exec(ctx, id, bc, ea)
+}
+
+func (r Runtime) exec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs) (proc_api.Process, error) {
+	sess, err := ea.Session()
+	if err != nil {
+		return proc_api.Process{}, err
 	}
 
 	argl, err := ea.Args()
 	if err != nil {
-		return err
+		return proc_api.Process{}, err
 	}
 	argv, err := csp.DecodeTextList(argl)
 	if err != nil {
-		return err
+		return proc_api.Process{}, err
 	}
 
 	args := csp.Args{
@@ -151,10 +162,10 @@ func (r Runtime) exec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs, e
 
 	p, err := r.mkproc(ctx, c)
 	if err != nil {
-		return err
+		return proc_api.Process{}, err
 	}
 
-	return er.SetProcess(proc_api.Process_ServerToClient(p))
+	return proc_api.Process_ServerToClient(p), nil
 }
 
 func (r Runtime) mkproc(ctx context.Context, c components) (*process, error) {

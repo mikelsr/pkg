@@ -19,6 +19,7 @@ import (
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
+	core_api "github.com/wetware/pkg/api/core"
 	"github.com/wetware/pkg/auth"
 	"github.com/wetware/pkg/boot"
 	capstore_server "github.com/wetware/pkg/cap/capstore/server"
@@ -42,7 +43,7 @@ type Config struct {
 	RuntimeConfig      wazero.RuntimeConfig
 }
 
-func (conf Config) Serve(ctx context.Context) error {
+func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc chan core_api.Session) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -98,6 +99,10 @@ func (conf Config) Serve(ctx context.Context) error {
 		return err
 	}
 	defer release()
+	s, err := server.NewRootSession()
+	if err != nil {
+		panic(err)
+	}
 
 	logger := system.ErrorReporter{
 		Logger: conf.Logger().With("id", r.ID()),
@@ -106,6 +111,8 @@ func (conf Config) Serve(ctx context.Context) error {
 	logger.Info("wetware started")
 	defer logger.Warn("wetware started")
 
+	sc <- s
+	ec <- e
 	for {
 		opts := &rpc.Options{
 			BootstrapClient: server.Export(),

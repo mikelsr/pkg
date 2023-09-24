@@ -22,6 +22,7 @@ import (
 	"github.com/tetratelabs/wazero/sys"
 	"github.com/urfave/cli/v2"
 
+	"github.com/wetware/pkg/cmd/ww/benchmark"
 	"github.com/wetware/pkg/cmd/ww/cluster"
 	"github.com/wetware/pkg/cmd/ww/ls"
 	"github.com/wetware/pkg/cmd/ww/ps"
@@ -72,6 +73,7 @@ var commands = []*cli.Command{
 	run.Command(),
 	start.Command(),
 	cluster.Command(),
+	benchmark.Command(),
 }
 
 func main() {
