@@ -5,10 +5,10 @@ gen:
 	GOOS=wasip1 GOARCH=wasm go build -o rom/internal/main.wasm rom/internal/main.go
 
 build: gen
-	go build ./cmd/ww
+	go build -buildvcs=false ./cmd/ww
 
 install: gen
-	go install ./cmd/...
+	go install -buildvcs=false ./cmd/...
 
 clean:
 	@rm -f $(GOPATH)/bin/ww
