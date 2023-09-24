@@ -1,0 +1,21 @@
+version: "3"
+services:
+  ww:
+    build: .
+    image: ww-bench:latest
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./:/pkg
+    working_dir: /pkg
+    deploy:
+      resources:
+        limits:
+          cpus: '6.0'
+          memory: 24G
+        reservations:
+          cpus: '4.0'
+          memory: 24G
+
