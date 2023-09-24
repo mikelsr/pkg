@@ -1,4 +1,4 @@
-version: "3"
+version: "2"
 services:
   ww:
     build: .
@@ -10,12 +10,4 @@ services:
     volumes:
       - ./:/pkg
     working_dir: /pkg
-    deploy:
-      resources:
-        limits:
-          cpus: '6.0'
-          memory: 24G
-        reservations:
-          cpus: '4.0'
-          memory: 24G
 
