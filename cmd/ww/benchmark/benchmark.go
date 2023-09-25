@@ -114,9 +114,12 @@ func benchmark(c *cli.Context) error {
 	total := c.Int64("total")
 	yield := c.Int64("yield")
 	iters := c.Int64("iters")
-	if procs <= 0 || total <= 0 || yield <= 0 || iters <= 0 {
+	if procs <= 0 || total <= 0 || yield < 0 || iters <= 0 {
 		return errors.New("empty or invalid procs, total, yield or iters")
 	}
+
+	fmt.Printf(`{"procs": %d, "iters": %d, "total": %d, "yield": %d, "cores": %d}%s`,
+		procs, iters, total, yield, runtime.GOMAXPROCS(0), "\n")
 
 	ec := make(chan csp_server.Runtime, 1)
 	sc := make(chan core_api.Session, 1)
@@ -125,7 +128,6 @@ func benchmark(c *cli.Context) error {
 	executor := <-ec
 	args := execArgs{
 		args: []string{
-			strconv.FormatInt(procs, 10),
 			strconv.FormatInt(total, 10),
 			strconv.FormatInt(yield, 10),
 		},
@@ -175,6 +177,7 @@ func benchmark(c *cli.Context) error {
 	avg_per_iter /= iters
 	fmt.Printf(`{
 		"procs": %d,
+		"iters": %d,
 		"total": %d,
 		"yield": %d,
 		"cores": %d,
@@ -182,7 +185,7 @@ func benchmark(c *cli.Context) error {
 		"avg_ms_per_iter": %d,
 		"total_ms": %d,
 	%s}%s`,
-		procs, total, yield, runtime.GOMAXPROCS(0),
+		procs, iters, total, yield, runtime.GOMAXPROCS(0),
 		avg_per_proc, avg_per_iter, ms_total, "\r", "\n")
 
 	return nil

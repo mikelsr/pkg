@@ -34,7 +34,7 @@ func main() {
 	var x int64
 	for i := int64(0); i < total; i++ {
 		x++
-		if x%yield == 0 {
+		if yield != 0 && x%yield == 0 {
 			// TODO this affecst the Wazero runtime, no the Go runtime
 			runtime.Gosched()
 		}
