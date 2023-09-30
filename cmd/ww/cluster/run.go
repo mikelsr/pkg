@@ -2,13 +2,16 @@ package cluster
 
 import (
 	"context"
+	"errors"
 	"io"
 	"os"
 	"time"
 
+	"capnproto.org/go/capnp/v3"
 	"github.com/urfave/cli/v2"
 
 	api "github.com/wetware/pkg/api/core"
+	"github.com/wetware/pkg/auth"
 	"github.com/wetware/pkg/vat"
 )
 
@@ -49,27 +52,68 @@ func runAction() cli.ActionFunc {
 			return err
 		}
 
-		// Run remote process.
-		proc, release := sess.Exec().Exec(c.Context, api.Session(sess), rom, 0, args...)
+		err, release := exec(c, sess, rom, args...) // exec with nothing cached
 		defer release()
-
-		// Wait for remote process to end.
-		waitChan := make(chan error, 1)
-		go func() {
-			waitChan <- proc.Wait(c.Context)
-		}()
-		select {
-		case err = <-waitChan:
+		if err != nil {
 			return err
-		case <-c.Context.Done():
-			killChan := make(chan error, 1)
-			go func() { killChan <- proc.Kill(context.Background()) }()
-			select {
-			case err = <-killChan:
-				return err
-			case <-time.After(killTimeout):
-				return err
-			}
+		}
+		err, release = exec(c, sess, rom, args...) // exec with bytecode cached
+		defer release()
+		if err != nil {
+			return err
+		}
+		err, release = execCached(c, sess, rom, args...)
+		defer release()
+		return err
+	}
+}
+
+func exec(c *cli.Context, sess auth.Session, rom []byte, args ...string) (error, capnp.ReleaseFunc) {
+	// Run remote process.
+	proc, release := sess.Exec().Exec(c.Context, api.Session(sess), rom, 0, args...)
+	defer release()
+
+	// Wait for remote process to end.
+	waitChan := make(chan error, 1)
+	go func() {
+		waitChan <- proc.Wait(c.Context)
+	}()
+	select {
+	case err := <-waitChan:
+		return err, release
+	case <-c.Context.Done():
+		killChan := make(chan error, 1)
+		go func() { killChan <- proc.Kill(context.Background()) }()
+		select {
+		case err := <-killChan:
+			return err, release
+		case <-time.After(killTimeout):
+			return errors.New("timeout"), release
+		}
+	}
+}
+
+func execCached(c *cli.Context, sess auth.Session, rom []byte, args ...string) (error, capnp.ReleaseFunc) {
+	// Run remote process.
+	proc, release := sess.Exec().Exec(c.Context, api.Session(sess), rom, 0, args...)
+	defer release()
+
+	// Wait for remote process to end.
+	waitChan := make(chan error, 1)
+	go func() {
+		waitChan <- proc.Wait(c.Context)
+	}()
+	select {
+	case err := <-waitChan:
+		return err, release
+	case <-c.Context.Done():
+		killChan := make(chan error, 1)
+		go func() { killChan <- proc.Kill(context.Background()) }()
+		select {
+		case err := <-killChan:
+			return err, release
+		case <-time.After(killTimeout):
+			return errors.New("timeout"), release
 		}
 	}
 }
