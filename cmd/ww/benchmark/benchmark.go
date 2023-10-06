@@ -134,6 +134,12 @@ func benchmark(c *cli.Context) error {
 		sess: session,
 	}
 	cid := executor.Cache.ExposedPut(busy)
+	// Cache the WASM compilation
+	p, err := executor.ExposedExec(c.Context, cid, busy, args)
+	if err != nil {
+		panic(err)
+	}
+	csp.Proc(p).Wait(c.Context)
 
 	ms_per_proc := make([]int64, iters*procs)
 	ms_per_iter := make([]int64, iters)
