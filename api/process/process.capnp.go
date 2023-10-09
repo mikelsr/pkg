@@ -816,6 +816,46 @@ func (c Process) Unlink(ctx context.Context, params func(Process_unlink_Params) 
 
 }
 
+func (c Process) Pause(ctx context.Context, params func(Process_pause_Params) error) (Process_pause_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      4,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "pause",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_pause_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_pause_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Process) Resume(ctx context.Context, params func(Process_resume_Params) error) (Process_resume_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      5,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "resume",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_resume_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_resume_Results_Future{Future: ans.Future()}, release
+
+}
+
 func (c Process) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
@@ -896,6 +936,10 @@ type Process_Server interface {
 	Link(context.Context, Process_link) error
 
 	Unlink(context.Context, Process_unlink) error
+
+	Pause(context.Context, Process_pause) error
+
+	Resume(context.Context, Process_resume) error
 }
 
 // Process_NewServer creates a new Server from an implementation of Process_Server.
@@ -914,7 +958,7 @@ func Process_ServerToClient(s Process_Server) Process {
 // This can be used to create a more complicated Server.
 func Process_Methods(methods []server.Method, s Process_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 4)
+		methods = make([]server.Method, 0, 6)
 	}
 
 	methods = append(methods, server.Method{
@@ -962,6 +1006,30 @@ func Process_Methods(methods []server.Method, s Process_Server) []server.Method 
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
 			return s.Unlink(ctx, Process_unlink{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      4,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "pause",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Pause(ctx, Process_pause{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      5,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "resume",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Resume(ctx, Process_resume{call})
 		},
 	})
 
@@ -1034,6 +1102,40 @@ func (c Process_unlink) Args() Process_unlink_Params {
 func (c Process_unlink) AllocResults() (Process_unlink_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
 	return Process_unlink_Results(r), err
+}
+
+// Process_pause holds the state for a server call to Process.pause.
+// See server.Call for documentation.
+type Process_pause struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_pause) Args() Process_pause_Params {
+	return Process_pause_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_pause) AllocResults() (Process_pause_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(r), err
+}
+
+// Process_resume holds the state for a server call to Process.resume.
+// See server.Call for documentation.
+type Process_resume struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_resume) Args() Process_resume_Params {
+	return Process_resume_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_resume) AllocResults() (Process_resume_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(r), err
 }
 
 // Process_List is a list of Process.
@@ -1586,6 +1688,266 @@ func (f Process_unlink_Results_Future) Struct() (Process_unlink_Results, error) 
 	return Process_unlink_Results(p.Struct()), err
 }
 
+type Process_pause_Params capnp.Struct
+
+// Process_pause_Params_TypeID is the unique identifier for the type Process_pause_Params.
+const Process_pause_Params_TypeID = 0xb72541d950858a60
+
+func NewProcess_pause_Params(s *capnp.Segment) (Process_pause_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Params(st), err
+}
+
+func NewRootProcess_pause_Params(s *capnp.Segment) (Process_pause_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Params(st), err
+}
+
+func ReadRootProcess_pause_Params(msg *capnp.Message) (Process_pause_Params, error) {
+	root, err := msg.Root()
+	return Process_pause_Params(root.Struct()), err
+}
+
+func (s Process_pause_Params) String() string {
+	str, _ := text.Marshal(0xb72541d950858a60, capnp.Struct(s))
+	return str
+}
+
+func (s Process_pause_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_pause_Params) DecodeFromPtr(p capnp.Ptr) Process_pause_Params {
+	return Process_pause_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_pause_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_pause_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_pause_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_pause_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_pause_Params_List is a list of Process_pause_Params.
+type Process_pause_Params_List = capnp.StructList[Process_pause_Params]
+
+// NewProcess_pause_Params creates a new list of Process_pause_Params.
+func NewProcess_pause_Params_List(s *capnp.Segment, sz int32) (Process_pause_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_pause_Params](l), err
+}
+
+// Process_pause_Params_Future is a wrapper for a Process_pause_Params promised by a client call.
+type Process_pause_Params_Future struct{ *capnp.Future }
+
+func (f Process_pause_Params_Future) Struct() (Process_pause_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_pause_Params(p.Struct()), err
+}
+
+type Process_pause_Results capnp.Struct
+
+// Process_pause_Results_TypeID is the unique identifier for the type Process_pause_Results.
+const Process_pause_Results_TypeID = 0xf589dc1668ea3d8f
+
+func NewProcess_pause_Results(s *capnp.Segment) (Process_pause_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(st), err
+}
+
+func NewRootProcess_pause_Results(s *capnp.Segment) (Process_pause_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_pause_Results(st), err
+}
+
+func ReadRootProcess_pause_Results(msg *capnp.Message) (Process_pause_Results, error) {
+	root, err := msg.Root()
+	return Process_pause_Results(root.Struct()), err
+}
+
+func (s Process_pause_Results) String() string {
+	str, _ := text.Marshal(0xf589dc1668ea3d8f, capnp.Struct(s))
+	return str
+}
+
+func (s Process_pause_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_pause_Results) DecodeFromPtr(p capnp.Ptr) Process_pause_Results {
+	return Process_pause_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_pause_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_pause_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_pause_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_pause_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_pause_Results_List is a list of Process_pause_Results.
+type Process_pause_Results_List = capnp.StructList[Process_pause_Results]
+
+// NewProcess_pause_Results creates a new list of Process_pause_Results.
+func NewProcess_pause_Results_List(s *capnp.Segment, sz int32) (Process_pause_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_pause_Results](l), err
+}
+
+// Process_pause_Results_Future is a wrapper for a Process_pause_Results promised by a client call.
+type Process_pause_Results_Future struct{ *capnp.Future }
+
+func (f Process_pause_Results_Future) Struct() (Process_pause_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_pause_Results(p.Struct()), err
+}
+
+type Process_resume_Params capnp.Struct
+
+// Process_resume_Params_TypeID is the unique identifier for the type Process_resume_Params.
+const Process_resume_Params_TypeID = 0xf5c2d7ad2dde5570
+
+func NewProcess_resume_Params(s *capnp.Segment) (Process_resume_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Params(st), err
+}
+
+func NewRootProcess_resume_Params(s *capnp.Segment) (Process_resume_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Params(st), err
+}
+
+func ReadRootProcess_resume_Params(msg *capnp.Message) (Process_resume_Params, error) {
+	root, err := msg.Root()
+	return Process_resume_Params(root.Struct()), err
+}
+
+func (s Process_resume_Params) String() string {
+	str, _ := text.Marshal(0xf5c2d7ad2dde5570, capnp.Struct(s))
+	return str
+}
+
+func (s Process_resume_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_resume_Params) DecodeFromPtr(p capnp.Ptr) Process_resume_Params {
+	return Process_resume_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_resume_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_resume_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_resume_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_resume_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_resume_Params_List is a list of Process_resume_Params.
+type Process_resume_Params_List = capnp.StructList[Process_resume_Params]
+
+// NewProcess_resume_Params creates a new list of Process_resume_Params.
+func NewProcess_resume_Params_List(s *capnp.Segment, sz int32) (Process_resume_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_resume_Params](l), err
+}
+
+// Process_resume_Params_Future is a wrapper for a Process_resume_Params promised by a client call.
+type Process_resume_Params_Future struct{ *capnp.Future }
+
+func (f Process_resume_Params_Future) Struct() (Process_resume_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_resume_Params(p.Struct()), err
+}
+
+type Process_resume_Results capnp.Struct
+
+// Process_resume_Results_TypeID is the unique identifier for the type Process_resume_Results.
+const Process_resume_Results_TypeID = 0xeafb60603769c851
+
+func NewProcess_resume_Results(s *capnp.Segment) (Process_resume_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(st), err
+}
+
+func NewRootProcess_resume_Results(s *capnp.Segment) (Process_resume_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_resume_Results(st), err
+}
+
+func ReadRootProcess_resume_Results(msg *capnp.Message) (Process_resume_Results, error) {
+	root, err := msg.Root()
+	return Process_resume_Results(root.Struct()), err
+}
+
+func (s Process_resume_Results) String() string {
+	str, _ := text.Marshal(0xeafb60603769c851, capnp.Struct(s))
+	return str
+}
+
+func (s Process_resume_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_resume_Results) DecodeFromPtr(p capnp.Ptr) Process_resume_Results {
+	return Process_resume_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_resume_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_resume_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_resume_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_resume_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_resume_Results_List is a list of Process_resume_Results.
+type Process_resume_Results_List = capnp.StructList[Process_resume_Results]
+
+// NewProcess_resume_Results creates a new list of Process_resume_Results.
+func NewProcess_resume_Results_List(s *capnp.Segment, sz int32) (Process_resume_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_resume_Results](l), err
+}
+
+// Process_resume_Results_Future is a wrapper for a Process_resume_Results promised by a client call.
+type Process_resume_Results_Future struct{ *capnp.Future }
+
+func (f Process_resume_Results_Future) Struct() (Process_resume_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_resume_Results(p.Struct()), err
+}
+
 type Info capnp.Struct
 
 // Info_TypeID is the unique identifier for the type Info.
@@ -1710,73 +2072,751 @@ func (f Info_Future) Struct() (Info, error) {
 	return Info(p.Struct()), err
 }
 
-const schema_9a51e53177277763 = "x\xda\xa4T]h\x1cU\x18\xfd\xce\xbd3{#d" +
-	"3\xde\xcc\xa6\xda\xd2\x1a\x1b\xa3\xd2U\xd3\xc4\xe2CB" +
-	"u7-\xa5\xa4(\xec-\xfa\xa0R\xc9t3f\x87" +
-	"\xfc\xad;\xb3\xa6b\x0b\x0a\xadZ\xd1\x87\x82\xa0\x84\x16" +
-	"#(\xe6AE\xe3\x0f\xf8\xa0PK\x95\xbe\xb6\x82T" +
-	"\x1f\x84VE\x11\x8b\x05\x13(\x88+wvg2M" +
-	"6\x06\xe2\xcb\xb2w\xee\xf9\xcew\xee\xf7sz'X" +
-	"\xde\xe8K\xe7\x041\xf5\xb0\x99\xaa\x8d\xe5\xbf\xd8\x94\x1e" +
-	"\xbc\xfc\x02\xa9\x0d\x00\x91!\x88v\x1c\xe3] \xd8\xaf" +
-	"\xf2\x1c\xa1\xf6\xe5\x03=Y\xab\xfd\xb3\x13$7\x83\xc8" +
-	"\x84\x06\xbc\xcf\x074\xe0\xd3\x10p\xd7\xf0\xec\x9b{\x82" +
-	"\xe1S$7D\x04\x17\xf9&\x90Q\xfb\x8b\x07\x8f\x9f" +
-	"\xbd\xfa\xf5|2\xf44\xdf\xa5C\xcf\x85\xa1\x8f\xfcs" +
-	"rh\xee\xa6\xc7\xbeJ\x02\xfe\xa8s/\x84\x80;^" +
-	"\xbe\xff\xadwr\x1dgH\xb5\x81\xd5\x8a\xd3wN\xf7" +
-	"\xfd\xacf\xc8d\x82\xc8\xee0f\xec-a\xbe\x8dF" +
-	"'\x08\xb5+\xaf\x7f\xeb\xcf\x97\xfa\xce&\x94\xf4\x9b\xa1" +
-	"\x92__<\x9d\xfa\xb1\xba\xfd|\xf2\x95[\xcdv\x9d" +
-	"h\x9b\xa9\x13\xbd\xb7\xb7\xb7{\xf6\x93\xecwI\xc0\x90" +
-	"\x8e\x85\xadB\xc0\xces\xcf\x1e\x9c\x9d\xd9y1\xc1]" +
-	"5\xb3\x9a{G\xea\xf6\xb9\x0b\x7f\xde\xf6=\xc96\xbe" +
-	"$\x91`\x1f0\xe7m\xd7\xd4H\xc7\x14\xb0\x91\x12D" +
-	"\xb5\x007,\xf2\x9f\x1e\xfce\x05\xfa7\xf3\x92\xbd\xa0" +
-	"\xd1\xf6U\xf3\x1b\xdb\x0b\xc1{\x0fl\xffp\xe3\x07\xef" +
-	"^I$U\xa9v\x9d\xb4\xf4\xf9\xad\x7f_8r\xcb" +
-	"B\xb2r\xfd\xa9\xb0\xb4\x83)\xad\xf7\xf0\xdc\xef\xd5\x93" +
-	"\xed\xaf-&\x01N*,\xad\x17\x02\xac'\x16\xcf\x9c" +
-	"\xbf{\xf8\x1a\xa9\xcd\xf1\x8b\x8f\xd7\x19N\x84\x80\xcb\x1f" +
-	"\xff\xd0ri\x9fw-\x91\xfc#\x9d\xbc\xb7V\xaeL" +
-	"\x15]\xdf\xef\xe1E\xa7<Y\x1e(4\x8e\xd5\xc9q" +
-	"or\xac\xbb\xe0T\x843\xe1+\x83\x1bD\x06\x88d" +
-	"\xfa^\"\xd5\xc2\xa12\x0c\x9dSA\xc9\xad\xa0\x85\x18" +
-	"Z\x08\xcb\xa9v=\x13\xb8\xc5\xa9\x11w\xb7S,\xb9" +
-	"=\xe5j\xd0\x9d+8\x95el\xfb\x88T+\x87\xba" +
-	"\x99\xa1v\xb0\x11@DH\x13Cz%g$/\x14" +
-	"\xb7\xdf\xf5\xab\xe3<\xf0c\x90\xd1,\xf1\xa8\x1b\xd4\x91" +
-	"\x81O\xff#\xf3\xf5\xa4%\xc7o\xf6\x9a\xae\xa5\xda\x88" +
-	"\xa27\xb2\x82\x0bu\xae\xa1I\xfe\xe4T\x01P\x998" +
-	"\xf4\x88\x0e=\xc4\xa1\x8e2H \xa3\xdb(\x9f\xcf\x12" +
-	"\xa9\xc3\x1c\xea%\x06\xb0\x0c\x18\x91<\xa6\x81\xcfq\xa8" +
-	"W\x18$G\x06\x9cH\x1e\xd7\xc0\xa3\x1cj\x96A\x1a" +
-	"\xc8\xc0 \x92\xa7\xf4\xc778\xd4\xdb\x0c\xa2\xec\x8dD" +
-	"}\xb2\xca\x89CR\xa6\xe5TF\x9fF\x1b\xa1\xc0\x81" +
-	"Vb\xfa\xaf\x15x\x13.Lb0W\xef\xc6\x987" +
-	">\xbe\xb2\x1b\xcdZ\x16\x96\x0c\xeb\x9b\xa7\x88h\xda\xf1" +
-	"\x828\xdbj\x1du\x0fy\xc1\xeeFG\xd7\xe0k\x8c" +
-	"\xfa~\xd7\xb7\xf4\x90,oV\xa1\xd2\x19\x9eu\xbfn" +
-	"\xe4&Q\xbcL\x88\x8cF>\x95%&]\x01\xc4[" +
-	"\x8e\xc8\xbf\xe4\xa3\xfa\xee!\x01\x16\x1b\x17\"\x97\x95\x83" +
-	"\xfa\xee>\x01\x1e[7\"o\x92\xdb\x06\x88\xc9-\xc2" +
-	"\xd2\xcf\xcd\xc3\xd25\xce\xc3\xd2R\xf3\xc8\xd55\xe7Q" +
-	"\xc0\xd2\xb3\xd8\xf2A\x15\xc5\x92\xabU\xb7\x86\xaa#\xef" +
-	"Gd7Ru\x11\x93{\xb4\xea\xc8`\x10\xb9\xbc\xec" +
-	"\xd7w\xf7h\xd5\x91\xaf#2\x19\xb9U\xdfu\x08Q" +
-	"\xae\x06y\x88QW\xff\x96\x1c\xffz5\xcdF\xa4\xd1" +
-	"\xfd\xff\xdeWm\x14\xcd\xf6u\xad\xdd\xe2\xab-\xff:" +
-	"\xf6\xd4Xm\xe7\xd7\x12Vr|\x80\x18\xb0\xc6\xf86" +
-	"*\xf1o\x00\x00\x00\xff\xff\x85\x11\x08\x19"
+type Events capnp.Client
+
+// Events_TypeID is the unique identifier for the type Events.
+const Events_TypeID = 0xe9b5ea42655a6266
+
+func (c Events) Pause(ctx context.Context, params func(Events_pause_Params) error) (Events_pause_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      0,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "pause",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_pause_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Events_pause_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Events) Resume(ctx context.Context, params func(Events_resume_Params) error) (Events_resume_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      1,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "resume",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_resume_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Events_resume_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Events) Stop(ctx context.Context, params func(Events_stop_Params) error) (Events_stop_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      2,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "stop",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_stop_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Events_stop_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Events) WaitStreaming() error {
+	return capnp.Client(c).WaitStreaming()
+}
+
+// String returns a string that identifies this capability for debugging
+// purposes.  Its format should not be depended on: in particular, it
+// should not be used to compare clients.  Use IsSame to compare clients
+// for equality.
+func (c Events) String() string {
+	return "Events(" + capnp.Client(c).String() + ")"
+}
+
+// AddRef creates a new Client that refers to the same capability as c.
+// If c is nil or has resolved to null, then AddRef returns nil.
+func (c Events) AddRef() Events {
+	return Events(capnp.Client(c).AddRef())
+}
+
+// Release releases a capability reference.  If this is the last
+// reference to the capability, then the underlying resources associated
+// with the capability will be released.
+//
+// Release will panic if c has already been released, but not if c is
+// nil or resolved to null.
+func (c Events) Release() {
+	capnp.Client(c).Release()
+}
+
+// Resolve blocks until the capability is fully resolved or the Context
+// expires.
+func (c Events) Resolve(ctx context.Context) error {
+	return capnp.Client(c).Resolve(ctx)
+}
+
+func (c Events) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Client(c).EncodeAsPtr(seg)
+}
+
+func (Events) DecodeFromPtr(p capnp.Ptr) Events {
+	return Events(capnp.Client{}.DecodeFromPtr(p))
+}
+
+// IsValid reports whether c is a valid reference to a capability.
+// A reference is invalid if it is nil, has resolved to null, or has
+// been released.
+func (c Events) IsValid() bool {
+	return capnp.Client(c).IsValid()
+}
+
+// IsSame reports whether c and other refer to a capability created by the
+// same call to NewClient.  This can return false negatives if c or other
+// are not fully resolved: use Resolve if this is an issue.  If either
+// c or other are released, then IsSame panics.
+func (c Events) IsSame(other Events) bool {
+	return capnp.Client(c).IsSame(capnp.Client(other))
+}
+
+// Update the flowcontrol.FlowLimiter used to manage flow control for
+// this client. This affects all future calls, but not calls already
+// waiting to send. Passing nil sets the value to flowcontrol.NopLimiter,
+// which is also the default.
+func (c Events) SetFlowLimiter(lim fc.FlowLimiter) {
+	capnp.Client(c).SetFlowLimiter(lim)
+}
+
+// Get the current flowcontrol.FlowLimiter used to manage flow control
+// for this client.
+func (c Events) GetFlowLimiter() fc.FlowLimiter {
+	return capnp.Client(c).GetFlowLimiter()
+}
+
+// A Events_Server is a Events with a local implementation.
+type Events_Server interface {
+	Pause(context.Context, Events_pause) error
+
+	Resume(context.Context, Events_resume) error
+
+	Stop(context.Context, Events_stop) error
+}
+
+// Events_NewServer creates a new Server from an implementation of Events_Server.
+func Events_NewServer(s Events_Server) *server.Server {
+	c, _ := s.(server.Shutdowner)
+	return server.New(Events_Methods(nil, s), s, c)
+}
+
+// Events_ServerToClient creates a new Client from an implementation of Events_Server.
+// The caller is responsible for calling Release on the returned Client.
+func Events_ServerToClient(s Events_Server) Events {
+	return Events(capnp.NewClient(Events_NewServer(s)))
+}
+
+// Events_Methods appends Methods to a slice that invoke the methods on s.
+// This can be used to create a more complicated Server.
+func Events_Methods(methods []server.Method, s Events_Server) []server.Method {
+	if cap(methods) == 0 {
+		methods = make([]server.Method, 0, 3)
+	}
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      0,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "pause",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Pause(ctx, Events_pause{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      1,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "resume",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Resume(ctx, Events_resume{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xe9b5ea42655a6266,
+			MethodID:      2,
+			InterfaceName: "process.capnp:Events",
+			MethodName:    "stop",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Stop(ctx, Events_stop{call})
+		},
+	})
+
+	return methods
+}
+
+// Events_pause holds the state for a server call to Events.pause.
+// See server.Call for documentation.
+type Events_pause struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Events_pause) Args() Events_pause_Params {
+	return Events_pause_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Events_pause) AllocResults() (Events_pause_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_pause_Results(r), err
+}
+
+// Events_resume holds the state for a server call to Events.resume.
+// See server.Call for documentation.
+type Events_resume struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Events_resume) Args() Events_resume_Params {
+	return Events_resume_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Events_resume) AllocResults() (Events_resume_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_resume_Results(r), err
+}
+
+// Events_stop holds the state for a server call to Events.stop.
+// See server.Call for documentation.
+type Events_stop struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Events_stop) Args() Events_stop_Params {
+	return Events_stop_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Events_stop) AllocResults() (Events_stop_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Results(r), err
+}
+
+// Events_List is a list of Events.
+type Events_List = capnp.CapList[Events]
+
+// NewEvents creates a new list of Events.
+func NewEvents_List(s *capnp.Segment, sz int32) (Events_List, error) {
+	l, err := capnp.NewPointerList(s, sz)
+	return capnp.CapList[Events](l), err
+}
+
+type Events_pause_Params capnp.Struct
+
+// Events_pause_Params_TypeID is the unique identifier for the type Events_pause_Params.
+const Events_pause_Params_TypeID = 0xa62fe22feb63d82e
+
+func NewEvents_pause_Params(s *capnp.Segment) (Events_pause_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_pause_Params(st), err
+}
+
+func NewRootEvents_pause_Params(s *capnp.Segment) (Events_pause_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_pause_Params(st), err
+}
+
+func ReadRootEvents_pause_Params(msg *capnp.Message) (Events_pause_Params, error) {
+	root, err := msg.Root()
+	return Events_pause_Params(root.Struct()), err
+}
+
+func (s Events_pause_Params) String() string {
+	str, _ := text.Marshal(0xa62fe22feb63d82e, capnp.Struct(s))
+	return str
+}
+
+func (s Events_pause_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_pause_Params) DecodeFromPtr(p capnp.Ptr) Events_pause_Params {
+	return Events_pause_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_pause_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_pause_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_pause_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_pause_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_pause_Params_List is a list of Events_pause_Params.
+type Events_pause_Params_List = capnp.StructList[Events_pause_Params]
+
+// NewEvents_pause_Params creates a new list of Events_pause_Params.
+func NewEvents_pause_Params_List(s *capnp.Segment, sz int32) (Events_pause_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_pause_Params](l), err
+}
+
+// Events_pause_Params_Future is a wrapper for a Events_pause_Params promised by a client call.
+type Events_pause_Params_Future struct{ *capnp.Future }
+
+func (f Events_pause_Params_Future) Struct() (Events_pause_Params, error) {
+	p, err := f.Future.Ptr()
+	return Events_pause_Params(p.Struct()), err
+}
+
+type Events_pause_Results capnp.Struct
+
+// Events_pause_Results_TypeID is the unique identifier for the type Events_pause_Results.
+const Events_pause_Results_TypeID = 0x82f79d7adbdcdd6f
+
+func NewEvents_pause_Results(s *capnp.Segment) (Events_pause_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_pause_Results(st), err
+}
+
+func NewRootEvents_pause_Results(s *capnp.Segment) (Events_pause_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_pause_Results(st), err
+}
+
+func ReadRootEvents_pause_Results(msg *capnp.Message) (Events_pause_Results, error) {
+	root, err := msg.Root()
+	return Events_pause_Results(root.Struct()), err
+}
+
+func (s Events_pause_Results) String() string {
+	str, _ := text.Marshal(0x82f79d7adbdcdd6f, capnp.Struct(s))
+	return str
+}
+
+func (s Events_pause_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_pause_Results) DecodeFromPtr(p capnp.Ptr) Events_pause_Results {
+	return Events_pause_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_pause_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_pause_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_pause_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_pause_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_pause_Results_List is a list of Events_pause_Results.
+type Events_pause_Results_List = capnp.StructList[Events_pause_Results]
+
+// NewEvents_pause_Results creates a new list of Events_pause_Results.
+func NewEvents_pause_Results_List(s *capnp.Segment, sz int32) (Events_pause_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_pause_Results](l), err
+}
+
+// Events_pause_Results_Future is a wrapper for a Events_pause_Results promised by a client call.
+type Events_pause_Results_Future struct{ *capnp.Future }
+
+func (f Events_pause_Results_Future) Struct() (Events_pause_Results, error) {
+	p, err := f.Future.Ptr()
+	return Events_pause_Results(p.Struct()), err
+}
+
+type Events_resume_Params capnp.Struct
+
+// Events_resume_Params_TypeID is the unique identifier for the type Events_resume_Params.
+const Events_resume_Params_TypeID = 0xb8521a0e0dcb52d8
+
+func NewEvents_resume_Params(s *capnp.Segment) (Events_resume_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_resume_Params(st), err
+}
+
+func NewRootEvents_resume_Params(s *capnp.Segment) (Events_resume_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_resume_Params(st), err
+}
+
+func ReadRootEvents_resume_Params(msg *capnp.Message) (Events_resume_Params, error) {
+	root, err := msg.Root()
+	return Events_resume_Params(root.Struct()), err
+}
+
+func (s Events_resume_Params) String() string {
+	str, _ := text.Marshal(0xb8521a0e0dcb52d8, capnp.Struct(s))
+	return str
+}
+
+func (s Events_resume_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_resume_Params) DecodeFromPtr(p capnp.Ptr) Events_resume_Params {
+	return Events_resume_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_resume_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_resume_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_resume_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_resume_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_resume_Params_List is a list of Events_resume_Params.
+type Events_resume_Params_List = capnp.StructList[Events_resume_Params]
+
+// NewEvents_resume_Params creates a new list of Events_resume_Params.
+func NewEvents_resume_Params_List(s *capnp.Segment, sz int32) (Events_resume_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_resume_Params](l), err
+}
+
+// Events_resume_Params_Future is a wrapper for a Events_resume_Params promised by a client call.
+type Events_resume_Params_Future struct{ *capnp.Future }
+
+func (f Events_resume_Params_Future) Struct() (Events_resume_Params, error) {
+	p, err := f.Future.Ptr()
+	return Events_resume_Params(p.Struct()), err
+}
+
+type Events_resume_Results capnp.Struct
+
+// Events_resume_Results_TypeID is the unique identifier for the type Events_resume_Results.
+const Events_resume_Results_TypeID = 0xe990db10c77bbcb7
+
+func NewEvents_resume_Results(s *capnp.Segment) (Events_resume_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_resume_Results(st), err
+}
+
+func NewRootEvents_resume_Results(s *capnp.Segment) (Events_resume_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_resume_Results(st), err
+}
+
+func ReadRootEvents_resume_Results(msg *capnp.Message) (Events_resume_Results, error) {
+	root, err := msg.Root()
+	return Events_resume_Results(root.Struct()), err
+}
+
+func (s Events_resume_Results) String() string {
+	str, _ := text.Marshal(0xe990db10c77bbcb7, capnp.Struct(s))
+	return str
+}
+
+func (s Events_resume_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_resume_Results) DecodeFromPtr(p capnp.Ptr) Events_resume_Results {
+	return Events_resume_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_resume_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_resume_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_resume_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_resume_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_resume_Results_List is a list of Events_resume_Results.
+type Events_resume_Results_List = capnp.StructList[Events_resume_Results]
+
+// NewEvents_resume_Results creates a new list of Events_resume_Results.
+func NewEvents_resume_Results_List(s *capnp.Segment, sz int32) (Events_resume_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_resume_Results](l), err
+}
+
+// Events_resume_Results_Future is a wrapper for a Events_resume_Results promised by a client call.
+type Events_resume_Results_Future struct{ *capnp.Future }
+
+func (f Events_resume_Results_Future) Struct() (Events_resume_Results, error) {
+	p, err := f.Future.Ptr()
+	return Events_resume_Results(p.Struct()), err
+}
+
+type Events_stop_Params capnp.Struct
+
+// Events_stop_Params_TypeID is the unique identifier for the type Events_stop_Params.
+const Events_stop_Params_TypeID = 0xfa45ca5ec6290c9f
+
+func NewEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Params(st), err
+}
+
+func NewRootEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Params(st), err
+}
+
+func ReadRootEvents_stop_Params(msg *capnp.Message) (Events_stop_Params, error) {
+	root, err := msg.Root()
+	return Events_stop_Params(root.Struct()), err
+}
+
+func (s Events_stop_Params) String() string {
+	str, _ := text.Marshal(0xfa45ca5ec6290c9f, capnp.Struct(s))
+	return str
+}
+
+func (s Events_stop_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_stop_Params) DecodeFromPtr(p capnp.Ptr) Events_stop_Params {
+	return Events_stop_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_stop_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_stop_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_stop_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_stop_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_stop_Params_List is a list of Events_stop_Params.
+type Events_stop_Params_List = capnp.StructList[Events_stop_Params]
+
+// NewEvents_stop_Params creates a new list of Events_stop_Params.
+func NewEvents_stop_Params_List(s *capnp.Segment, sz int32) (Events_stop_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_stop_Params](l), err
+}
+
+// Events_stop_Params_Future is a wrapper for a Events_stop_Params promised by a client call.
+type Events_stop_Params_Future struct{ *capnp.Future }
+
+func (f Events_stop_Params_Future) Struct() (Events_stop_Params, error) {
+	p, err := f.Future.Ptr()
+	return Events_stop_Params(p.Struct()), err
+}
+
+type Events_stop_Results capnp.Struct
+
+// Events_stop_Results_TypeID is the unique identifier for the type Events_stop_Results.
+const Events_stop_Results_TypeID = 0xa66966629ce6e8e9
+
+func NewEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Results(st), err
+}
+
+func NewRootEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Events_stop_Results(st), err
+}
+
+func ReadRootEvents_stop_Results(msg *capnp.Message) (Events_stop_Results, error) {
+	root, err := msg.Root()
+	return Events_stop_Results(root.Struct()), err
+}
+
+func (s Events_stop_Results) String() string {
+	str, _ := text.Marshal(0xa66966629ce6e8e9, capnp.Struct(s))
+	return str
+}
+
+func (s Events_stop_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Events_stop_Results) DecodeFromPtr(p capnp.Ptr) Events_stop_Results {
+	return Events_stop_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Events_stop_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Events_stop_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Events_stop_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Events_stop_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Events_stop_Results_List is a list of Events_stop_Results.
+type Events_stop_Results_List = capnp.StructList[Events_stop_Results]
+
+// NewEvents_stop_Results creates a new list of Events_stop_Results.
+func NewEvents_stop_Results_List(s *capnp.Segment, sz int32) (Events_stop_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Events_stop_Results](l), err
+}
+
+// Events_stop_Results_Future is a wrapper for a Events_stop_Results promised by a client call.
+type Events_stop_Results_Future struct{ *capnp.Future }
+
+func (f Events_stop_Results_Future) Struct() (Events_stop_Results, error) {
+	p, err := f.Future.Ptr()
+	return Events_stop_Results(p.Struct()), err
+}
+
+const schema_9a51e53177277763 = "x\xda\xacV]l\x14U\x14>\xe7\xce\xcc\xce\xa8\xdd" +
+	"\xae\xb7\xb3 \x12b\xa5\x16\x0d\xab\xb4\x14\x1e\x0c\x04\xec" +
+	"\x02i\x08\xc4\x87\x9d&<\x14\x03\xd9\xe92\xb0\x13\xda" +
+	"\xee\xb23\xdb\x82@B\x0d\x15Kl\xd4D\xa36m" +
+	"\xa8\x89\xd5\xc6\x88\x91*\xa2\x895\x11\x02\x15\x8d\x0f\x82" +
+	"\x09`QcQBKB4\xb15\xf5o\xcd\x9d\xd9" +
+	"\x99\x9d\xee\x8f5\xc4\x97\xa6\xb3\xe7\xdc\xef|\xe7\xe7~" +
+	"\xe7.\x8fpa\xbe\xce/\xde\x05D9$\xf82\x89" +
+	"o\xaf\x8e=\xd9\xff\xdbS@\xe7!\x00/\x02\xac\xd4" +
+	"\x85\x85\x08|fwxd\xa1\x7f\xdd\xb5\xa7A\x99\x8f" +
+	"\x8eI\x11\xaa\x10Pn\x12\xea\x013\x9f<V\x13\x0a" +
+	"T|\xf0\x02\xd0E\x08  s\xd8'\xacf\x0e\x9d" +
+	"\x96\xc3\xc3\xd1\x81c\x0df\xb4\x1f\xe8|\x07`\xd0\xc6" +
+	"\xae\xb9\x1c\xbbY;^\xfb\x86'j\x8fP\xc1,\x13" +
+	"7\xae\xf75\xef\xd4\xbd\x96\xb4m\xf9\x953\x9f8\xfb" +
+	"\xcb\xb9ao\xb8m\xc2z\x16N\xb3\xc2E\x8fvE" +
+	"\xae\xac[r\xca\x13\xae\xdb\x0ew\xb9\xf1\x0b\x7f\xf9\xc2" +
+	"\xc6\x0f=\xa0{l\xcb\x96\xbf\xfb6\x0d\xdd\xb3\xf5\xb4" +
+	"\x17\xb4\xc9\xceA\xb5@\x1f<\xba\xf6\xb5\xc1\xfayg" +
+	"@)G\x92\x89u<\xd4Q\xf7\x93\xd2\x0b\x02\x11\x01" +
+	"\xe4N\xa1W\xee\x16\xd8\x99.\xa1\x12\x013\xb7^\xfe" +
+	"\xda\x18\x8e\xd7\x9d\xf5f\xec\xb3\x02\xdd8\xf2\xa9\xef\xfb" +
+	"t\xed\x05o5{|\x15,\xd0K>\x16\xe8\xed\x8d" +
+	"\xcb\xab\x07\xde\x0f]\xf2:\x9cdgQ\x1e\xb1\x1c\xd6" +
+	"\x9c\xdf\xdf<\xd0\xbb\xe6\x8a\x07\xfb\x07_\x88a\xaf\xf4" +
+	"-\x19\xba\xf8\xf3\x03\xdf\x00-\xe7r\x14\x01\xe5\xf3\xbe" +
+	"a\xf9+\x1f\xf3\xfc\xd2w\x04\xe5\x11Q\x04\xc8\x98x" +
+	"\xc74\xf7\xe3\xe3\xd7\x0b\xbc\x07\xc5q\xf9\x04s\x91\x8f" +
+	"\x8b\xa3\xf2\x12\x899\x9f\xfax\xff\xe8\xddc\xcfOx" +
+	"*\xe7\x97\xaaX\xd0\x9d\xcd[\xb5\xf5\x93''\x0a`" +
+	"\xa6\xc4\xb7\xe4\xbf,\x98\x19qT\xdec\xc1(\x9f\xe9" +
+	"\x8fF\xa3\x7fLz\xb87I\x16\xf7\x8d\xdbj\xdf\xbd" +
+	"\xf7\x9d7oy,\xeb$\xab\xdf\xf1\x8f\xee\xff\xf3\xe2" +
+	"\xc1\xfb\xa6\xbc\xadY*Y\xfd\xae\x93XA\x9e[;" +
+	"\x19\x9f\x7f\xb5{\xcasT\xb1\xb9%\xb7|\xb7\xec\xf8" +
+	"\xa5\xd3^\xcb*\xdbr`\xe8f\xba\xaf\xe2\xc5i/" +
+	"\xe8b\xc9\xea\xf7R\x0b4\xb0}\xfa\xcc\x85G\xa23" +
+	"\xa0,r\xdb\xb0\xc9\x8e\xaaX\x0e\xd7\xde\x1b\x93\xc67" +
+	"\xeb3\x1e\xec=6\xe1ceK\xcfm\xff\xbc\xe1w" +
+	"O\xad\x9a\xa4;\x11\x96g\x92\xa9DL3\x8c\x1a." +
+	"\xa6&\xdb\x92\xab\x1b\xda\xb56\xd3\xa8I\xaaiC\xab" +
+	"n\xd4\x8ct\x0bg\x1a\xf9N\x91\xecg\xba\xadEo" +
+	"\xdb]\x1dQS\xa2\xdaj(<\xc7\x03\xf0\x08@\xfd" +
+	"+\x00\x14\x89C%H\xb02a\xc6\xb5\x14J@P" +
+	"\x02\xcc\x87Z\xbf\xcf\xd4b\x89\x1d\xda\x065\x16\xd7j" +
+	"\x92i\xb3\xba>\xa2\xa6\xf2\xd06\x03(e\x1c*\x0b" +
+	"\x08f\x9a\xb3\x07\x00\x00\xfd@\xd0_\x88\xe9\xd0\xb3\xc8" +
+	"\x95\xcaaV\xa2VH,\xe5c\x98\x89\xa4\x8dcz" +
+	"|\xf8b\x09\xec\xd2\xcc\xac\xa7\x01\xffC\x069v\\" +
+	"k)v)\xcdH\xb7\x96t\x9aM/\xae\x1a\xc5\xea" +
+	"[\x95\xeb\x96\x18\xd3w\x14\xb0B\x1bkS\x1b\xb73" +
+	"\x11AT\x82\xee\xd1\x83\xec\xe8^\x0e\x95\xc3\x04)b" +
+	"\x90\xcd%\xed\x0c\x01(\x078T\x9e!\x88$\x88\x04" +
+	"\x80v1\xc7C\x1c*\xcf\x12\xa4\x1c\x06\x91\x03\xa0\xdd" +
+	"\xcc\xf10\x87\xca\x00A\xcac\x10y\x00\xda\xcf~|" +
+	"\x85C\xe5u\x82bR\xdf\xe1LN \xe9\xf9\xf0\xd2" +
+	"\x0c\xa8\xa9]\xedX\x0e\x18\xe1\x10\xcb\x80\xb0\x7f\x03\xa6" +
+	"\xde\xaa\xa1\x00\x04\x85\xd2\xd5\xdd\xad\xb7\xb4\xcc9\xe3\xce" +
+	"\x84\xb3\xf9\xb8\xad\x09w\x80:T\xddt\xa3\x95\x9a\x0d" +
+	"m\xafnn\xc8\xce\xc6\x1cx\xd9\xcb\xd7\xa8\x19\x016" +
+	"n\xf9\xcd\x8a\xa4*\xado\xd6\xaf\x05\x9c\x00\xe0\xaa\x03" +
+	":rNO\x84\x80\xd0A\x11\xd1\x95:t\xb6\x04}" +
+	"\x95\xd9zD$\xeez@gg\xb2\x06\x13\x9a\x16\x91" +
+	"s\x171:\x1b\x80\xea\xab\x81\xd0m\"\xf2\xee\xceC" +
+	"G\x0c\xa9\xb2\x02\x08m\x10QpU\x10\x1d\xf5\xa5\xab" +
+	"\xd8\xb9eb\x80\x95)\x8c\x01\xd6\x9b0\x06X\x8aa" +
+	"\xac\xb7s\x0dc\xa5u!\xc2Xo\x0f}\x18#\x98" +
+	"\xab\x0f\xc9\x9fx1\x16\xd7X\xfaeV\xfa\xce\x93\x00" +
+	"\x1d\xf1\xa6J\x95M\x07]\xe9Eg\x91\xd3UU\x16" +
+	"\x1d$\xee\x1aFG~\xe9bf\x9b'\x8a\xc9\xb4\x19" +
+	"Fq\x97\xc6\xfe\xc6Uc6\x9b\xa2\x97\x94\xb5_," +
+	"\xd2\xac\x86\xf6\x00s\xcb\x91u\x1e!\xe8\xbc\x81\xdc\xda" +
+	"\xa1\xfbb@g\x01:\xb5C\xe2\xea<:o\x15\xba" +
+	"8d\x91-\xa8\\\x80\xa9ZQ\xca\xce\x80\xe58\xcf" +
+	"\x1e\xb0b\xb7(_@\xf9R\xea^L\x1c\xe7\x92\x9f" +
+	"\xa2\xa2XP\xca\xe2\xec\xb3\xbb\xe9\xdfe\x91\xa9\xf6m" +
+	"\xc8\"_Jb\xe7J2\xae\x1a\x88@\x10\xe7P\x8b" +
+	"\xff\xb0\x96l\xd6\x00\xff\x04\x00\x00\xff\xff\xc9B6\xf7"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
 		String: schema_9a51e53177277763,
 		Nodes: []uint64{
+			0x82f79d7adbdcdd6f,
 			0x86e3410d1abd406b,
 			0x91b6120f2a2e3ebe,
 			0x9d6074459fa0602b,
+			0xa62fe22feb63d82e,
+			0xa66966629ce6e8e9,
 			0xb2c6f1c55b7403f4,
+			0xb72541d950858a60,
+			0xb8521a0e0dcb52d8,
 			0xc25a17a8499cfe55,
 			0xc3153fa5a13d8a26,
 			0xc53168b273d497ee,
@@ -1785,11 +2825,17 @@ func RegisterSchema(reg *schemas.Registry) {
 			0xd93c9aa0627bc93c,
 			0xda23f0d3a8250633,
 			0xe64ce403f6090174,
+			0xe990db10c77bbcb7,
+			0xe9b5ea42655a6266,
+			0xeafb60603769c851,
 			0xeea7ae19b02f5d47,
 			0xf51e7dd3fc20b968,
+			0xf589dc1668ea3d8f,
+			0xf5c2d7ad2dde5570,
 			0xf694129c75eba87c,
 			0xf9602cd2c3f65e0f,
 			0xf9694ae208dbb3e3,
+			0xfa45ca5ec6290c9f,
 		},
 		Compressed: true,
 	})

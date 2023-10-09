@@ -31,6 +31,10 @@ interface Process {
 
     # linkExt   @4 (other :Process) -> ();
     # unlinkExt @5 (other :Process) -> ();
+    pause  @4 () -> ();
+    # Pause a process.
+    resume @5 () -> ();
+    # Resume a paused process.
 }
 
 struct Info {
@@ -39,4 +43,12 @@ struct Info {
     cid  @2 :Cid;
     argv @3 :List(Text);
     time @4 :Int64;
+}
+
+interface Events {
+    # Events are sent to the WASM process. It's the process' responsiblity to
+    # handle events.
+    pause  @0 () -> ();
+    resume @1 () -> ();
+    stop   @2 () -> ();
 }

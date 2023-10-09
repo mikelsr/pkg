@@ -52,3 +52,11 @@ interface Executor {
     bytecodeCache @3() -> (cache :Process.BytecodeCache);
 }
 
+interface ProcessInit {
+    # Aggregates the capabilities passed onto a process so they can be passed
+    # through the same channel.
+    terminal @0 () -> (terminal :Terminal);
+    events   @1 (handler :Process.Events) -> ();
+    # The WASM process should send the events capability through a call to events().
+}
+

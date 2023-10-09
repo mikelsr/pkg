@@ -1733,79 +1733,606 @@ func (p Executor_bytecodeCache_Results_Future) Cache() process.BytecodeCache {
 	return process.BytecodeCache(p.Future.Field(0, nil).Client())
 }
 
-const schema_e82706a772b0927b = "x\xda\x9cUo\x88\x14e\x1c\xfe=\xef;{s\xd7" +
-	"\xde\xee\xec\xeb\xec\x15\x06\xd7\xa2\x9d\x99\x07^zW\x88" +
-	"\x17uk\xb9\x94\xa2t\xafg\xc4I\x1f\x1ag\x87\xbb" +
-	"\x85\xbd\x9dufOOJ-\x08\x11\x0b\xa2\xbf\x84b" +
-	"\xa0\xa1\xd9\x87\xac\x0fe\x11\x06I$\xe4\x87\xa0\xa2\x92" +
-	"\xc2\xac\x8cJ!R\xcb\x82\xd2&\xde\xb9\x9b\x9d\xbd;" +
-	"\xcd\xea\xd3\xbc\xf0>\xef\xf3{~\xcf\xef\xcf,\xf8R" +
-	"\xcbk\x0bSo^Ml\xa0\x19\x89\xa6\xe0\x97'\x86" +
-	"\x8c\xa5'\xefy\x98D\x92\x07\x0f>\xf5\x9a\xf7R\xd3" +
-	"\xdc\x1f\x89`.I\xee1\x97%u\xa2\x9eBR\x87" +
-	"\xf9\x93:\x06\x95\xdb\xf7\xbd|`\xe5\x93\x8f\x90\xc8\x82" +
-	"(\x01u\xfdi\xb2\x17\x04\xf3x\xb2\x8f\x10\xacX\xbb" +
-	"Oz\x9b\xdb\x1f\x1b\x07h\xea\xfebr9H\xfb\xeb" +
-	"\xbe\xdd\x1f\xe7\xf7\xb7=\xdd\xf0\xf0Tr\x95zx>" +
-	"|\xf8\xcc\xae\xcf7\x9f\xda\xf6\xc2s$\xb3P\x08\xae" +
-	"\x10m\xadL!f\xb6\xfe@\x08fm<\xff\xec\x9a" +
-	"\x03\x07v6\xc6Fj\x86\x02\xb4\xa4\x14\xc5L\xf3\xc4" +
-	"l\xbc\xd2\xf9\xc6$\x8ay\xa9n\x85X\x98R\x14\xc7" +
-	"o:=\x17\xc7N\x1f$a\"\x18\xfc\xfa\xe0\xd6\xb3" +
-	"\xb3\xee=B\x09\xa6\x13\x99m\xe9\xa3\xe6\xac\xb4:\xb5" +
-	"\xa77\x10\x02V>\xfe\xfa`\xcf\xc9C$M4\x80" +
-	"\xdb\x9at\x10\x99\x1b\xd3G\x09\xe6\xa6\xf4\xab\x84\xe0\xe2" +
-	";o_<\xfb\xe2\xe1w\xa7Y\xd8f\xec1\xdb\x0d" +
-	"E9\xd3\xb8\xcb\\\xa2N1\x91L\x021:\xd1\xa4" +
-	"`\xf3\x8c\x1d\xe6B\xe3\x1a\xa2\x9e\xc5F\x0eJ\xf0\x9f" +
-	"_}\xf0\xd0[\xb7~\xd4\x90\xb3\xb9$\xf3\x07\xc1," +
-	"dT\xca\xfa\xcee\xee\xba\x0b\xcf\x7f\xd6\xe8\xc9h\xe6" +
-	"*\x95\xf1\xa6\x10\x90^\x94\x1f\xfa\xf5\xba\x81\xdf\x1b\x01" +
-	"\xbb\xc6\x01{C\x00;\xc6\x16\x0d\x16O\x04q\xc1\xcc" +
-	"\xf73\xe7(\xa0\x80n\x09l\xd7s\xbal\xab\x8aJ" +
-	"\xb5\xb70\xe6\xd8\xa3z\xcd\xf5\xfa\x01\x99\xe1\x09\xa2z" +
-	"\xcd\x10\xc9\x10\xeb:\x89\x09GG\\\x0cD-#\x06" +
-	"\xd7\x10\x13R\x07\xab\xc7D\x94\x9e(\\KL,\xd6" +
-	"\xc1\xeb\x0d\x04\x8a\x1af\xbeGL\xcc\xd1\x0dg\xcc\xb1" +
-	"\xf3\x08\xd4\xe7N\xcb\x1e&\xee\x14\xf3\xe0U?\x8f`" +
-	"\xed\xc6\x9ac\xbbE\x87r\xea\xc6\xc9\xa3\x1f\xa8\x8b\xe7" +
-	"\x91\xf8\x9a\xebuE\xaf\x9db\xc7\xaa>\xc7\x1f-\xd7" +
-	"|\xa9q\x8dH\x03\x91H\xddA$\x9b9d\x96a" +
-	"K\xd5sm\xc7\xf7!\x82\x9e\xa69\xfb?9s\xfd" +
-	"\x17D\x80\xa0\x98Ykd\x8e4\x84\xec\x1d\xfd\x96g" +
-	"\x8d\xf8D\xff\x06\xbb*\xd4\x81IB\xbac!9[" +
-	"\xa1 \x82\x1aZ~\xe3\xdf\xad\xf8~\xaa\x8ci\x09F" +
-	"\xd1e\xa6Nh\xa9\xcc\xee\xe7\x90\xc3\x0c\x02\x08\x07D" +
-	"8\xcb\x89d\x91CV\x19\xc0\xb2`Db\xa4\x93H" +
-	"\x0es\xc8\x1a\x83\xe0,\x0bN\xa4\xcaJ\xb2\xcc!\xb7" +
-	"1l\xf1\x1d\xdf/\xb9\x15d\xe2^& C\x0de" +
-	" B\x8a\x18R\x04\xa3Z-\x15\xd1L\x0c\xcd\x04\xc3" +
-	"\xf2\x86|\xa4\x09\xfd\x1ch%\xa6\x8e\x93\xb2X\xedx" +
-	"#\xa5\x8aU\xee*\xbbC\xa5\xca%\x8di\xac\xd0\xe5" +
-	"\x95\\\xa9\xf6\xfd\xb9\xd0\xa1+\x1a4\x9bH>\xc0!" +
-	"\xcb\xb1A\xa5\xce\xd8\xb4\xbaAu\xd7\x1e\xfd'Y\xba" +
-	"]*\xfewcX\xa5\xda;0N\xd9U\x18\xaby" +
-	"\x16\x91\x1a\xc1\xe6\xba\xf4y*x\x07\x87\\\xd0 }" +
-	"~/\x91\xbc\x91C\xde\xcc`T\xac\x11'\xe4m%" +
-	"\xf4\xd9\xe5\x92S\xa9a\x86\xc6\x09\x98q\x99@e\xd7" +
-	"\xb6\xcaD\xb2\xb5\x1e\xa5\xa0\xa2\xe49\xe4\x0a\x86(\xc8" +
-	"2\x15d)\x87\xecg\x10\x0c\xe3\x06\xadT\xc0\xbb9" +
-	"\xe4j\x06\xa3\xea8^=\xb2\xefx\xeb\x1d\x0f-\xc4" +
-	"\xd0B0\x86]\xbf\x16\xddMZ5a\x1b\xe8\x15\xab" +
-	"\xac\xf2\xd4\xc2U\x13\xed1D\x7f\x01!\xba\x89\x89\x84" +
-	"\x9e\x0b[e\xf2\xc4#J\x84\xbb\x15\xa9\xa1q\xef\xa3" +
-	";\x17z(\xb3*14\xacy\xb1I\x11b\xa2\xa0" +
-	"Ng\\y\xc1x\x16\xda\xb4\xd2kY$T\xe9\x97" +
-	"O\xcc\xc6\x18\x83\xd0\x12Y4\x11\x89Q5\xbfU\x0e" +
-	"\xf98C.\xf4\xd2X_r6@\x04;:.\xac" +
-	"\xe99\xd3\xbe}b\x88\xc3\xad\x06\x11\xff\x86\xa3\xd9\xb6" +
-	"\xaa\x035\xd7\x0bGI\x04G\x0a?o\xdf\x9a\xdc\xfb" +
-	"\xed\xc4m\xceQ)D\xfd\x92\x89\xd3#L\xeb\x9cz" +
-	"\xf7W\xfdKn\xbch\xd1t0\xe4\xd4\xc6\xf3c\xda" +
-	"\x1b\xb6\xdf\xb6{o_\xdb{Si\xa7\xef\x9b\xf1A" +
-	"\xf5\x89\xfe\xff.\xbd\xc4\xf8G;\xf4r\xa4\x96m\xbb" +
-	"\xa3\x95\x1aDp\xe8\xdc\xe1\x0f\x97~s\xee\xecT\xd2" +
-	"\xa9\x06L\x8c\xfd\xdf\x01\x00\x00\xff\xff\xe8\xd9O'"
+type ProcessInit capnp.Client
+
+// ProcessInit_TypeID is the unique identifier for the type ProcessInit.
+const ProcessInit_TypeID = 0x8efe6ee8e0e56459
+
+func (c ProcessInit) Terminal(ctx context.Context, params func(ProcessInit_terminal_Params) error) (ProcessInit_terminal_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0x8efe6ee8e0e56459,
+			MethodID:      0,
+			InterfaceName: "core.capnp:ProcessInit",
+			MethodName:    "terminal",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(ProcessInit_terminal_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return ProcessInit_terminal_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c ProcessInit) Events(ctx context.Context, params func(ProcessInit_events_Params) error) (ProcessInit_events_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0x8efe6ee8e0e56459,
+			MethodID:      1,
+			InterfaceName: "core.capnp:ProcessInit",
+			MethodName:    "events",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 1}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(ProcessInit_events_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return ProcessInit_events_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c ProcessInit) WaitStreaming() error {
+	return capnp.Client(c).WaitStreaming()
+}
+
+// String returns a string that identifies this capability for debugging
+// purposes.  Its format should not be depended on: in particular, it
+// should not be used to compare clients.  Use IsSame to compare clients
+// for equality.
+func (c ProcessInit) String() string {
+	return "ProcessInit(" + capnp.Client(c).String() + ")"
+}
+
+// AddRef creates a new Client that refers to the same capability as c.
+// If c is nil or has resolved to null, then AddRef returns nil.
+func (c ProcessInit) AddRef() ProcessInit {
+	return ProcessInit(capnp.Client(c).AddRef())
+}
+
+// Release releases a capability reference.  If this is the last
+// reference to the capability, then the underlying resources associated
+// with the capability will be released.
+//
+// Release will panic if c has already been released, but not if c is
+// nil or resolved to null.
+func (c ProcessInit) Release() {
+	capnp.Client(c).Release()
+}
+
+// Resolve blocks until the capability is fully resolved or the Context
+// expires.
+func (c ProcessInit) Resolve(ctx context.Context) error {
+	return capnp.Client(c).Resolve(ctx)
+}
+
+func (c ProcessInit) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Client(c).EncodeAsPtr(seg)
+}
+
+func (ProcessInit) DecodeFromPtr(p capnp.Ptr) ProcessInit {
+	return ProcessInit(capnp.Client{}.DecodeFromPtr(p))
+}
+
+// IsValid reports whether c is a valid reference to a capability.
+// A reference is invalid if it is nil, has resolved to null, or has
+// been released.
+func (c ProcessInit) IsValid() bool {
+	return capnp.Client(c).IsValid()
+}
+
+// IsSame reports whether c and other refer to a capability created by the
+// same call to NewClient.  This can return false negatives if c or other
+// are not fully resolved: use Resolve if this is an issue.  If either
+// c or other are released, then IsSame panics.
+func (c ProcessInit) IsSame(other ProcessInit) bool {
+	return capnp.Client(c).IsSame(capnp.Client(other))
+}
+
+// Update the flowcontrol.FlowLimiter used to manage flow control for
+// this client. This affects all future calls, but not calls already
+// waiting to send. Passing nil sets the value to flowcontrol.NopLimiter,
+// which is also the default.
+func (c ProcessInit) SetFlowLimiter(lim fc.FlowLimiter) {
+	capnp.Client(c).SetFlowLimiter(lim)
+}
+
+// Get the current flowcontrol.FlowLimiter used to manage flow control
+// for this client.
+func (c ProcessInit) GetFlowLimiter() fc.FlowLimiter {
+	return capnp.Client(c).GetFlowLimiter()
+}
+
+// A ProcessInit_Server is a ProcessInit with a local implementation.
+type ProcessInit_Server interface {
+	Terminal(context.Context, ProcessInit_terminal) error
+
+	Events(context.Context, ProcessInit_events) error
+}
+
+// ProcessInit_NewServer creates a new Server from an implementation of ProcessInit_Server.
+func ProcessInit_NewServer(s ProcessInit_Server) *server.Server {
+	c, _ := s.(server.Shutdowner)
+	return server.New(ProcessInit_Methods(nil, s), s, c)
+}
+
+// ProcessInit_ServerToClient creates a new Client from an implementation of ProcessInit_Server.
+// The caller is responsible for calling Release on the returned Client.
+func ProcessInit_ServerToClient(s ProcessInit_Server) ProcessInit {
+	return ProcessInit(capnp.NewClient(ProcessInit_NewServer(s)))
+}
+
+// ProcessInit_Methods appends Methods to a slice that invoke the methods on s.
+// This can be used to create a more complicated Server.
+func ProcessInit_Methods(methods []server.Method, s ProcessInit_Server) []server.Method {
+	if cap(methods) == 0 {
+		methods = make([]server.Method, 0, 2)
+	}
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0x8efe6ee8e0e56459,
+			MethodID:      0,
+			InterfaceName: "core.capnp:ProcessInit",
+			MethodName:    "terminal",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Terminal(ctx, ProcessInit_terminal{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0x8efe6ee8e0e56459,
+			MethodID:      1,
+			InterfaceName: "core.capnp:ProcessInit",
+			MethodName:    "events",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Events(ctx, ProcessInit_events{call})
+		},
+	})
+
+	return methods
+}
+
+// ProcessInit_terminal holds the state for a server call to ProcessInit.terminal.
+// See server.Call for documentation.
+type ProcessInit_terminal struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c ProcessInit_terminal) Args() ProcessInit_terminal_Params {
+	return ProcessInit_terminal_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c ProcessInit_terminal) AllocResults() (ProcessInit_terminal_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return ProcessInit_terminal_Results(r), err
+}
+
+// ProcessInit_events holds the state for a server call to ProcessInit.events.
+// See server.Call for documentation.
+type ProcessInit_events struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c ProcessInit_events) Args() ProcessInit_events_Params {
+	return ProcessInit_events_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c ProcessInit_events) AllocResults() (ProcessInit_events_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return ProcessInit_events_Results(r), err
+}
+
+// ProcessInit_List is a list of ProcessInit.
+type ProcessInit_List = capnp.CapList[ProcessInit]
+
+// NewProcessInit creates a new list of ProcessInit.
+func NewProcessInit_List(s *capnp.Segment, sz int32) (ProcessInit_List, error) {
+	l, err := capnp.NewPointerList(s, sz)
+	return capnp.CapList[ProcessInit](l), err
+}
+
+type ProcessInit_terminal_Params capnp.Struct
+
+// ProcessInit_terminal_Params_TypeID is the unique identifier for the type ProcessInit_terminal_Params.
+const ProcessInit_terminal_Params_TypeID = 0xea6d16891c17db82
+
+func NewProcessInit_terminal_Params(s *capnp.Segment) (ProcessInit_terminal_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return ProcessInit_terminal_Params(st), err
+}
+
+func NewRootProcessInit_terminal_Params(s *capnp.Segment) (ProcessInit_terminal_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return ProcessInit_terminal_Params(st), err
+}
+
+func ReadRootProcessInit_terminal_Params(msg *capnp.Message) (ProcessInit_terminal_Params, error) {
+	root, err := msg.Root()
+	return ProcessInit_terminal_Params(root.Struct()), err
+}
+
+func (s ProcessInit_terminal_Params) String() string {
+	str, _ := text.Marshal(0xea6d16891c17db82, capnp.Struct(s))
+	return str
+}
+
+func (s ProcessInit_terminal_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (ProcessInit_terminal_Params) DecodeFromPtr(p capnp.Ptr) ProcessInit_terminal_Params {
+	return ProcessInit_terminal_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s ProcessInit_terminal_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s ProcessInit_terminal_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s ProcessInit_terminal_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s ProcessInit_terminal_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// ProcessInit_terminal_Params_List is a list of ProcessInit_terminal_Params.
+type ProcessInit_terminal_Params_List = capnp.StructList[ProcessInit_terminal_Params]
+
+// NewProcessInit_terminal_Params creates a new list of ProcessInit_terminal_Params.
+func NewProcessInit_terminal_Params_List(s *capnp.Segment, sz int32) (ProcessInit_terminal_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[ProcessInit_terminal_Params](l), err
+}
+
+// ProcessInit_terminal_Params_Future is a wrapper for a ProcessInit_terminal_Params promised by a client call.
+type ProcessInit_terminal_Params_Future struct{ *capnp.Future }
+
+func (f ProcessInit_terminal_Params_Future) Struct() (ProcessInit_terminal_Params, error) {
+	p, err := f.Future.Ptr()
+	return ProcessInit_terminal_Params(p.Struct()), err
+}
+
+type ProcessInit_terminal_Results capnp.Struct
+
+// ProcessInit_terminal_Results_TypeID is the unique identifier for the type ProcessInit_terminal_Results.
+const ProcessInit_terminal_Results_TypeID = 0xb2239bbcb9521b14
+
+func NewProcessInit_terminal_Results(s *capnp.Segment) (ProcessInit_terminal_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return ProcessInit_terminal_Results(st), err
+}
+
+func NewRootProcessInit_terminal_Results(s *capnp.Segment) (ProcessInit_terminal_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return ProcessInit_terminal_Results(st), err
+}
+
+func ReadRootProcessInit_terminal_Results(msg *capnp.Message) (ProcessInit_terminal_Results, error) {
+	root, err := msg.Root()
+	return ProcessInit_terminal_Results(root.Struct()), err
+}
+
+func (s ProcessInit_terminal_Results) String() string {
+	str, _ := text.Marshal(0xb2239bbcb9521b14, capnp.Struct(s))
+	return str
+}
+
+func (s ProcessInit_terminal_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (ProcessInit_terminal_Results) DecodeFromPtr(p capnp.Ptr) ProcessInit_terminal_Results {
+	return ProcessInit_terminal_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s ProcessInit_terminal_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s ProcessInit_terminal_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s ProcessInit_terminal_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s ProcessInit_terminal_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s ProcessInit_terminal_Results) Terminal() Terminal {
+	p, _ := capnp.Struct(s).Ptr(0)
+	return Terminal(p.Interface().Client())
+}
+
+func (s ProcessInit_terminal_Results) HasTerminal() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s ProcessInit_terminal_Results) SetTerminal(v Terminal) error {
+	if !v.IsValid() {
+		return capnp.Struct(s).SetPtr(0, capnp.Ptr{})
+	}
+	seg := s.Segment()
+	in := capnp.NewInterface(seg, seg.Message().CapTable().Add(capnp.Client(v)))
+	return capnp.Struct(s).SetPtr(0, in.ToPtr())
+}
+
+// ProcessInit_terminal_Results_List is a list of ProcessInit_terminal_Results.
+type ProcessInit_terminal_Results_List = capnp.StructList[ProcessInit_terminal_Results]
+
+// NewProcessInit_terminal_Results creates a new list of ProcessInit_terminal_Results.
+func NewProcessInit_terminal_Results_List(s *capnp.Segment, sz int32) (ProcessInit_terminal_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[ProcessInit_terminal_Results](l), err
+}
+
+// ProcessInit_terminal_Results_Future is a wrapper for a ProcessInit_terminal_Results promised by a client call.
+type ProcessInit_terminal_Results_Future struct{ *capnp.Future }
+
+func (f ProcessInit_terminal_Results_Future) Struct() (ProcessInit_terminal_Results, error) {
+	p, err := f.Future.Ptr()
+	return ProcessInit_terminal_Results(p.Struct()), err
+}
+func (p ProcessInit_terminal_Results_Future) Terminal() Terminal {
+	return Terminal(p.Future.Field(0, nil).Client())
+}
+
+type ProcessInit_events_Params capnp.Struct
+
+// ProcessInit_events_Params_TypeID is the unique identifier for the type ProcessInit_events_Params.
+const ProcessInit_events_Params_TypeID = 0xca85f2cfe432ed49
+
+func NewProcessInit_events_Params(s *capnp.Segment) (ProcessInit_events_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return ProcessInit_events_Params(st), err
+}
+
+func NewRootProcessInit_events_Params(s *capnp.Segment) (ProcessInit_events_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return ProcessInit_events_Params(st), err
+}
+
+func ReadRootProcessInit_events_Params(msg *capnp.Message) (ProcessInit_events_Params, error) {
+	root, err := msg.Root()
+	return ProcessInit_events_Params(root.Struct()), err
+}
+
+func (s ProcessInit_events_Params) String() string {
+	str, _ := text.Marshal(0xca85f2cfe432ed49, capnp.Struct(s))
+	return str
+}
+
+func (s ProcessInit_events_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (ProcessInit_events_Params) DecodeFromPtr(p capnp.Ptr) ProcessInit_events_Params {
+	return ProcessInit_events_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s ProcessInit_events_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s ProcessInit_events_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s ProcessInit_events_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s ProcessInit_events_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s ProcessInit_events_Params) Handler() process.Events {
+	p, _ := capnp.Struct(s).Ptr(0)
+	return process.Events(p.Interface().Client())
+}
+
+func (s ProcessInit_events_Params) HasHandler() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s ProcessInit_events_Params) SetHandler(v process.Events) error {
+	if !v.IsValid() {
+		return capnp.Struct(s).SetPtr(0, capnp.Ptr{})
+	}
+	seg := s.Segment()
+	in := capnp.NewInterface(seg, seg.Message().CapTable().Add(capnp.Client(v)))
+	return capnp.Struct(s).SetPtr(0, in.ToPtr())
+}
+
+// ProcessInit_events_Params_List is a list of ProcessInit_events_Params.
+type ProcessInit_events_Params_List = capnp.StructList[ProcessInit_events_Params]
+
+// NewProcessInit_events_Params creates a new list of ProcessInit_events_Params.
+func NewProcessInit_events_Params_List(s *capnp.Segment, sz int32) (ProcessInit_events_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[ProcessInit_events_Params](l), err
+}
+
+// ProcessInit_events_Params_Future is a wrapper for a ProcessInit_events_Params promised by a client call.
+type ProcessInit_events_Params_Future struct{ *capnp.Future }
+
+func (f ProcessInit_events_Params_Future) Struct() (ProcessInit_events_Params, error) {
+	p, err := f.Future.Ptr()
+	return ProcessInit_events_Params(p.Struct()), err
+}
+func (p ProcessInit_events_Params_Future) Handler() process.Events {
+	return process.Events(p.Future.Field(0, nil).Client())
+}
+
+type ProcessInit_events_Results capnp.Struct
+
+// ProcessInit_events_Results_TypeID is the unique identifier for the type ProcessInit_events_Results.
+const ProcessInit_events_Results_TypeID = 0xc6398605d1d1ffd8
+
+func NewProcessInit_events_Results(s *capnp.Segment) (ProcessInit_events_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return ProcessInit_events_Results(st), err
+}
+
+func NewRootProcessInit_events_Results(s *capnp.Segment) (ProcessInit_events_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return ProcessInit_events_Results(st), err
+}
+
+func ReadRootProcessInit_events_Results(msg *capnp.Message) (ProcessInit_events_Results, error) {
+	root, err := msg.Root()
+	return ProcessInit_events_Results(root.Struct()), err
+}
+
+func (s ProcessInit_events_Results) String() string {
+	str, _ := text.Marshal(0xc6398605d1d1ffd8, capnp.Struct(s))
+	return str
+}
+
+func (s ProcessInit_events_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (ProcessInit_events_Results) DecodeFromPtr(p capnp.Ptr) ProcessInit_events_Results {
+	return ProcessInit_events_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s ProcessInit_events_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s ProcessInit_events_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s ProcessInit_events_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s ProcessInit_events_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// ProcessInit_events_Results_List is a list of ProcessInit_events_Results.
+type ProcessInit_events_Results_List = capnp.StructList[ProcessInit_events_Results]
+
+// NewProcessInit_events_Results creates a new list of ProcessInit_events_Results.
+func NewProcessInit_events_Results_List(s *capnp.Segment, sz int32) (ProcessInit_events_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[ProcessInit_events_Results](l), err
+}
+
+// ProcessInit_events_Results_Future is a wrapper for a ProcessInit_events_Results promised by a client call.
+type ProcessInit_events_Results_Future struct{ *capnp.Future }
+
+func (f ProcessInit_events_Results_Future) Struct() (ProcessInit_events_Results, error) {
+	p, err := f.Future.Ptr()
+	return ProcessInit_events_Results(p.Struct()), err
+}
+
+const schema_e82706a772b0927b = "x\xda\x9cV\x7flTU\x16>\xdf}3\x9dvi" +
+	"g\xe6\xce\x9b.\xcb.\xec\x04(\xcb\xd2\x84.\xb4\x9b" +
+	"\x10\xbaa;\xb04K\x1b\x1a\xe7\xb54\xa6\x8d&\x0e" +
+	"3\xd7v\x92\xe9\x9b\xe1\xbd)\x94( F\x11\xd1h" +
+	"\xfc\x811\x10L\xc0\x80\xf0\x07U\x8c\x10!\x90HL" +
+	"H\xe0\x0f\x0d\x9a(J\x10\x14T\xda\xc4\x08U4Q" +
+	"\xe0\x99\xfbf\xde\xcc\x1b\xdaB\xf4\xafy\xc9=\xf7|" +
+	"\xe7\xfb\xcew\xce\x9d\x05\xe7\xbdQ\xcf\xc2\x9aE\xd3\x89" +
+	"u\xad\x80\xb7\xc2\xfa\xe1\xf9\xbe\xc0\xf2\xcb\xf7=F|" +
+	"\x8ab=\xf2\xe2[\xc6\x1b\x15s\xaf\x12A\x85\x7f\x8f" +
+	"Z\xe5\xf7\x115y\xfd>\xa8\x07\xe5\xa7\xa5\xffw\xdf" +
+	"\x81\xe1\x8e\x176\x13\x0f\x83\xc8\x0by\xbc\xdd\xdf\x0c\x82" +
+	"\xba\xcb\xdfB\xb0V\xae\xde\xa7\x19\x1bg<\x93\x0f\xf0" +
+	"\xc8\xf3\x13\xfev\x90\xc7\xeaI~}\xe9\xaa~\xfb\xb9" +
+	"q@\x07\xfc\xc7\xd4C2\xbbz\xd0\xff\x94\x8a\x80\x8f" +
+	"\xe8\xf6\xfd\xbb?\x8a\xee\xaf}\xc9\x852\xe2\xef\x94(" +
+	"7l\x94\x97w}\xbaqd\xebk\xaf\x90\x16\x86\x8c" +
+	"PdDm\x80\xc9\x88i\x81o\x09\xd6\xcc\xf57\xb6" +
+	"\xf7\x0e\x0f\xeft\x17\x8a`H\x06T\x05e\x8a\xf0\xdf" +
+	":\x8f\x1e\xdf9\xfbm\xe2S\x8b\x01\xf3\x82\xcbd\xc0" +
+	"B;`\x9azq\x16\x0e\xd6\x1f.\xc3\xe8\x0e6\xca" +
+	"\x88\x07\x83\x12\xe3\xc2\xbfF\xe7\xe2\xdc\xe8\x11\xe2*\xac" +
+	"\x9eKG\xb6\\\x9f\xd9}\x8a\xbcLRY\xca\xcf\xa8" +
+	"\x1d\\~\xb5\xf1u\x04\x8b\xa5/\xbc\xd3\xd3t\xf98" +
+	"i*\\\xc1\xb5\x15>\x10\xa9{\xf9\x19)\x04\x7f\x93" +
+	"`\xdd:q\xec\xd6\xf5\xd7O\xbe7N\xa7\xa5\xa1=" +
+	"j[H\xa6l\x0d\xfd_\x1d\x90_\xd69\xeb\xecY" +
+	"\xef\x96\xc5\xa7\xf2,l\xb9\xbbC\x8d\xb6\xdc\x0e\x846" +
+	"\x05(\xe5\xf1V\xc8\x04KB;\xd4\xd6\xd0T\xa2\xa6" +
+	"\x8eP\x04\x04\xab\xed\xbb\xc6+\x1f\x8e=y\xc6\xadF" +
+	"\xb7ZosU\xa5\x1a\x17~\xfd\xe2\xf4\xa3\xef\xfe\xe7" +
+	"\xacKOu\x83\xfa\x0bA\xddl\x9f\xfbv\xb6e\xd6" +
+	"\xdc|\xf5\x13\xb7\xde\x87\xd4?\xc9\x04G\xed\x80\xc7\xcf" +
+	"O\x9d\xfe\xf4\x9f\x07F]\x95~\xa66\xcbJ\xfd\x8b" +
+	"\xa2}?\xfe\xbd\xebg\xf7\xd5\x93\xf9\xab\xa7\xed\xab\xec" +
+	"\x1c[\xd4\x93\xbch\x95<\xa5\x8e\xa8cd\x91E\xc3" +
+	"V\"c\x88\x86D<\x0b=\xdb\xdc:$\x12\x83\xbe" +
+	"\\\xc6\x88\x01ZP\xf1\x12\x15\x9d\x02\xa7@\xbe\xa6\x9e" +
+	"\x18\x17>\x94:\x0c\xc7\xd5\xbc\xa7\x97\x18\xd7|`E" +
+	"L8\xc4y\xeb_\x89\xf1\xc5>(E\x8f\x83\x1c\x9b" +
+	"\xce7\x88\xf19\xbe\x80\x18\x12\x89(,\xf9\xf3\xbfx" +
+	"\xa2\x9f\x14\x91\x8cB\xc9\x9aQX\xab\xd7\xe7D\"\x93" +
+	"\x14\x14\x91'\"\x8a\x18P,^q\x8a\xcfe\x8c\x06" +
+	"\xe7\xb6H\xd6u\xb6\x08s0\x9d35\x8f\xe2!\xf2" +
+	"\x80\x88\xd7,#\xd2*\x15ha\x86MY#\x93\x10" +
+	"\xa6\x09n5U\xcc\xd9\xff\xf1\xb5\xd9\x9f\x13\x01\x9cJ" +
+	"\x99=\xee\xccN\x0dv\xf6\xbaX\xdc\x88\x0f\x98De" +
+	"\x12\xc6d\xc6\x16\xd3l\xd3S9\xa9b\xa5\xad\xa2\xd3" +
+	"<8S\xc3\x17\xb6\x13\xe3\xf3\xa4\x8a\x8eu\xe0x\x91" +
+	"\xcfh&\xc6\xb9\xcf\xca\x09c \xa5\xc7\xd3D\x14E" +
+	"\x8bX+\xf4\x9cY\xce\xfb.\xd5u\xda\xccQF\xbd" +
+	"\xb1D=\x92\x90Q\xe0V\x0eU?)WV~s" +
+	"'\xf1q\x92:|\xb5`1a\\j\xf9\x80\x02\xad" +
+	"\x9f\x81\x03\xf6\x9cs\xd1N\xa4%\x15hY\x06\xb00" +
+	"\x18\x11\x1f\xa8'\xd2\xfa\x15h9\x06\xae\xb00\x14\"" +
+	"i$\xd2\xd2\x0a\xb4\xad\x0c\x9bLa\x9a\xa9\x8c\x8e`" +
+	"i\xf0\x08\x08\x92\xab\xf1D\xa8!\x86\x1aB \x9bM" +
+	"%QI\x0c\x95\x84@\xdc\xe83\xe1'\xc4\x14\xa0\x9a" +
+	"\x98\xfc,c\xb1\xaa cC:\xd3\x97\xd2'\x14\xc6" +
+	"\xed\x89\xc9+q\xab\x1e\xcb;G\xb6\xb9\xc1\xe9S!" +
+	"\xb5I\xee\xd4R\x8dj\x05\xda_\x18\xdc\x0d\x05/-" +
+	"\xaa{)_0s,b7\xe0\x9e\xfa\xcf\"\xd2\x1e" +
+	"R\xa0\xa5K\xfa\xa7\xeaK=)\xea_l\xca\x13w" +
+	"c\xedK\xa4\x92\xbf_w\xa6g\x9b\xbb\xf2)\x1bZ" +
+	"\x87rF\x9c(?\x0dN\xe9\xf3$x\x9d\x02m\x81" +
+	"\xab\xf4\xf9\xcdD\xda?\x15h\xfff\x08\xe8\xf1\x01a" +
+	"\xe7\xad&\xb4$\xd2)\xa1\xe7\x10\xf2(\x04\x84&\x01" +
+	"Jg\x12R[\xad\xba\x88\xd2*Q\xa2\x0a\xb4\x95\x0c" +
+	"\x0eH\x9b\x04Y\xae@\x8b1p\x86\xbc@\x1d2p" +
+	"\x85\x02m\x15C +\x84QD6\x85\xb1V\x18\xa8" +
+	"\"\x86*B\xa0?c\xe6\x9c\xb3\xb2\xc1\xb7]\xe6\xd3" +
+	"\xe3i\xc9\xd3cO\xbd\xb3\x98\xe1<\xa6\x9c7\x12\xe3" +
+	"^_\xc4v\xe2\xf8\x15\xe66U~\xdc\xeb:E\xc4" +
+	"\xf6T\x19\x96MX\xc9\xe8\x9a\x07\xeeW\x14\x8d\x11[" +
+	"k-,\x05\x80\xeb\xd1\xe4\x1b$0\x0a\x8d\x17\xf5%" +
+	"\x87p\xa6\x84\xe1\x19g\x11O\x18^i\x91\xf6\xc2\x88" +
+	"\x0e1p\x8f7\x8c\x0a\">(\xd7HV\x81\xf6," +
+	"C\xc4\xd6<\xb06%\xd6\x81[;\xean\xf66]" +
+	"\x9b\xb1\xad\xe0h{\x9d\x83\x97\xfe\"9F\x8fg\xbb" +
+	"r\x19C\xe4\xc7\xe0T\xeb\xf7\xdb\xb6L\xd9\xfbU\xe1" +
+	"4\"$\x05\xc7W\xc1\x12=\xc2\xb8\xc9\x9e@\xafX" +
+	"<`\x0f\xc9$\xc3\xdd\x1f\xd7\x93ia\x80[\x0f\xaf" +
+	"\xee\x15\xcbF\x0f\x8f\xdc9}\xcc=}Ys\xc2'" +
+	"\xc4\xd9\xa3u\x0c\x11\xf9\x84\x98\xa5r\xff\xb1m\xc9\xee" +
+	"\xbd-\xb5\xefOTn\xf9:u\x96\x05\xfd\xf1\xc7I" +
+	"\x99l\x11\xb5\xe4w\xf5\xdd\xd6\xa0\xf3zM\x86\x1eO" +
+	"$2\x83z\x0e\xdc:>v\xf2\x83\xe5_\x8e]\xbf" +
+	"\x97R\x85\xfd\xf4[\x00\x00\x00\xff\xff2\x96\xf9\xbd"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
@@ -1814,16 +2341,21 @@ func RegisterSchema(reg *schemas.Registry) {
 			0x804fe3440f678ff3,
 			0x81914daea9a63e6e,
 			0x8b1d7e7251a6624c,
+			0x8efe6ee8e0e56459,
 			0x9315a840d2a15700,
 			0x969e88e97ed79d94,
 			0x9baeae5a95f57921,
+			0xb2239bbcb9521b14,
 			0xb52aad0122df1319,
 			0xb6ead80127ea2fdd,
 			0xbce33359b4dd6c02,
 			0xc0c1a3f1fdbabdfd,
+			0xc6398605d1d1ffd8,
 			0xc65521f186b6e059,
+			0xca85f2cfe432ed49,
 			0xd13bb87cc9defbdd,
 			0xd698fc716f499b07,
+			0xea6d16891c17db82,
 			0xf7531ef46740370e,
 			0xffdf64593702d802,
 		},

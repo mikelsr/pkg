@@ -2,6 +2,7 @@ package csp_server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -16,7 +17,8 @@ type killFunc func(uint32)
 // process is the main implementation of the Process capability.
 type process struct {
 	csp.Args
-	time     int64
+	time int64
+
 	done     <-chan execResult
 	killFunc // killFunc must call cancel()
 	cancel   context.CancelFunc
@@ -24,6 +26,7 @@ type process struct {
 
 	linked  *sync.Map
 	getProc func(uint32) (*process, bool)
+	events  *api.Events
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
@@ -85,6 +88,25 @@ func (p *process) Unlink(ctx context.Context, call api.Process_unlink) error {
 
 func (p *process) unlink(pid uint32) {
 	p.linked.Delete(pid)
+}
+func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
+	if p.events == nil {
+		return errors.New("event handler not initialized")
+	}
+
+	p.events.Pause(ctx, nil)
+
+	return nil
+}
+
+func (p *process) Resume(ctx context.Context, call api.Process_resume) error {
+	if p.events == nil {
+		return errors.New("event handler not initialized")
+	}
+
+	p.events.Resume(ctx, nil)
+
+	return nil
 }
 
 // Create an info struct from the process meta.

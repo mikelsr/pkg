@@ -32,6 +32,14 @@ func (p *testProc) Unlink(ctx context.Context, call api.Process_unlink) error {
 	return nil
 }
 
+func (p *testProc) Pause(ctx context.Context, call api.Process_pause) error {
+	return nil
+}
+
+func (p *testProc) Resume(ctx context.Context, call api.Process_resume) error {
+	return nil
+}
+
 func testProcTree() csp.ProcTree {
 	/*
 	        0
