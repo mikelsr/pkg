@@ -4,7 +4,7 @@ cmd/scratch/*
 ww
 ww-arm
 *.wasm
-!rom/internal/main.wasm
+# !rom/internal/main.wasm
 
 # Binaries for programs and plugins
 *.exe
