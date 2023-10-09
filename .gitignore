@@ -2,6 +2,7 @@
 cmd/scratch/*
 .envrc
 ww
+ww-arm
 *.wasm
 !rom/internal/main.wasm
 
