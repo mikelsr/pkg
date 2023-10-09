@@ -16,7 +16,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multibase"
-	"github.com/stealthrocket/wazergo"
 	"github.com/tetratelabs/wazero"
 	wasm "github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/experimental/sock"
@@ -25,7 +24,7 @@ import (
 	proc_api "github.com/wetware/pkg/api/process"
 	"github.com/wetware/pkg/auth"
 	"github.com/wetware/pkg/cap/csp"
-	"github.com/wetware/pkg/cap/csp/proc"
+	"github.com/wetware/pkg/rom"
 	"github.com/wetware/pkg/system"
 	"github.com/wetware/pkg/util/log"
 )
@@ -53,9 +52,6 @@ type Runtime struct {
 	Cache   BytecodeCache
 	Tree    ProcTree
 	Log     log.Logger
-
-	// HostModule is unused for now.
-	HostModule *wazergo.ModuleInstance[*proc.Module]
 }
 
 // Executor provides the Executor capability.
@@ -74,10 +70,7 @@ func (r Runtime) Exec(ctx context.Context, call core_api.Executor_exec) error {
 		return err
 	}
 
-	// Cache new bytecodes every time they are received.
 	cid := r.Cache.put(bc)
-	r.Log.Info("cached bytecode",
-		"cid", cid.Encode(multibase.MustNewEncoder(multibase.Base58BTC)))
 
 	p, err := r.exec(ctx, cid, bc, call.Args())
 	if err != nil {
@@ -121,6 +114,10 @@ func (r Runtime) ExposedExec(ctx context.Context, id cid.Cid, bc []byte, ea exec
 }
 
 func (r Runtime) exec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs) (proc_api.Process, error) {
+
+	ro := rom.ROM{Bytecode: bc}
+	id = ro.CID()
+
 	sess, err := ea.Session()
 	if err != nil {
 		return proc_api.Process{}, err
@@ -282,7 +279,6 @@ func ServeModule(ctx context.Context, addr *net.TCPAddr, sess auth.Session) {
 		panic(err)
 	}
 	defer tcpConn.Close()
-
 	conn := rpc.NewConn(rpc.NewStreamTransport(tcpConn), &rpc.Options{
 		BootstrapClient: capnp.NewClient(core_api.Terminal_NewServer(sess.AddRef())),
 		ErrorReporter: system.ErrorReporter{
@@ -290,7 +286,6 @@ func ServeModule(ctx context.Context, addr *net.TCPAddr, sess auth.Session) {
 		},
 	})
 	defer conn.Close()
-
 	select {
 	case <-ctx.Done(): // close conn if the program is exiting
 		conn.Close()
@@ -352,4 +347,12 @@ func (r Runtime) Ps(ctx context.Context, call core_api.Executor_ps) error {
 		i++
 	}
 	return res.SetProcs(pl)
+}
+
+func (r Runtime) BytecodeCache(ctx context.Context, call core_api.Executor_bytecodeCache) error {
+	res, err := call.AllocResults()
+	if err != nil {
+		return err
+	}
+	return res.SetCache(proc_api.BytecodeCache_ServerToClient(r.Cache))
 }

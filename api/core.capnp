@@ -48,5 +48,7 @@ interface Executor {
     # Provides a significant performance improvement for medium to large
     # WASM streams.
     ps @2 () -> (procs :List(Process.Info));
+    # List all running processes.
+    bytecodeCache @3() -> (cache :Process.BytecodeCache);
 }
 

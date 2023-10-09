@@ -739,6 +739,26 @@ func (c Executor) Ps(ctx context.Context, params func(Executor_ps_Params) error)
 
 }
 
+func (c Executor) BytecodeCache(ctx context.Context, params func(Executor_bytecodeCache_Params) error) (Executor_bytecodeCache_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0x804fe3440f678ff3,
+			MethodID:      3,
+			InterfaceName: "core.capnp:Executor",
+			MethodName:    "bytecodeCache",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Executor_bytecodeCache_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Executor_bytecodeCache_Results_Future{Future: ans.Future()}, release
+
+}
+
 func (c Executor) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
@@ -817,6 +837,8 @@ type Executor_Server interface {
 	ExecCached(context.Context, Executor_execCached) error
 
 	Ps(context.Context, Executor_ps) error
+
+	BytecodeCache(context.Context, Executor_bytecodeCache) error
 }
 
 // Executor_NewServer creates a new Server from an implementation of Executor_Server.
@@ -835,7 +857,7 @@ func Executor_ServerToClient(s Executor_Server) Executor {
 // This can be used to create a more complicated Server.
 func Executor_Methods(methods []server.Method, s Executor_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 3)
+		methods = make([]server.Method, 0, 4)
 	}
 
 	methods = append(methods, server.Method{
@@ -871,6 +893,18 @@ func Executor_Methods(methods []server.Method, s Executor_Server) []server.Metho
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
 			return s.Ps(ctx, Executor_ps{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0x804fe3440f678ff3,
+			MethodID:      3,
+			InterfaceName: "core.capnp:Executor",
+			MethodName:    "bytecodeCache",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.BytecodeCache(ctx, Executor_bytecodeCache{call})
 		},
 	})
 
@@ -926,6 +960,23 @@ func (c Executor_ps) Args() Executor_ps_Params {
 func (c Executor_ps) AllocResults() (Executor_ps_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
 	return Executor_ps_Results(r), err
+}
+
+// Executor_bytecodeCache holds the state for a server call to Executor.bytecodeCache.
+// See server.Call for documentation.
+type Executor_bytecodeCache struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Executor_bytecodeCache) Args() Executor_bytecodeCache_Params {
+	return Executor_bytecodeCache_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Executor_bytecodeCache) AllocResults() (Executor_bytecodeCache_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_bytecodeCache_Results(r), err
 }
 
 // Executor_List is a list of Executor.
@@ -1532,74 +1583,229 @@ func (f Executor_ps_Results_Future) Struct() (Executor_ps_Results, error) {
 	return Executor_ps_Results(p.Struct()), err
 }
 
-const schema_e82706a772b0927b = "x\xda\xa4U_h\x1c\xd5\x17>\xdf\xbd\xb3\xbb\xd9\xec" +
-	"n67\xb3\xe5G\x7fP\x97\xd6\x8d\xd5\x80\xb1M\x84" +
-	"bD\xb3h\x17m\xb1\xb8\xb7\xad\x0f->8\xce\x0e" +
-	"\xc9\xc2fg:\xb3iS\xfcS\x0bZj\x11D1" +
-	"b[*\xb4R\xb5\x0fF\x0bZT\"\x18\xc4\x8a}" +
-	"\x10D\xd1\"\xd4\xaa}P\xfbb\x13-\xa26\x8c\xdc" +
-	"\xc9\xce\xee&1-\xe2S.\x99\x8f\xef\x9c\xf3\x9d\xf3" +
-	"}\xbb\xa6[\xcbkkS\x83]\xc4\xe4\x97\x91\xa8\xff" +
-	"\xeb\xb3C\xe9\xf5\x17\xee\x7f\x82D\x82\xfb\x8f<\xff\x96" +
-	"\xfbZt\xf5OD\xd0#\xf1cz*\x1e#\xd2\xe3" +
-	"\xf1O\xf4\xa7\xd4\xcb\xaf\xde\xf9\xea\x89\x89M\xcf\xed%" +
-	"\x91\x01Q\x041\xa2\xfe\x91\xf8\x00\x08\xfah|\x90\xe0" +
-	"\xbfp\xe4\xeb\xc7\x7f\xde\xff\xf2\x8b$3P\x08\xae\x10" +
-	"\xe3q\xa6\x10\x07\xe3?\x12\xfc\x95\xbb/\x8fo\x9f\x98" +
-	"8\xdcJ\xb1\xb7\xbdK\x01\x9enW\x14\xcb\xf5\xf3\xab" +
-	"\xf0F\xcf;\xf3(N\xb4\xf7)\xc4\xc9vEq\xee" +
-	"\x96\x8b\xabq\xf6\xe2)\x12:\xfcm\xdf\x9d\xda7\xbd" +
-	"\xf2\x81\xd3\x14a\xaa\xd7\xf1\xc4\x19\xfdhB\xbd\x8e$" +
-	"v\x11|V9\xf7\xf6\xb6\xfe\x0b\x93$u\xb4\x80\x97" +
-	"Ec \xd2\xffH\x9c!\xe8\xb3\x897\x09\xfe\xec\x07" +
-	"\xef\xcfN\xbf2\xf5\xe1\"!\xc6\x93\xc7\xf4#IE" +
-	"y0y\x8f>\xa5^M\"\x99\x00\x9a\xe8HT\xc1" +
-	"N$\x0f\xe9'\x93\xff#\xea\x7f/\x99\x85j\xf8\xaf" +
-	"o?}\xf4\xdd\xdb?o\x99Y\x9fJ\xfdI\xd0?" +
-	"N\xa9\x91c\x877\xd8;\xae\xbc\xf4U\xab&\x97S" +
-	"\xedj\xe2\xd9\x00\xd0\xb1.?\xf4\xdbu[~o\x05" +
-	"\xac\xe8\x08\x00\xdd\x1d\x0a\xc0\xce\xb2u\xdbJ\xe7\xfd9" +
-	"\x80\xa6\x0a\x14:f\xc8\xa7I\xdf\xb4]\xab\xd74\x1c" +
-	"T\x9d\x81\xc2\x98e\x8e\xc6j\xb6[\x04d\x92G\x88" +
-	"\x1a\x1bC\xd8\x84\x90=\xc4D!\x86\xe6*\x10\xee]" +
-	"\xdc\xb6\x9d\x98X\x1b\x03kTD8\x9c\xe8\xfe?1" +
-	"\xb1<\x96\xb6\xc6,3\x0f_\xfd\xb9\xdb0\x87\x89[" +
-	"\xa5<\xb8\xe3\xe5Q\x04\x1a\xed\xf0\xb0\x9d\x9a\xed\xf6\x86" +
-	"X\xab\x94\xdb<hy\xa3\x95\x9a'5\xae\x11i " +
-	"\x12\xa9\xbb\x88d\x1b\x87\xcc0\xecq\\\xdb\xb4<\x0f" +
-	"\xc2\xef\x8fv\xbf\xfe\xc5\xa5\xeb\xbf!\x02\x04]\x859" +
-	"W4\\c\xc4#\xd9\xd9\xa04\x14\xe5\x83\x1cr\x98" +
-	"A\x00\xc1\xa5\x09k#\x91,qH\x87\x01,\x03F" +
-	"$Fz\x88\xe40\x87\xac1\x08\xce2\xe0Db\x87" +
-	"\xfag\x85C\xeeg\xd8\xe3Y\x9eW\xb6\xab\xe8l\x1e" +
-	"\x05\x01\x9d\x04\xff\xe1\xdd5\xcb\xb4K\x16\x11!E\x0c" +
-	")B\xdaq\xca%\xb4\x11C\x1b!m\xb8C\x1e:" +
-	"\x08E\x0e$\x89\xa9\xe7\xbc)\xb6Z\xeeH\xb9jT" +
-	"z+\xf6P\xb9\x9a\xdb\x1c(\x83%\xa5Y\xba\x93k" +
-	"\x89^\xcc\x06\x0a]S\xa0UD\xf2!\x0eYi\x0a" +
-	"T\xeei\x8a\xd6\x10\xa8\xa1\xda\x93Wk+f\x96K" +
-	"\xff^\x18Vu\x06\xb6\xccQ\xf6\x16\xc6j\xaeA\xa4" +
-	"\xae\xb9\xad\xd1\xfaM\xaax\x8eC\xaeii\xfd\xe6\x01" +
-	"\"y#\x87\xbc\x95!]5F\xac\x807I\x184" +
-	"+e\xabZC\x97\xc6\x09\xe8Z\xa2P\xc56\x8d\x0a" +
-	"\x91L6\xaa\x14T\x95<\x87\xbc\x8f!,\xb2A\x15" +
-	"Y\xcf!\x8b\x0c\x82aN\xa0M\x0ax/\x87\xdc\xca" +
-	"\x90v,\xcbmT\xf6,w\xa7\xe5\"N\x0cqB" +
-	"z\xd8\xf6j\xe1\xb7y\xae\x0d\xce V5*jN" +
-	"-pm\x18\x08\x08\xe3T\x88>b\"\x12\xcb\x06\xa7" +
-	"2\xdfj\x08\x07\xe1vUjh\x0dP\xf4e\x03\x0d" +
-	"eF\x0d\x86\x96\xbc\x14\x8f)B\xd4\x17j\xf547" +
-	"/\x18\xcf@[\xb4z-\x83\x88Z\xfd\xc6\xba7\xc6" +
-	"\x18\x84\x16\xc9 J$F\xfb\x88\xa4\xc3!\x9fa\xc8" +
-	"\x06Z\xa6w\x96\xad]\x10\xfe\xa1\xdc\x95\xed\xfd\x97V" +
-	"\x1c\xa8\x9b8\x08\x0f\x88\xe6\xafR\xe8m\xc3\xd9R\xb3" +
-	"\xdd\xc0J\xc2?]\xf8\xe5\xc0\xbe\xc4\xf1\x1f\xea_\xb3" +
-	"\x96\x1a!\xbc\x97\xce\xe6x\x84E\x97\xd3\xb8~\xc7\xfb" +
-	"\xc7\xa8\xe9\xab\xfb)\xc7\x90UQ\xe35io8p" +
-	"\xc7\xd1\xe3\x83\xcb>ZH\xbb8o\xe6\x8c\xea\x11\xfd" +
-	"\xb7\x10[`\xffz\x8a-Ij\x98\xa6=Z\xadA" +
-	"\xf8\x933S\x9f\xad\xff~fz!\xe9B\x01\xea\xb6" +
-	"\xff;\x00\x00\xff\xff\xe1\xb0\x0f\x9f"
+type Executor_bytecodeCache_Params capnp.Struct
+
+// Executor_bytecodeCache_Params_TypeID is the unique identifier for the type Executor_bytecodeCache_Params.
+const Executor_bytecodeCache_Params_TypeID = 0x8b1d7e7251a6624c
+
+func NewExecutor_bytecodeCache_Params(s *capnp.Segment) (Executor_bytecodeCache_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Executor_bytecodeCache_Params(st), err
+}
+
+func NewRootExecutor_bytecodeCache_Params(s *capnp.Segment) (Executor_bytecodeCache_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Executor_bytecodeCache_Params(st), err
+}
+
+func ReadRootExecutor_bytecodeCache_Params(msg *capnp.Message) (Executor_bytecodeCache_Params, error) {
+	root, err := msg.Root()
+	return Executor_bytecodeCache_Params(root.Struct()), err
+}
+
+func (s Executor_bytecodeCache_Params) String() string {
+	str, _ := text.Marshal(0x8b1d7e7251a6624c, capnp.Struct(s))
+	return str
+}
+
+func (s Executor_bytecodeCache_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Executor_bytecodeCache_Params) DecodeFromPtr(p capnp.Ptr) Executor_bytecodeCache_Params {
+	return Executor_bytecodeCache_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Executor_bytecodeCache_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Executor_bytecodeCache_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Executor_bytecodeCache_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Executor_bytecodeCache_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Executor_bytecodeCache_Params_List is a list of Executor_bytecodeCache_Params.
+type Executor_bytecodeCache_Params_List = capnp.StructList[Executor_bytecodeCache_Params]
+
+// NewExecutor_bytecodeCache_Params creates a new list of Executor_bytecodeCache_Params.
+func NewExecutor_bytecodeCache_Params_List(s *capnp.Segment, sz int32) (Executor_bytecodeCache_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Executor_bytecodeCache_Params](l), err
+}
+
+// Executor_bytecodeCache_Params_Future is a wrapper for a Executor_bytecodeCache_Params promised by a client call.
+type Executor_bytecodeCache_Params_Future struct{ *capnp.Future }
+
+func (f Executor_bytecodeCache_Params_Future) Struct() (Executor_bytecodeCache_Params, error) {
+	p, err := f.Future.Ptr()
+	return Executor_bytecodeCache_Params(p.Struct()), err
+}
+
+type Executor_bytecodeCache_Results capnp.Struct
+
+// Executor_bytecodeCache_Results_TypeID is the unique identifier for the type Executor_bytecodeCache_Results.
+const Executor_bytecodeCache_Results_TypeID = 0x9315a840d2a15700
+
+func NewExecutor_bytecodeCache_Results(s *capnp.Segment) (Executor_bytecodeCache_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_bytecodeCache_Results(st), err
+}
+
+func NewRootExecutor_bytecodeCache_Results(s *capnp.Segment) (Executor_bytecodeCache_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_bytecodeCache_Results(st), err
+}
+
+func ReadRootExecutor_bytecodeCache_Results(msg *capnp.Message) (Executor_bytecodeCache_Results, error) {
+	root, err := msg.Root()
+	return Executor_bytecodeCache_Results(root.Struct()), err
+}
+
+func (s Executor_bytecodeCache_Results) String() string {
+	str, _ := text.Marshal(0x9315a840d2a15700, capnp.Struct(s))
+	return str
+}
+
+func (s Executor_bytecodeCache_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Executor_bytecodeCache_Results) DecodeFromPtr(p capnp.Ptr) Executor_bytecodeCache_Results {
+	return Executor_bytecodeCache_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Executor_bytecodeCache_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Executor_bytecodeCache_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Executor_bytecodeCache_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Executor_bytecodeCache_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Executor_bytecodeCache_Results) Cache() process.BytecodeCache {
+	p, _ := capnp.Struct(s).Ptr(0)
+	return process.BytecodeCache(p.Interface().Client())
+}
+
+func (s Executor_bytecodeCache_Results) HasCache() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Executor_bytecodeCache_Results) SetCache(v process.BytecodeCache) error {
+	if !v.IsValid() {
+		return capnp.Struct(s).SetPtr(0, capnp.Ptr{})
+	}
+	seg := s.Segment()
+	in := capnp.NewInterface(seg, seg.Message().CapTable().Add(capnp.Client(v)))
+	return capnp.Struct(s).SetPtr(0, in.ToPtr())
+}
+
+// Executor_bytecodeCache_Results_List is a list of Executor_bytecodeCache_Results.
+type Executor_bytecodeCache_Results_List = capnp.StructList[Executor_bytecodeCache_Results]
+
+// NewExecutor_bytecodeCache_Results creates a new list of Executor_bytecodeCache_Results.
+func NewExecutor_bytecodeCache_Results_List(s *capnp.Segment, sz int32) (Executor_bytecodeCache_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[Executor_bytecodeCache_Results](l), err
+}
+
+// Executor_bytecodeCache_Results_Future is a wrapper for a Executor_bytecodeCache_Results promised by a client call.
+type Executor_bytecodeCache_Results_Future struct{ *capnp.Future }
+
+func (f Executor_bytecodeCache_Results_Future) Struct() (Executor_bytecodeCache_Results, error) {
+	p, err := f.Future.Ptr()
+	return Executor_bytecodeCache_Results(p.Struct()), err
+}
+func (p Executor_bytecodeCache_Results_Future) Cache() process.BytecodeCache {
+	return process.BytecodeCache(p.Future.Field(0, nil).Client())
+}
+
+const schema_e82706a772b0927b = "x\xda\x9cUm\x88TU\x18~\x9fs\xee\xec\xdd\xdd" +
+	"\xf9\xda\xe3\x9d%\x0al\xd0\xd6\xac\x057\xdb\x0d\xc4\x0d" +
+	"\xdb\xa1\\JQ\xda\xa3\x86\xac\xf4\xa3\xf1\xceaw`" +
+	"v\xeex\xef\xac\xeeRiB\x88Y\x10[\x19\xa5\x14" +
+	"hh\xf6#\xedGI\x84A\x12\x09\x0a\x06\x15\x94\x04" +
+	"fe\xf4!DjYQ\xda\x8dsw\xef\xdc\xd9]" +
+	"7\xab_\xf7\xc0y\xce\xf3>\xef\xf3~\xdc\x85\x87\x8c" +
+	"\x9cq{rm+1\xf9{\xac\xc1\xff\xf9\xe9\x81\xf4" +
+	"\xd2\xb3\xf7?F\"\xce\xfd\x87\x9fy\xc3}\xb5a\xfe" +
+	"\xf7D\xb0\xc6\x9a\xf7Z/6\x9bD];\x9bMX" +
+	"K\xe2&\x91_\xbek\xffk\x07W\x8em%\x91\x01" +
+	"Q\x0c\xfaz^\xbc\x1b\x04kA\xbc\x87\xe0\xafX\xbf" +
+	"_\xba\x9bg?9\x0e0\xf4\xfd\xca\xf8r\x90\xf1\xd7" +
+	"\xda=\x1f\xe7\x0e\xb4>[\xf7pq|\x95~\xd8\x1b" +
+	"<|\xee\xa5\xcf6\xff\xb0\xfd\xe5\xe7If\xa0\x11\\" +
+	"#T\x9ciD1\xfe\x1d\xc1\x9f3zi\xe7\xba\x83" +
+	"\x07w\xd7\xc7\x96\x89Y\x1a\xd0\x9f\xd0\x14\xd7[g\xe6" +
+	"\xe2\xf5\xf6\xb7&Q\x8c&:5bkBS\x9c\xbe" +
+	"\xed\xdc|\x9c:w\x98\x84\x05\xbf\xff\xcb\xc3\xdb.\xcc" +
+	"y\xe0\x18\xc5\x98Id\xa9\xe4\x09kCR\x9f\x86\x92" +
+	"\x9b\x08>+\x9d~\xb3\xbf\xeb\xec\x11\x92\x16\xea\xc0\xad" +
+	"\x0d&\x88\xac\xe3\xc9\x13\x04\xebd\xf2\x10\xc1\xbf\xf2\xee" +
+	";W.\xbcr\xf4\xbdi\x16\xaa\xd4^k(\xa5)" +
+	"\x8b\xa9{\xad1}\x8a\x88d\x1c\x88\xd0\xb1\x06\x0d\x1b" +
+	"M\xed\xb2\xb6\xa6\xae#\xeaz\"\x95\x85\x16\xfc\xe7\x17" +
+	"\xc7\x1fy\xfb\xce\x8f\xear\xb6\xc6\xd2\x7f\x10\xac\x9di" +
+	"\x9d\xb2\xb9{\x99\xb3\xe1\xf2\x0b\x9f\xd6{\xf2A\xbaY" +
+	"g|2\x00\xa4\x16\xe5\x06~\xb9q\xf5o\xf5\x80\x1f" +
+	"\xc7\x01\x97\x02\x00;\xc5\x16\xf5\x17\xce\xf8Q\xc1\xac\xd6" +
+	"\x96\x8b\xe4\x93OM\xbe\xed\xb8\xaa\xc3\xceWP\xaet" +
+	"\xf7\x8e({\xd8\xac:n\x1f [x\x8c\xa8V3" +
+	"\x842\xc4\x86vbB\x99\x88\x8a\x81\xb0eD\xff:" +
+	"bB\x9a`\xb5\x98\x08\xd3\x13\xbd7\x10\x13\x8bM\xf0" +
+	"Z\x03\x81\xc2\x86Y\xe0\x12\x13\xf3\xcc\xb4\x1aQv\x0e" +
+	"\xbe\xfe\xdc\x93\xb7\x07\x89\xabB\x0e\xbc\xe2\xe5\xe0\xaf\x1f" +
+	"\xad*\xdb)(\xca\xea\x1b\x95C\x1fP\x13\xcfC\xf1" +
+	"U\xc7\xed\x08_\xabB\xdb\xaa\x1e\xe5\x0d\x97\xaa\x9e4" +
+	"\xb8Ad\x80H$\xef&\x92\x8d\x1c2\xc3\xb0\xa5\xe2" +
+	":\xb6\xf2<\x08\xbf\xaba\xde\x81O\xce\xdf\xf49\x11" +
+	" (b6\xea\x99C\x0d\x01{[_\xde\xcd\x0fy" +
+	"D\xff\x06\xbb*\xd0\x81IB:#!Y[\xa3 " +
+	"\xfc*\x9a~\xe5\xdf\xac\xf8v\xaa\x8ci\x09\x86\xd1e" +
+	"K\x8d0\xaf3{\x90C\x0e2\x08 \x18\x10\xa1\x96" +
+	"\x13\xc9\x02\x87\xac0\x80e\xc0\x88\xc4P;\x91\x1c\xe4" +
+	"\x90U\x06\xc1Y\x06\x9cH\x97\x95d\x89Cng\xd8" +
+	"\xe2)\xcf+:e\xb4D\xbdL@\x0b\xd5\x95\x81\x08" +
+	"IbH\x12\xd2\x95J\xb1\x80Fbh$\xa4\xf3\xee" +
+	"\x80\x87\x14\xa1\x8f\x03\x09b\xfa8)\x8b5\xca\x1d*" +
+	"\x96\xf3\xa5\x8e\x923P,_\xd5\x98\xfa\x0a\xcd\xac\xe4" +
+	"Z\xb5\xef\xcb\x06\x0e]\xd3\xa0\xb9D\xf2!\x0eY\x8a" +
+	"\x0c*\xb6G\xa6\xd5\x0c\xaa\xb9\xf6\xf8?\xc92\xedb" +
+	"\xe1\xbf\x1b\xc3\xca\x95\xee\xd5\xe3\x94\x1d\xbd#U7O" +
+	"\xa4G\xb0\xb1&\xfdV\x1d\xbc\x8dC.\xac\x93\xbe\xa0" +
+	"\x9bH\xde\xc2!\xef`H\x97\xf3C*\xe0M\x10z" +
+	"\xecRQ\x95\xab\x98ep\x02f\xcd\x10\xa8\xe4\xd8\xf9" +
+	"\x12\x91L\xd4\xa2\xf4\xea(9\x0e\xb9\x82!\x0c\xb2L" +
+	"\x07Y\xca!\xfb\x18\x04\xc3\xb8A+5\xf0>\x0e\xb9" +
+	"\x86!]Q\xca\xadE\xf6\x94\xbbQ\xb9h\"\x86&" +
+	"Bz\xd0\xf1\xaa\xe1\xdd\xa4U\x13\xb4\x81Y\xce\x97t" +
+	"\x9eF\xb0j\xc2=\x86\xf0/ D'1\x113\xb3" +
+	"A\xabL\x9ex\x84\x89p\xa7,\x0d\xd4\xef}tf" +
+	"\x03\x0feF'\x86\xba5/\x1e\xd5\x84\x98(\xa8j" +
+	"\x8f*/\x18\xcf\xc0\x98Vz#\x83\x98.\xfd\xf2\x89" +
+	"\xd9\x18a\x10F,\x83\x06\"1\xac\xe7\xb7\xc2!\x9f" +
+	"b\xc8\x06^\xa67\x16\xd5&\x08\x7fW\xdb\xe5u]" +
+	"\xe7g\xef\x98\x18\xe2`\xabAD\xbf\xe1p\xb6\xf3\x95" +
+	"\xd5U\xc7\x0dFI\xf8\xc7z\x7f\xda\xb1-\xbe\xef\xeb" +
+	"\x89\xdb\xac\xd2)\x84\xfd\xd2\x12\xa5G\x98\xd69\xb5\xee" +
+	"\xafxW\xddx\xe1\xa2ic\xc8\xea\x8d\xe7E\xb47" +
+	"\xefX\xb2g_O\xeb\xfbSi\xa7\xef\x9b\xf1A\xf5" +
+	"\x88\xfe\xff.\xbd\xca\xf8\x87;t&\xd2\xbcm;\xc3" +
+	"\xe5*\x84\x7f\xe4\xe2\xd1\x0f\x97~u\xf1\xc2T\xd2\xa9" +
+	"\x06L\x8c\xfd\xdf\x01\x00\x00\xff\xff\xa2oR\xe0"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
@@ -1607,6 +1813,8 @@ func RegisterSchema(reg *schemas.Registry) {
 		Nodes: []uint64{
 			0x804fe3440f678ff3,
 			0x81914daea9a63e6e,
+			0x8b1d7e7251a6624c,
+			0x9315a840d2a15700,
 			0x969e88e97ed79d94,
 			0x9baeae5a95f57921,
 			0xb52aad0122df1319,

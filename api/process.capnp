@@ -33,19 +33,3 @@ struct Info {
     argv @3 :List(Text);
     time @4 :Int64;
 }
-
-interface BootContext {
-    # Every process is given a BootContext containing the arguments and capabilitis
-    # passed by the parent process.
-    pid  @0 () -> (pid :UInt32);
-    # PID of the process.
-    cid  @1 () -> (cid :Cid);
-    # CID of the process bytecode.
-    args @2 () -> (args :List(Text));
-    # CLI arguments.
-    caps @3 () -> (caps :List(Capability));
-    # Capabilities.
-
-    setPid @4 (pid :UInt32) -> ();
-    setCid @5 (cid :Cid) -> ();
-}
