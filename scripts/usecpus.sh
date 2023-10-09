@@ -7,10 +7,10 @@ if [ -z $1 ]; then
     exit 1
 fi
 
-if ! [ -f /.dockerenv ]; then
-    echo "Not inside a container!";
-   exit 1
-fi
+#if ! [ -f /.dockerenv ]; then
+#    echo "Not inside a container!";
+#   exit 1
+#fi
 
 cpus=$1
 
