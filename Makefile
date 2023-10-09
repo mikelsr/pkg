@@ -1,14 +1,24 @@
+.PHONY: all build build-arm clean gen install
+
+FLAGS := CGO_ENABLED=0
+ARM_FLAGS := ${FLAGS} GOOS=linux GOARCH=arm GOARM=7
+WASM_FLAGS := ${FLAGS} GOOS=wasip1 GOARCH=wasm
+
 all: clean install
 
 gen:
 	go generate ./...
-	GOOS=wasip1 GOARCH=wasm go build -o rom/internal/main.wasm rom/internal/main.go
+	env ${WASM_FLAGS} go build -o rom/internal/main.wasm rom/internal/main.go
 
 build: gen
-	go build -buildvcs=false ./cmd/ww
+	env ${FLAGS} go build ./cmd/ww
+
+build-arm:
+	GOOS=linux GOARCH=arm GOARM=7
+	env ${FLAGS}  go build -o ww-arm ./cmd/ww
 
 install: gen
-	go install -buildvcs=false ./cmd/...
+	env ${FLAGS} go install ./cmd/...
 
 clean:
 	@rm -f $(GOPATH)/bin/ww
