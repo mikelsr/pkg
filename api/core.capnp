@@ -14,6 +14,10 @@ interface Terminal {
     login @0 (account :Cluster.Signer) -> (session :Session);
 }
 
+interface PeerLister {
+    peers @0 () -> (session :Session);
+}
+
 # Session is a capability-set that was granted to a particular
 # user.  It is the application wide ambient-authority boundary.
 struct Session {
@@ -50,6 +54,7 @@ interface Executor {
     ps @2 () -> (procs :List(Process.Info));
     # List all running processes.
     bytecodeCache @3() -> (cache :Process.BytecodeCache);
+    dialPeer @4(peerId :Text) -> (session :Session);
 }
 
 interface ProcessInit {

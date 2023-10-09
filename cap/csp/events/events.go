@@ -9,7 +9,13 @@ import (
 type EventHandler struct {
 	pause  chan struct{}
 	resume chan struct{}
-	stop   chan struct{}
+}
+
+func New() EventHandler {
+	return EventHandler{
+		pause:  make(chan struct{}),
+		resume: make(chan struct{}),
+	}
 }
 
 func (e EventHandler) Pause(ctx context.Context, call api.Events_pause) error {
@@ -18,10 +24,6 @@ func (e EventHandler) Pause(ctx context.Context, call api.Events_pause) error {
 
 func (e EventHandler) Resume(ctx context.Context, call api.Events_resume) error {
 	return chanOrCtx(ctx, e.resume)
-}
-
-func (e EventHandler) Stop(ctx context.Context, call api.Events_stop) error {
-	return chanOrCtx(ctx, e.stop)
 }
 
 func chanOrCtx(ctx context.Context, c chan struct{}) error {
@@ -38,9 +40,5 @@ func (e EventHandler) OnPause() <-chan struct{} {
 }
 
 func (e EventHandler) OnResume() <-chan struct{} {
-	return e.pause
-}
-
-func (e EventHandler) OnStop() <-chan struct{} {
 	return e.pause
 }

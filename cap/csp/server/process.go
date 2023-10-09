@@ -12,6 +12,8 @@ import (
 	"github.com/wetware/pkg/cap/csp"
 )
 
+var nilEvents = api.Events{}
+
 type killFunc func(uint32)
 
 // process is the main implementation of the Process capability.
@@ -24,9 +26,9 @@ type process struct {
 	cancel   context.CancelFunc
 	result   execResult
 
-	linked  *sync.Map
-	getProc func(uint32) (*process, bool)
-	events  *api.Events
+	linked           *sync.Map
+	localProcFetcher func(uint32) (*process, bool)
+	events           api.Events
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
@@ -74,7 +76,7 @@ func (p *process) Link(ctx context.Context, call api.Process_link) error {
 }
 
 func (p *process) link(pid uint32) error {
-	other, ok := p.getProc(pid)
+	other, ok := p.localProcFetcher(pid)
 	if !ok {
 		return fmt.Errorf("process %d not found", pid)
 	}
@@ -90,7 +92,7 @@ func (p *process) unlink(pid uint32) {
 	p.linked.Delete(pid)
 }
 func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
-	if p.events == nil {
+	if p.events == nilEvents {
 		return errors.New("event handler not initialized")
 	}
 
@@ -100,7 +102,7 @@ func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
 }
 
 func (p *process) Resume(ctx context.Context, call api.Process_resume) error {
-	if p.events == nil {
+	if p.events == nilEvents {
 		return errors.New("event handler not initialized")
 	}
 

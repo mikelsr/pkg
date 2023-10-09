@@ -44,7 +44,7 @@ type Config struct {
 	RuntimeConfig      wazero.RuntimeConfig
 }
 
-func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc chan core_api.Session) error {
+func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc chan core_api.Session, h local.Host) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -75,7 +75,7 @@ func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc cha
 	}
 	defer r.Close()
 
-	e, err := conf.NewExecutor(ctx)
+	e, err := conf.NewExecutor(ctx, h)
 	if err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc cha
 	}
 }
 
-func (conf Config) NewExecutor(ctx context.Context) (csp_server.Runtime, error) {
+func (conf Config) NewExecutor(ctx context.Context, h local.Host) (csp_server.Runtime, error) {
 	if conf.RuntimeConfig == nil {
 		if runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64" {
 			conf.RuntimeConfig = wazero.
@@ -157,6 +157,28 @@ func (conf Config) NewExecutor(ctx context.Context) (csp_server.Runtime, error) 
 		Cache:   make(csp_server.BytecodeCache),
 		Tree:    csp_server.NewProcTree(ctx),
 		Log:     slog.Default(),
+		PeerDial: func(ctx context.Context, call core_api.Executor_dialPeer) error {
+			res, err := call.AllocResults()
+			if err != nil {
+				return err
+			}
+			p, err := call.Args().PeerId()
+			if err != nil {
+				return err
+			}
+			d := Dialer{
+				Host:    h,
+				Account: auth.SignerFromHost(h),
+			}
+			sess, err := d.Dial(
+				ctx,
+				h.Peerstore().PeerInfo(peer.ID(p)),
+				proto.Namespace("ww")...)
+			if err != nil {
+				return err
+			}
+			return res.SetSession(core_api.Session(sess))
+		},
 	}, nil
 }
 

@@ -50,5 +50,4 @@ interface Events {
     # handle events.
     pause  @0 () -> ();
     resume @1 () -> ();
-    stop   @2 () -> ();
 }

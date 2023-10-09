@@ -47,7 +47,7 @@ func TestServer(t *testing.T) {
 			defer cancel()
 			require.NotZero(t, root, "must return non-null Host")
 		},
-	}.Serve(ctx, ec, sc)
+	}.Serve(ctx, ec, sc, h)
 	<-sc
 	<-ec
 	require.ErrorIs(t, err, context.Canceled)

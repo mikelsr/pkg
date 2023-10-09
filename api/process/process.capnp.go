@@ -2117,26 +2117,6 @@ func (c Events) Resume(ctx context.Context, params func(Events_resume_Params) er
 
 }
 
-func (c Events) Stop(ctx context.Context, params func(Events_stop_Params) error) (Events_stop_Results_Future, capnp.ReleaseFunc) {
-
-	s := capnp.Send{
-		Method: capnp.Method{
-			InterfaceID:   0xe9b5ea42655a6266,
-			MethodID:      2,
-			InterfaceName: "process.capnp:Events",
-			MethodName:    "stop",
-		},
-	}
-	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
-		s.PlaceArgs = func(s capnp.Struct) error { return params(Events_stop_Params(s)) }
-	}
-
-	ans, release := capnp.Client(c).SendCall(ctx, s)
-	return Events_stop_Results_Future{Future: ans.Future()}, release
-
-}
-
 func (c Events) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
@@ -2213,8 +2193,6 @@ type Events_Server interface {
 	Pause(context.Context, Events_pause) error
 
 	Resume(context.Context, Events_resume) error
-
-	Stop(context.Context, Events_stop) error
 }
 
 // Events_NewServer creates a new Server from an implementation of Events_Server.
@@ -2233,7 +2211,7 @@ func Events_ServerToClient(s Events_Server) Events {
 // This can be used to create a more complicated Server.
 func Events_Methods(methods []server.Method, s Events_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 3)
+		methods = make([]server.Method, 0, 2)
 	}
 
 	methods = append(methods, server.Method{
@@ -2257,18 +2235,6 @@ func Events_Methods(methods []server.Method, s Events_Server) []server.Method {
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
 			return s.Resume(ctx, Events_resume{call})
-		},
-	})
-
-	methods = append(methods, server.Method{
-		Method: capnp.Method{
-			InterfaceID:   0xe9b5ea42655a6266,
-			MethodID:      2,
-			InterfaceName: "process.capnp:Events",
-			MethodName:    "stop",
-		},
-		Impl: func(ctx context.Context, call *server.Call) error {
-			return s.Stop(ctx, Events_stop{call})
 		},
 	})
 
@@ -2307,23 +2273,6 @@ func (c Events_resume) Args() Events_resume_Params {
 func (c Events_resume) AllocResults() (Events_resume_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
 	return Events_resume_Results(r), err
-}
-
-// Events_stop holds the state for a server call to Events.stop.
-// See server.Call for documentation.
-type Events_stop struct {
-	*server.Call
-}
-
-// Args returns the call's arguments.
-func (c Events_stop) Args() Events_stop_Params {
-	return Events_stop_Params(c.Call.Args())
-}
-
-// AllocResults allocates the results struct.
-func (c Events_stop) AllocResults() (Events_stop_Results, error) {
-	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return Events_stop_Results(r), err
 }
 
 // Events_List is a list of Events.
@@ -2595,214 +2544,82 @@ func (f Events_resume_Results_Future) Struct() (Events_resume_Results, error) {
 	return Events_resume_Results(p.Struct()), err
 }
 
-type Events_stop_Params capnp.Struct
-
-// Events_stop_Params_TypeID is the unique identifier for the type Events_stop_Params.
-const Events_stop_Params_TypeID = 0xfa45ca5ec6290c9f
-
-func NewEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return Events_stop_Params(st), err
-}
-
-func NewRootEvents_stop_Params(s *capnp.Segment) (Events_stop_Params, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return Events_stop_Params(st), err
-}
-
-func ReadRootEvents_stop_Params(msg *capnp.Message) (Events_stop_Params, error) {
-	root, err := msg.Root()
-	return Events_stop_Params(root.Struct()), err
-}
-
-func (s Events_stop_Params) String() string {
-	str, _ := text.Marshal(0xfa45ca5ec6290c9f, capnp.Struct(s))
-	return str
-}
-
-func (s Events_stop_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (Events_stop_Params) DecodeFromPtr(p capnp.Ptr) Events_stop_Params {
-	return Events_stop_Params(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s Events_stop_Params) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s Events_stop_Params) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s Events_stop_Params) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s Events_stop_Params) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-
-// Events_stop_Params_List is a list of Events_stop_Params.
-type Events_stop_Params_List = capnp.StructList[Events_stop_Params]
-
-// NewEvents_stop_Params creates a new list of Events_stop_Params.
-func NewEvents_stop_Params_List(s *capnp.Segment, sz int32) (Events_stop_Params_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[Events_stop_Params](l), err
-}
-
-// Events_stop_Params_Future is a wrapper for a Events_stop_Params promised by a client call.
-type Events_stop_Params_Future struct{ *capnp.Future }
-
-func (f Events_stop_Params_Future) Struct() (Events_stop_Params, error) {
-	p, err := f.Future.Ptr()
-	return Events_stop_Params(p.Struct()), err
-}
-
-type Events_stop_Results capnp.Struct
-
-// Events_stop_Results_TypeID is the unique identifier for the type Events_stop_Results.
-const Events_stop_Results_TypeID = 0xa66966629ce6e8e9
-
-func NewEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return Events_stop_Results(st), err
-}
-
-func NewRootEvents_stop_Results(s *capnp.Segment) (Events_stop_Results, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
-	return Events_stop_Results(st), err
-}
-
-func ReadRootEvents_stop_Results(msg *capnp.Message) (Events_stop_Results, error) {
-	root, err := msg.Root()
-	return Events_stop_Results(root.Struct()), err
-}
-
-func (s Events_stop_Results) String() string {
-	str, _ := text.Marshal(0xa66966629ce6e8e9, capnp.Struct(s))
-	return str
-}
-
-func (s Events_stop_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
-	return capnp.Struct(s).EncodeAsPtr(seg)
-}
-
-func (Events_stop_Results) DecodeFromPtr(p capnp.Ptr) Events_stop_Results {
-	return Events_stop_Results(capnp.Struct{}.DecodeFromPtr(p))
-}
-
-func (s Events_stop_Results) ToPtr() capnp.Ptr {
-	return capnp.Struct(s).ToPtr()
-}
-func (s Events_stop_Results) IsValid() bool {
-	return capnp.Struct(s).IsValid()
-}
-
-func (s Events_stop_Results) Message() *capnp.Message {
-	return capnp.Struct(s).Message()
-}
-
-func (s Events_stop_Results) Segment() *capnp.Segment {
-	return capnp.Struct(s).Segment()
-}
-
-// Events_stop_Results_List is a list of Events_stop_Results.
-type Events_stop_Results_List = capnp.StructList[Events_stop_Results]
-
-// NewEvents_stop_Results creates a new list of Events_stop_Results.
-func NewEvents_stop_Results_List(s *capnp.Segment, sz int32) (Events_stop_Results_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
-	return capnp.StructList[Events_stop_Results](l), err
-}
-
-// Events_stop_Results_Future is a wrapper for a Events_stop_Results promised by a client call.
-type Events_stop_Results_Future struct{ *capnp.Future }
-
-func (f Events_stop_Results_Future) Struct() (Events_stop_Results, error) {
-	p, err := f.Future.Ptr()
-	return Events_stop_Results(p.Struct()), err
-}
-
-const schema_9a51e53177277763 = "x\xda\xacV]l\x14U\x14>\xe7\xce\xcc\xce\xa8\xdd" +
-	"\xae\xb7\xb3 \x12b\xa5\x16\x0d\xab\xb4\x14\x1e\x0c\x04\xec" +
-	"\x02i\x08\xc4\x87\x9d&<\x14\x03\xd9\xe92\xb0\x13\xda" +
-	"\xee\xb23\xdb\x82@B\x0d\x15Kl\xd4D\xa36m" +
-	"\xa8\x89\xd5\xc6\x88\x91*\xa2\x895\x11\x02\x15\x8d\x0f\x82" +
-	"\x09`QcQBKB4\xb15\xf5o\xcd\x9d\xd9" +
-	"\x99\x9d\xee\x8f5\xc4\x97\xa6\xb3\xe7\xdc\xef|\xe7\xe7~" +
-	"\xe7.\x8fpa\xbe\xce/\xde\x05D9$\xf82\x89" +
-	"o\xaf\x8e=\xd9\xff\xdbS@\xe7!\x00/\x02\xac\xd4" +
-	"\x85\x85\x08|fwxd\xa1\x7f\xdd\xb5\xa7A\x99\x8f" +
-	"\x8eI\x11\xaa\x10Pn\x12\xea\x013\x9f<V\x13\x0a" +
-	"T|\xf0\x02\xd0E\x08  s\xd8'\xacf\x0e\x9d" +
-	"\x96\xc3\xc3\xd1\x81c\x0df\xb4\x1f\xe8|\x07`\xd0\xc6" +
-	"\xae\xb9\x1c\xbbY;^\xfb\x86'j\x8fP\xc1,\x13" +
-	"7\xae\xf75\xef\xd4\xbd\x96\xb4m\xf9\x953\x9f8\xfb" +
-	"\xcb\xb9ao\xb8m\xc2z\x16N\xb3\xc2E\x8fvE" +
-	"\xae\xac[r\xca\x13\xae\xdb\x0ew\xb9\xf1\x0b\x7f\xf9\xc2" +
-	"\xc6\x0f=\xa0{l\xcb\x96\xbf\xfb6\x0d\xdd\xb3\xf5\xb4" +
-	"\x17\xb4\xc9\xceA\xb5@\x1f<\xba\xf6\xb5\xc1\xfayg" +
-	"@)G\x92\x89u<\xd4Q\xf7\x93\xd2\x0b\x02\x11\x01" +
-	"\xe4N\xa1W\xee\x16\xd8\x99.\xa1\x12\x013\xb7^\xfe" +
-	"\xda\x18\x8e\xd7\x9d\xf5f\xec\xb3\x02\xdd8\xf2\xa9\xef\xfb" +
-	"t\xed\x05o5{|\x15,\xd0K>\x16\xe8\xed\x8d" +
-	"\xcb\xab\x07\xde\x0f]\xf2:\x9cdgQ\x1e\xb1\x1c\xd6" +
-	"\x9c\xdf\xdf<\xd0\xbb\xe6\x8a\x07\xfb\x07_\x88a\xaf\xf4" +
-	"-\x19\xba\xf8\xf3\x03\xdf\x00-\xe7r\x14\x01\xe5\xf3\xbe" +
-	"a\xf9+\x1f\xf3\xfc\xd2w\x04\xe5\x11Q\x04\xc8\x98x" +
-	"\xc74\xf7\xe3\xe3\xd7\x0b\xbc\x07\xc5q\xf9\x04s\x91\x8f" +
-	"\x8b\xa3\xf2\x12\x899\x9f\xfax\xff\xe8\xddc\xcfOx" +
-	"*\xe7\x97\xaaX\xd0\x9d\xcd[\xb5\xf5\x93''\x0a`" +
-	"\xa6\xc4\xb7\xe4\xbf,\x98\x19qT\xdec\xc1(\x9f\xe9" +
-	"\x8fF\xa3\x7fLz\xb87I\x16\xf7\x8d\xdbj\xdf\xbd" +
-	"\xf7\x9d7oy,\xeb$\xab\xdf\xf1\x8f\xee\xff\xf3\xe2" +
-	"\xc1\xfb\xa6\xbc\xadY*Y\xfd\xae\x93XA\x9e[;" +
-	"\x19\x9f\x7f\xb5{\xcasT\xb1\xb9%\xb7|\xb7\xec\xf8" +
-	"\xa5\xd3^\xcb*\xdbr`\xe8f\xba\xaf\xe2\xc5i/" +
-	"\xe8b\xc9\xea\xf7R\x0b4\xb0}\xfa\xcc\x85G\xa23" +
-	"\xa0,r\xdb\xb0\xc9\x8e\xaaX\x0e\xd7\xde\x1b\x93\xc67" +
-	"\xeb3\x1e\xec=6\xe1ceK\xcfm\xff\xbc\xe1w" +
-	"O\xad\x9a\xa4;\x11\x96g\x92\xa9DL3\x8c\x1a." +
-	"\xa6&\xdb\x92\xab\x1b\xda\xb56\xd3\xa8I\xaaiC\xab" +
-	"n\xd4\x8ct\x0bg\x1a\xf9N\x91\xecg\xba\xadEo" +
-	"\xdb]\x1dQS\xa2\xdaj(<\xc7\x03\xf0\x08@\xfd" +
-	"+\x00\x14\x89C%H\xb02a\xc6\xb5\x14J@P" +
-	"\x02\xcc\x87Z\xbf\xcf\xd4b\x89\x1d\xda\x065\x16\xd7j" +
-	"\x92i\xb3\xba>\xa2\xa6\xf2\xd06\x03(e\x1c*\x0b" +
-	"\x08f\x9a\xb3\x07\x00\x00\xfd@\xd0_\x88\xe9\xd0\xb3\xc8" +
-	"\x95\xcaaV\xa2VH,\xe5c\x98\x89\xa4\x8dcz" +
-	"|\xf8b\x09\xec\xd2\xcc\xac\xa7\x01\xffC\x069v\\" +
-	"k)v)\xcdH\xb7\x96t\x9aM/\xae\x1a\xc5\xea" +
-	"[\x95\xeb\x96\x18\xd3w\x14\xb0B\x1bkS\x1b\xb73" +
-	"\x11AT\x82\xee\xd1\x83\xec\xe8^\x0e\x95\xc3\x04)b" +
-	"\x90\xcd%\xed\x0c\x01(\x078T\x9e!\x88$\x88\x04" +
-	"\x80v1\xc7C\x1c*\xcf\x12\xa4\x1c\x06\x91\x03\xa0\xdd" +
-	"\xcc\xf10\x87\xca\x00A\xcac\x10y\x00\xda\xcf~|" +
-	"\x85C\xe5u\x82bR\xdf\xe1LN \xe9\xf9\xf0\xd2" +
-	"\x0c\xa8\xa9]\xedX\x0e\x18\xe1\x10\xcb\x80\xb0\x7f\x03\xa6" +
-	"\xde\xaa\xa1\x00\x04\x85\xd2\xd5\xdd\xad\xb7\xb4\xcc9\xe3\xce" +
-	"\x84\xb3\xf9\xb8\xad\x09w\x80:T\xddt\xa3\x95\x9a\x0d" +
-	"m\xafnn\xc8\xce\xc6\x1cx\xd9\xcb\xd7\xa8\x19\x016" +
-	"n\xf9\xcd\x8a\xa4*\xado\xd6\xaf\x05\x9c\x00\xe0\xaa\x03" +
-	":rNO\x84\x80\xd0A\x11\xd1\x95:t\xb6\x04}" +
-	"\x95\xd9zD$\xeez@gg\xb2\x06\x13\x9a\x16\x91" +
-	"s\x171:\x1b\x80\xea\xab\x81\xd0m\"\xf2\xee\xceC" +
-	"G\x0c\xa9\xb2\x02\x08m\x10QpU\x10\x1d\xf5\xa5\xab" +
-	"\xd8\xb9eb\x80\x95)\x8c\x01\xd6\x9b0\x06X\x8aa" +
-	"\xac\xb7s\x0dc\xa5u!\xc2Xo\x0f}\x18#\x98" +
-	"\xab\x0f\xc9\x9fx1\x16\xd7X\xfaeV\xfa\xce\x93\x00" +
-	"\x1d\xf1\xa6J\x95M\x07]\xe9Eg\x91\xd3UU\x16" +
-	"\x1d$\xee\x1aFG~\xe9bf\x9b'\x8a\xc9\xb4\x19" +
-	"Fq\x97\xc6\xfe\xc6Uc6\x9b\xa2\x97\x94\xb5_," +
-	"\xd2\xac\x86\xf6\x00s\xcb\x91u\x1e!\xe8\xbc\x81\xdc\xda" +
-	"\xa1\xfbb@g\x01:\xb5C\xe2\xea<:o\x15\xba" +
-	"8d\x91-\xa8\\\x80\xa9ZQ\xca\xce\x80\xe58\xcf" +
-	"\x1e\xb0b\xb7(_@\xf9R\xea^L\x1c\xe7\x92\x9f" +
-	"\xa2\xa2XP\xca\xe2\xec\xb3\xbb\xe9\xdfe\x91\xa9\xf6m" +
-	"\xc8\"_Jb\xe7J2\xae\x1a\x88@\x10\xe7P\x8b" +
-	"\xff\xb0\x96l\xd6\x00\xff\x04\x00\x00\xff\xff\xc9B6\xf7"
+const schema_9a51e53177277763 = "x\xda\xacV\x7fh[U\x14>\xe7\xbe\xf7r3i" +
+	"\x1ao_Z\xd72\xad\xad\xed\xc4\xea\xfacCde" +
+	"\xb3iG\x19\x1d\x0e\xf2\x0aE\x98L\x92\xa6oM\xe8" +
+	"\xaf\x98\xf7\xd2V\xb7\x82\xcaf\xedp\xe8@P\xcb\x8a" +
+	"\x1d8-\xa2\xa2\xd59\x0bN\xe8\xc6\x9cC\xfc\xc3M" +
+	"\xd8j\xa7b\xe7\xc4v0\x1c\xb8JQ\x8c\xdc\xf7\xf2" +
+	"^^\xd3d\x95\xe1?c\xaf\xe7\xbb\xdf\xf9\xee9\xe7" +
+	"~'\xb5\xeb\x05\xbfX\xe7y\xfc\x0e \xca\xa0\xe4J" +
+	"\xf6\xfdpy\xf6\x99\xb1?\x9f\x07V\x88\x00\"\x05\xd8" +
+	"\xc4\xa4\x12\x041\xd9\xe5?Y\xe2i\xbc\xf2\x02(E" +
+	"h\x85\x96\xc4r\x04\x94Qj\x00L~\xf1hu\x95" +
+	"\xb7\xe0\xd3\xc3\xc0\xd6!\x80\x84\x1cP&\xd5s\xc0\x03" +
+	"\x06\xe0\xc1\xe0\xf8\x9b\xcdzp\x0cX\x91E\xb0\xd3\xe4" +
+	"\xae\xbe\x14\xbeV3W\xf3\xb6#\xeb\xc3R\x01\x8f\xfc" +
+	"!\xe8O\x9c\xb9\xf1\xe5\xa4\x93\xf4n\xa9\x89\x93V\x1a" +
+	"\xa4\xc1\x83\x07\x023\x8d\x95'\x1c\xa4-&\xe9\xa5\xd6" +
+	"\xaf=\xf9%\xad\x9f9H\xeb\xccH\xdb?GZ&" +
+	"\xee\xdau\xcaIZl*-3H\xd7\x1f\xdcz\xf4" +
+	"XC\xe1iP\xf2\x91$\xc3\x03\xf7\x0f\xd4]UF" +
+	"A\"\x14@n\x94F\xe5\x16\x89\x9fi\x96J\x110" +
+	"y\xfd\xb5\xef\xb4\xc9H\xdd\x19\x87\x04\xd5e$\xfam" +
+	"x\xda\xf5S\xa2\xe6\xbc\xb3f;]\x05<Q\x9b\x8b" +
+	"'zo{m\xc5\xf8'U\x17\x9d\x80\x04?\x8b\xf2" +
+	"\x90\x01\xd8rno\xfb\xf8\xe8\x96\x19\x07\xf7QW\x15" +
+	"\xe7\xde\xe4\xaa\x9c\xb8\xf0\xfb}\xdf\x03\xcb\x17\xd2\x12\x01" +
+	"\xe5\x11\xd7\xa4|\xd8\xc5\x91\x87\\\xc3(\x0fQ\x0a\x90" +
+	"\xd4q\xcd\xa2\xf0\xcbc\xbf\xae@\xabtN~\x8aC" +
+	"\xe4\x1ezV\xbej\x80O|\xbe\xf7\xec\x9d\xb3\xaf\xcc" +
+	";*\xf7\x0d-\xe7I\xf7\xb4\xefR\x9b\x16\x8e\xcf\xaf" +
+	"\xa09N\xdf\x95O\x1a4StX^\xe3\xe64\xca" +
+	"W\xd1G\x82\xc1\xbf\x16\x1c\xdaoPC\xfb\xf6\xdd5" +
+	"\x1f\x16\x7f\xf0\xceuGd\x86\x1a\xfd\x8eL\xdd\xfb\xf7" +
+	"\x85\xa1{n:[3M\x8d~\x9f\xa3\xbc /o" +
+	"]\x88\x14]\x1e\xb9\xe98:oj\x8b\xb5\xfd\xb8\xe1" +
+	"\xfd\x8b\xa7\x9c\x91o\xcd\xc8\xbe\x89k\x89#\x05\xaf." +
+	":I\xa7\xa8\xd1\xefi\x83\xd4\xfb\xe4\xe2\xe9\xf3\x0f\x05" +
+	"\x97@Yg\xb7\xe1g3\xeb\xbc\x01\xb8\xf2\xf1\xac{" +
+	"nGt\xc9\xc1\xbd\xc6]\x80P\x9b\x8c\xc5\xfb\xc2\xaa" +
+	"\xa6U\x0b\xe1P\xac7V\xdf\xdc\xaf\xf6\xeaZu," +
+	"\x94\xd0\xd4\x8aVUKt\x0b\xba\x96\x09\x0a\xa4>\x13" +
+	"\xbd\xdd\xd1\xde\xae\x8a@(NC=\x9a\"\x0a\"\x80" +
+	"\x88\x00\xcc\xb3\x11@q\x0b\xa8\xf8\x08\x96\xf6\xe9\x115" +
+	"\x8en \xe8\x06\xcc\xa4jzZW\xc3}\x1d\xea\xb6" +
+	"P8\xa2V\xc7\x12zEC \x14\xcf`\xdb\x01\xa0" +
+	"\xe4\x09\xa8\xac%\x98lO\x1d\x00\x00\xf4\x00A\xcfJ" +
+	"NK\x9e!.\xd7\x1d\x96]\xd4H\x89i\x8c\x98M" +
+	"\\\xa7\xaa\x9bl\xba\x06\xff\x83\xbatf\xa1'\x97\xba" +
+	"\xb8\xaa%zr\x82\x96\xcb\x8b\x84\xb4l\xb5+Ow" +
+	"\x82\x86\xa3\x1d+T\xa1\xc9\xd5\xd2+\xec\xe9\x0b *" +
+	">\xfb\xe8\x10?:(\xa0\xb2\x9f C\xf4\xf1\xc9b" +
+	"\xcfU\x01(\xfb\x04T^$\x88\xc4\x87\x04\x80\x1d\xe0" +
+	"\xc0g\x05T^\"\xc8\x04\xf4\xa1\x00\xc0F8p\xbf" +
+	"\x80\xca8A&\xa2\x0fE\x006\xc6\xff\xf8\xba\x80\xca" +
+	"[\x04i,\xdaaM\x857\xe6\xf8p\xca\xf4\x86\xe2" +
+	"\x9d\xfd\x98\x0f\x18\x10\x10\xf3\x80\xf0\xffz\xf5h\x8f\x8a" +
+	"\x12\x10\x94rW\xb7+\xda\xdd\xbd\xea\xfcZ\xd3\xcb{" +
+	"\x7f[\xd3k\x11\x0d\x84\xa2\xba\x9d-\xd7l\xa8\x83Q" +
+	"}[j6V\xe1K=\xacVU\xf3\xf2q\xcbl" +
+	"V ^j|\xf3~\xad\x15$\x00\xfb}\xa3e\xc8" +
+	"\xec\xa3* \xec\x18E\xb4\xcd\x0a-\x9fgo\xf0\xd8" +
+	"!\x8a\xc46x\xb4v\x1bo0a\x09\x8a\x82\xbd0" +
+	"\xd1\xf2p\x16\xad\x07\xc2vS\x14\xed\xad\x85\x96\x9d1" +
+	"e#\x10\xd6LQ\xb2}\x0c-\xffd\x9b\xf9\xb9\x0d" +
+	"\xd4\xcb\xcb\xe4G/\xef\x8d\x1f\xbd\xfc\x8a~l0\xef" +
+	"\xea\xc7R\xe3A\xf8\xb1\xc1\x1cz?\x060]\x1f\x92" +
+	"9\xf14\x1cQ\xf9\xf5\xf3\x8c\xeb[\xab\x1b-\xfbe" +
+	"J\xb9)\x07m\xf3Dk\x15\xb3\xcd\xe5\x86\x1c$\xf6" +
+	"\"E\xcb@Y\x19\x8f\x15R\x1aK\xe8~\xa4\x9d*" +
+	"\xff7\x12\xd2\x96\xab\xc9\xfaHy\xfbi\x96f5\xf7" +
+	"{9\x8c\x8bu\x1bb\xad\x1f\x0bh\xfdVau\xbc" +
+	"v\x95\\\xac\xb5\xf3\xd1Za\xac\x98\xd7\xceCoY" +
+	"\x9d\x8c\xe9I\x0bZ>=\xd9\x9e\xc8\x7fr>n\xcb" +
+	"\xd9\x9co5o\xc9\xeax+\xea\x94]}j\xa9\xdc" +
+	"\xda\xf3\xb8%\xdf\x86\xe7\x89\xb9\xfcs\xb5KFB\x1a" +
+	"\"\x10\xc4U\xac U\xd5\x7f\x03\x00\x00\xff\xff\xab|" +
+	"\x00\x11"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
@@ -2813,7 +2630,6 @@ func RegisterSchema(reg *schemas.Registry) {
 			0x91b6120f2a2e3ebe,
 			0x9d6074459fa0602b,
 			0xa62fe22feb63d82e,
-			0xa66966629ce6e8e9,
 			0xb2c6f1c55b7403f4,
 			0xb72541d950858a60,
 			0xb8521a0e0dcb52d8,
@@ -2835,7 +2651,6 @@ func RegisterSchema(reg *schemas.Registry) {
 			0xf694129c75eba87c,
 			0xf9602cd2c3f65e0f,
 			0xf9694ae208dbb3e3,
-			0xfa45ca5ec6290c9f,
 		},
 		Compressed: true,
 	})

@@ -15,7 +15,7 @@ build: gen
 
 build-arm:
 	GOOS=linux GOARCH=arm GOARM=7
-	env ${FLAGS}  go build -o ww-arm ./cmd/ww
+	env ${ARM_FLAGS}  go build -o ww-arm ./cmd/ww
 
 install: gen
 	env ${FLAGS} go install ./cmd/...

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"log/slog"
@@ -48,10 +49,11 @@ type execArgs interface {
 // Runtime is the main Executor implementation.  It spawns WebAssembly-
 // based processes.  The zero-value Runtime panics.
 type Runtime struct {
-	Runtime wazero.Runtime
-	Cache   BytecodeCache
-	Tree    ProcTree
-	Log     log.Logger
+	Runtime  wazero.Runtime
+	Cache    BytecodeCache
+	Tree     ProcTree
+	Log      log.Logger
+	PeerDial func(context.Context, core_api.Executor_dialPeer) error
 }
 
 // Executor provides the Executor capability.
@@ -236,12 +238,15 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 
 	killFunc := r.Tree.Kill
 	proc := &process{
-		Args:     c.args,
-		time:     time.Now().UnixMilli(),
-		killFunc: killFunc,
-		done:     done,
-		cancel:   c.cancel,
-		getProc:  r.getLocalProc,
+		Args:             c.args,
+		time:             time.Now().UnixMilli(),
+		killFunc:         killFunc,
+		done:             done,
+		cancel:           c.cancel,
+		localProcFetcher: r.getLocalProc,
+		linked:           &sync.Map{},
+		events:           nilEvents,
+		// events:           proc_api.Events_ServerToClient(events.New()),
 	}
 
 	// Register new process.
@@ -364,4 +369,8 @@ func (r Runtime) getLocalProc(pid uint32) (*process, bool) {
 		return nil, ok
 	}
 	return p.(*process), ok
+}
+
+func (r Runtime) DialPeer(ctx context.Context, call core_api.Executor_dialPeer) error {
+	return r.PeerDial(ctx, call)
 }
