@@ -254,3 +254,77 @@ func TestProcTree_Trim(t *testing.T) {
 		t.Fatalf("expected a process count of %d, got %d", e, c)
 	}
 }
+
+func BenchmarkTree_InsertSibling(b *testing.B) {
+	t := csp.ProcTree{
+		Ctx:  context.Background(),
+		PIDC: csp.NewAtomicCounter(10),
+		TPC:  csp.NewAtomicCounter(10),
+		Root: &csp.ProcNode{Pid: 0},
+		Map:  &sync.Map{},
+		Mut:  &sync.RWMutex{},
+	}
+	offset := uint32(1)
+	total := uint32(10000)
+	b.ResetTimer()
+	for i := offset; i < total+offset; i++ {
+		t.Insert(i, 0)
+	}
+}
+
+func BenchmarkTree_InsertChild(b *testing.B) {
+	t := csp.ProcTree{
+		Ctx:  context.Background(),
+		PIDC: csp.NewAtomicCounter(10),
+		TPC:  csp.NewAtomicCounter(10),
+		Root: &csp.ProcNode{Pid: 0},
+		Map:  &sync.Map{},
+		Mut:  &sync.RWMutex{},
+	}
+	offset := uint32(1)
+	total := uint32(10000)
+	b.ResetTimer()
+	for i := offset; i < total+offset; i++ {
+		t.Insert(i, i-1)
+	}
+}
+
+func BenchmarkTree_DeleteDesc(b *testing.B) {
+	t := csp.ProcTree{
+		Ctx:  context.Background(),
+		PIDC: csp.NewAtomicCounter(10),
+		TPC:  csp.NewAtomicCounter(10),
+		Root: &csp.ProcNode{Pid: 0},
+		Map:  &sync.Map{},
+		Mut:  &sync.RWMutex{},
+	}
+	offset := uint32(1)
+	total := uint32(10000)
+	for i := offset; i < total+offset; i++ {
+		t.Insert(i, 0)
+	}
+	b.ResetTimer()
+	for i := total + offset - 1; i >= offset; i-- {
+		t.Pop(i)
+	}
+}
+
+func BenchmarkTree_DeleteAsc(b *testing.B) {
+	t := csp.ProcTree{
+		Ctx:  context.Background(),
+		PIDC: csp.NewAtomicCounter(10),
+		TPC:  csp.NewAtomicCounter(10),
+		Root: &csp.ProcNode{Pid: 0},
+		Map:  &sync.Map{},
+		Mut:  &sync.RWMutex{},
+	}
+	offset := uint32(1)
+	total := uint32(10000)
+	for i := offset; i < total+offset; i++ {
+		t.Insert(i, 0)
+	}
+	b.ResetTimer()
+	for i := offset; i < total+offset; i++ {
+		t.Pop(i)
+	}
+}
