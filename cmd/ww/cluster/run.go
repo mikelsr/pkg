@@ -5,12 +5,9 @@ import (
 	"os"
 	"time"
 
-	"capnproto.org/go/capnp/v3"
 	"github.com/urfave/cli/v2"
 
 	api "github.com/wetware/pkg/api/core"
-	"github.com/wetware/pkg/auth"
-	romlib "github.com/wetware/pkg/rom"
 	"github.com/wetware/pkg/vat"
 )
 
@@ -51,26 +48,10 @@ func runAction() cli.ActionFunc {
 			return err
 		}
 
-		release := exec(c, sess, rom, args...) // exec with nothing cached
+		p, release := sess.Exec().Exec(c.Context, api.Session(sess), rom, 0, args...)
 		defer release()
-		release = exec(c, sess, rom, args...) // exec with bytecode cached
-		defer release()
-		release = execCached(c, sess, rom, args...)
-		defer release()
-		return nil
+		return p.Wait(c.Context)
 	}
-}
-
-func exec(c *cli.Context, sess auth.Session, rom []byte, args ...string) capnp.ReleaseFunc {
-	_, release := sess.Exec().Exec(c.Context, api.Session(sess), rom, 0, args...)
-	return release
-}
-
-func execCached(c *cli.Context, sess auth.Session, rom []byte, args ...string) capnp.ReleaseFunc {
-	r := romlib.ROM{Bytecode: rom}
-	cid := r.CID()
-	_, release := sess.Exec().ExecCached(c.Context, api.Session(sess), cid, 0, args...)
-	return release
 }
 
 func bytecode(c *cli.Context) ([]byte, error) {

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+
+	//"runtime/pprof"
 	"strconv"
 	"sync"
 	"time"
@@ -135,11 +137,11 @@ func benchmark(c *cli.Context) error {
 	}
 	cid := executor.Cache.ExposedPut(busy)
 	// Cache the WASM compilation
-	p, err := executor.ExposedExec(c.Context, cid, busy, args)
+	p1, err := executor.ExposedExec(c.Context, cid, busy, args)
 	if err != nil {
 		panic(err)
 	}
-	csp.Proc(p).Wait(c.Context)
+	csp.Proc(p1).Wait(c.Context)
 
 	ms_per_proc := make([]int64, iters*procs)
 	ms_per_iter := make([]int64, iters)
@@ -169,6 +171,7 @@ func benchmark(c *cli.Context) error {
 		ms_per_iter[i] = endIter.Sub(startIter).Milliseconds()
 	}
 	endTotal := time.Now()
+	//pprof.StopCPUProfile()
 	ms_total := endTotal.Sub(startTotal).Milliseconds()
 
 	avg_per_proc := int64(0)

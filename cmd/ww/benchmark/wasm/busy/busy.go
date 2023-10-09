@@ -1,4 +1,4 @@
-//go:generate env GOOS=wasip1 GOARCH=wasm go build -o busy.wasm busy.go
+//go:generate env CGO_ENABLED=0 CGO= GOOS=wasip1 GOARCH=wasm go build -o busy.wasm busy.go
 package main
 
 import (
@@ -35,7 +35,7 @@ func main() {
 	for i := int64(0); i < total; i++ {
 		x++
 		if yield != 0 && x%yield == 0 {
-			// TODO this affecst the Wazero runtime, no the Go runtime
+			// this affecst the Wazero runtime, no the Go runtime (?)
 			runtime.Gosched()
 		}
 	}

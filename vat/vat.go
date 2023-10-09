@@ -134,10 +134,10 @@ func (conf Config) Serve(ctx context.Context, ec chan csp_server.Runtime, sc cha
 func (conf Config) NewExecutor(ctx context.Context) (csp_server.Runtime, error) {
 	if conf.RuntimeConfig == nil {
 		if runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64" {
-		conf.RuntimeConfig = wazero.
-			NewRuntimeConfigCompiler().
-			WithCompilationCache(wazero.NewCompilationCache()).
-			WithCloseOnContextDone(true)
+			conf.RuntimeConfig = wazero.
+				NewRuntimeConfigCompiler().
+				WithCompilationCache(wazero.NewCompilationCache()).
+				WithCloseOnContextDone(true)
 		} else {
 			conf.RuntimeConfig = wazero.
 				NewRuntimeConfigInterpreter().
