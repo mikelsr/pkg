@@ -6,6 +6,7 @@ $Go.package("process");
 $Go.import("github.com/wetware/pkg/api/process");
 
 using Cid = Data;
+using Pid = UInt32;
 
 interface BytecodeCache {
     # BytecodeCache is used to store WASM byte code. May be implemented with
@@ -24,11 +25,17 @@ interface Process {
     # Wait until a process finishes running.
     kill   @1 () -> ();
     # Kill the process.
+    link   @2 (other :Pid) -> ();
+    # TODO: replace (other :Pid) with (other :Process)
+    unlink @3 (other :Pid) -> ();
+
+    # linkExt   @4 (other :Process) -> ();
+    # unlinkExt @5 (other :Process) -> ();
 }
 
 struct Info {
-    pid  @0 :UInt32;
-    ppid @1 :UInt32;
+    pid  @0 :Pid;
+    ppid @1 :Pid;
     cid  @2 :Cid;
     argv @3 :List(Text);
     time @4 :Int64;

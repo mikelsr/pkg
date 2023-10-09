@@ -2,6 +2,8 @@ package csp_server
 
 import (
 	"context"
+	"fmt"
+	"sync"
 
 	"capnproto.org/go/capnp/v3"
 	"github.com/tetratelabs/wazero/sys"
@@ -9,18 +11,38 @@ import (
 	"github.com/wetware/pkg/cap/csp"
 )
 
+type killFunc func(uint32)
+
 // process is the main implementation of the Process capability.
 type process struct {
 	csp.Args
 	time     int64
 	done     <-chan execResult
-	killFunc func(uint32) // killFunc must call cancel()
+	killFunc // killFunc must call cancel()
 	cancel   context.CancelFunc
 	result   execResult
+
+	linked  *sync.Map
+	getProc func(uint32) (*process, bool)
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
+	return p.kill()
+}
+
+func (p *process) kill() error {
+	defer p.killLinked()
 	p.killFunc(p.Pid)
+	return nil
+}
+
+func (p *process) killLinked() error {
+	p.linked.Range(func(key, value any) bool {
+		if value != nil {
+			value.(*process).kill()
+		}
+		return true
+	})
 	return nil
 }
 
@@ -42,6 +64,27 @@ func (p *process) Wait(ctx context.Context, call api.Process_wait) error {
 	}
 
 	return err
+}
+
+func (p *process) Link(ctx context.Context, call api.Process_link) error {
+	return nil
+}
+
+func (p *process) link(pid uint32) error {
+	other, ok := p.getProc(pid)
+	if !ok {
+		return fmt.Errorf("process %d not found", pid)
+	}
+	p.linked.Store(other.Pid, other)
+	return nil
+}
+
+func (p *process) Unlink(ctx context.Context, call api.Process_unlink) error {
+	return nil
+}
+
+func (p *process) unlink(pid uint32) {
+	p.linked.Delete(pid)
 }
 
 // Create an info struct from the process meta.

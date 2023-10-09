@@ -24,6 +24,14 @@ func (p *testProc) Wait(ctx context.Context, call api.Process_wait) error {
 	return nil
 }
 
+func (p *testProc) Link(ctx context.Context, call api.Process_link) error {
+	return nil
+}
+
+func (p *testProc) Unlink(ctx context.Context, call api.Process_unlink) error {
+	return nil
+}
+
 func testProcTree() csp.ProcTree {
 	/*
 	        0
