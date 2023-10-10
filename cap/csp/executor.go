@@ -3,7 +3,6 @@ package csp
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 
 	capnp "capnproto.org/go/capnp/v3"
 	"lukechampine.com/blake3"
@@ -146,7 +145,6 @@ func EncodeTextList(v []string) (capnp.TextList, error) {
 func (ex Executor) DialPeer(ctx context.Context, peer []byte) (core_api.Session, bool, error) {
 	b := make([]byte, len(peer))
 	copy(b, peer)
-	fmt.Printf("PEER ID: %s\n", b)
 	f, _ := core_api.Executor(ex).DialPeer(ctx, func(e core_api.Executor_dialPeer_Params) error {
 		return e.SetPeerId(b)
 	})
