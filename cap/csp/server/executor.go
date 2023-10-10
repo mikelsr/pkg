@@ -30,6 +30,8 @@ import (
 	"github.com/wetware/pkg/util/log"
 )
 
+var nilCid, _ = cid.V1Builder{}.Sum([]byte{})
+
 // components the Runtime requires to build a process.
 type components struct {
 	args     csp.Args
@@ -116,8 +118,10 @@ func (r Runtime) ExposedExec(ctx context.Context, id cid.Cid, bc []byte, ea exec
 
 func (r Runtime) exec(ctx context.Context, id cid.Cid, bc []byte, ea execArgs) (proc_api.Process, error) {
 
-	ro := rom.ROM{Bytecode: bc}
-	id = ro.CID()
+	if id == nilCid {
+		ro := rom.ROM{Bytecode: bc}
+		id = ro.CID()
+	}
 
 	sess, err := ea.Session()
 	if err != nil {
