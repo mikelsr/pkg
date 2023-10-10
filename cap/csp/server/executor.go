@@ -380,5 +380,6 @@ func (r Runtime) fetchLocalProc(pid uint32) (*process, bool) {
 }
 
 func (r Runtime) DialPeer(ctx context.Context, call core_api.Executor_dialPeer) error {
+	call.Go()
 	return r.PeerDial(ctx, call)
 }

@@ -54,7 +54,7 @@ interface Executor {
     ps @2 () -> (procs :List(Process.Info));
     # List all running processes.
     bytecodeCache @3() -> (cache :Process.BytecodeCache);
-    dialPeer @4(peerId :Text) -> (session :Session);
+    dialPeer @4(peerId :Data) -> (session :Session, self :Bool);
 }
 
 interface ProcessInit {

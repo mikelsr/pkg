@@ -162,9 +162,19 @@ func (conf Config) NewExecutor(ctx context.Context, h local.Host) (csp_server.Ru
 			if err != nil {
 				return err
 			}
+
 			p, err := call.Args().PeerId()
 			if err != nil {
 				return err
+			}
+			var id peer.ID
+			err = id.UnmarshalBinary(p)
+			if err != nil {
+				return err
+			}
+			if id == h.ID() {
+				res.SetSelf(true)
+				return nil
 			}
 			d := Dialer{
 				Host:    h,
@@ -172,11 +182,12 @@ func (conf Config) NewExecutor(ctx context.Context, h local.Host) (csp_server.Ru
 			}
 			sess, err := d.Dial(
 				ctx,
-				h.Peerstore().PeerInfo(peer.ID(p)),
+				h.Peerstore().PeerInfo(id),
 				proto.Namespace("ww")...)
 			if err != nil {
 				return err
 			}
+			res.SetSelf(false)
 			return res.SetSession(core_api.Session(sess))
 		},
 	}, nil
