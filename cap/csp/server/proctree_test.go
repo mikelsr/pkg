@@ -51,6 +51,10 @@ func (p *testProc) Resume(ctx context.Context, call api.Process_resume) error {
 	return nil
 }
 
+func (p *testProc) Id(ctx context.Context, call api.Process_id) error {
+	return nil
+}
+
 func testProcTree() csp.ProcTree {
 	/*
 	        0
