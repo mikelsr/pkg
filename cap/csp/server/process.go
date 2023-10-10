@@ -27,6 +27,7 @@ type process struct {
 	cancel   context.CancelFunc
 	result   execResult
 
+	id         int64
 	links      *sync.Map
 	localLinks *sync.Map
 	monitors   chan api.Process_monitor
@@ -85,15 +86,40 @@ func (p *process) Wait(ctx context.Context, call api.Process_wait) error {
 	return err
 }
 
+func (p *process) Id(ctx context.Context, call api.Process_id) error {
+	res, err := call.AllocResults()
+	if err != nil {
+		return err
+	}
+	res.SetId(p.id)
+	return nil
+}
+
 func (p *process) Link(ctx context.Context, call api.Process_link) error {
+	other := call.Args().Other() // skip error management
+	f, _ := other.Id(ctx, nil)   // get future of Id RPC
+	s, err := f.Struct()
+	if err != nil {
+		return err
+	}
+	otherId := s.Id()
+	p.links.Store(otherId, other)
+	if !call.Args().Roundtrip() {
+		f, _ := other.Link(ctx, func(args api.Process_link_Params) error {
+			args.SetRoundtrip(true)
+			return args.SetOther(api.Process_ServerToClient(p))
+		})
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-f.Done():
+		}
+	}
 	return nil
 }
 
 func (p *process) LinkLocal(ctx context.Context, call api.Process_linkLocal) error {
-	return nil
-}
-
-func (p *process) linkLocal(pid uint32) error {
+	pid := call.Args().Other()
 	other, ok := p.procFetch(pid)
 	if !ok {
 		return fmt.Errorf("process %d not found", pid)
@@ -104,24 +130,36 @@ func (p *process) linkLocal(pid uint32) error {
 }
 
 func (p *process) Unlink(ctx context.Context, call api.Process_unlink) error {
+	other := call.Args().Other() // skip error management
+	f, _ := other.Id(ctx, nil)   // get future of Id RPC
+	s, err := f.Struct()
+	if err != nil {
+		return err
+	}
+	otherId := s.Id()
+	p.links.Delete(otherId)
+	if !call.Args().Roundtrip() {
+		f, _ := other.Unlink(ctx, func(args api.Process_unlink_Params) error {
+			args.SetRoundtrip(true)
+			return args.SetOther(api.Process_ServerToClient(p))
+		})
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-f.Done():
+		}
+	}
 	return nil
 }
 
 func (p *process) UnlinkLocal(ctx context.Context, call api.Process_unlinkLocal) error {
-	return nil
-}
-
-func (p *process) unlink(ctx context.Context, op api.Process) error {
-	return nil
-}
-
-func (p *process) unlinkLocal(pid uint32) error {
+	pid := call.Args().Other()
 	other, ok := p.procFetch(pid)
 	if !ok {
 		return fmt.Errorf("process %d not found", pid)
 	}
+	p.localLinks.Delete(other.Pid)
 	other.localLinks.Delete(p.Pid)
-	p.localLinks.Delete(pid)
 	return nil
 }
 

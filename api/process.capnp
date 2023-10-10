@@ -39,6 +39,7 @@ interface Process {
     # Pause a process.
     resume @8 () -> ();
     # Resume a paused process.
+    id @9 () -> (id :Int64);
 }
 
 struct Info {

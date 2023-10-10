@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	mrand "math/rand"
 	"net"
 	"os"
 	"sync"
@@ -249,9 +250,10 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 		cancel:    c.cancel,
 		procFetch: r.fetchLocalProc,
 
-		monitors:   make(chan proc_api.Process_monitor),
+		id:         mrand.Int63(),
 		links:      &sync.Map{},
 		localLinks: &sync.Map{},
+		monitors:   make(chan proc_api.Process_monitor),
 		events:     nilEvents,
 	}
 
