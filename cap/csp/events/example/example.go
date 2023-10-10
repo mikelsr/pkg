@@ -18,7 +18,7 @@ func main() {
 	defer cancel()
 
 	external := core_api.ProcessInit{}
-	eventHandler := new(events.EventHandler)
+	eventHandler := events.New()
 	eventCap := proc_api.Events_ServerToClient(eventHandler)
 	external.Events(ctx, func(pi core_api.ProcessInit_events_Params) error {
 		return pi.SetHandler(eventCap)
@@ -34,12 +34,8 @@ func main() {
 			// suspend the current goroutine, so execution resumes automatically.
 			runtime.Gosched()
 			select {
-			case <-eventHandler.OnStop():
-				os.Exit(0)
 			case <-eventHandler.OnResume():
 			}
-		case <-eventHandler.OnStop():
-			os.Exit(0)
 		case <-crawl(ctx, <-urls):
 		}
 	}

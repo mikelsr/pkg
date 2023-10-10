@@ -351,6 +351,323 @@ func (p Terminal_login_Results_Future) Session() Session_Future {
 	return Session_Future{Future: p.Future.Field(0, nil)}
 }
 
+type PeerLister capnp.Client
+
+// PeerLister_TypeID is the unique identifier for the type PeerLister.
+const PeerLister_TypeID = 0x8e73ddc10aabd76d
+
+func (c PeerLister) Peers(ctx context.Context, params func(PeerLister_peers_Params) error) (PeerLister_peers_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0x8e73ddc10aabd76d,
+			MethodID:      0,
+			InterfaceName: "core.capnp:PeerLister",
+			MethodName:    "peers",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(PeerLister_peers_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return PeerLister_peers_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c PeerLister) WaitStreaming() error {
+	return capnp.Client(c).WaitStreaming()
+}
+
+// String returns a string that identifies this capability for debugging
+// purposes.  Its format should not be depended on: in particular, it
+// should not be used to compare clients.  Use IsSame to compare clients
+// for equality.
+func (c PeerLister) String() string {
+	return "PeerLister(" + capnp.Client(c).String() + ")"
+}
+
+// AddRef creates a new Client that refers to the same capability as c.
+// If c is nil or has resolved to null, then AddRef returns nil.
+func (c PeerLister) AddRef() PeerLister {
+	return PeerLister(capnp.Client(c).AddRef())
+}
+
+// Release releases a capability reference.  If this is the last
+// reference to the capability, then the underlying resources associated
+// with the capability will be released.
+//
+// Release will panic if c has already been released, but not if c is
+// nil or resolved to null.
+func (c PeerLister) Release() {
+	capnp.Client(c).Release()
+}
+
+// Resolve blocks until the capability is fully resolved or the Context
+// expires.
+func (c PeerLister) Resolve(ctx context.Context) error {
+	return capnp.Client(c).Resolve(ctx)
+}
+
+func (c PeerLister) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Client(c).EncodeAsPtr(seg)
+}
+
+func (PeerLister) DecodeFromPtr(p capnp.Ptr) PeerLister {
+	return PeerLister(capnp.Client{}.DecodeFromPtr(p))
+}
+
+// IsValid reports whether c is a valid reference to a capability.
+// A reference is invalid if it is nil, has resolved to null, or has
+// been released.
+func (c PeerLister) IsValid() bool {
+	return capnp.Client(c).IsValid()
+}
+
+// IsSame reports whether c and other refer to a capability created by the
+// same call to NewClient.  This can return false negatives if c or other
+// are not fully resolved: use Resolve if this is an issue.  If either
+// c or other are released, then IsSame panics.
+func (c PeerLister) IsSame(other PeerLister) bool {
+	return capnp.Client(c).IsSame(capnp.Client(other))
+}
+
+// Update the flowcontrol.FlowLimiter used to manage flow control for
+// this client. This affects all future calls, but not calls already
+// waiting to send. Passing nil sets the value to flowcontrol.NopLimiter,
+// which is also the default.
+func (c PeerLister) SetFlowLimiter(lim fc.FlowLimiter) {
+	capnp.Client(c).SetFlowLimiter(lim)
+}
+
+// Get the current flowcontrol.FlowLimiter used to manage flow control
+// for this client.
+func (c PeerLister) GetFlowLimiter() fc.FlowLimiter {
+	return capnp.Client(c).GetFlowLimiter()
+}
+
+// A PeerLister_Server is a PeerLister with a local implementation.
+type PeerLister_Server interface {
+	Peers(context.Context, PeerLister_peers) error
+}
+
+// PeerLister_NewServer creates a new Server from an implementation of PeerLister_Server.
+func PeerLister_NewServer(s PeerLister_Server) *server.Server {
+	c, _ := s.(server.Shutdowner)
+	return server.New(PeerLister_Methods(nil, s), s, c)
+}
+
+// PeerLister_ServerToClient creates a new Client from an implementation of PeerLister_Server.
+// The caller is responsible for calling Release on the returned Client.
+func PeerLister_ServerToClient(s PeerLister_Server) PeerLister {
+	return PeerLister(capnp.NewClient(PeerLister_NewServer(s)))
+}
+
+// PeerLister_Methods appends Methods to a slice that invoke the methods on s.
+// This can be used to create a more complicated Server.
+func PeerLister_Methods(methods []server.Method, s PeerLister_Server) []server.Method {
+	if cap(methods) == 0 {
+		methods = make([]server.Method, 0, 1)
+	}
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0x8e73ddc10aabd76d,
+			MethodID:      0,
+			InterfaceName: "core.capnp:PeerLister",
+			MethodName:    "peers",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Peers(ctx, PeerLister_peers{call})
+		},
+	})
+
+	return methods
+}
+
+// PeerLister_peers holds the state for a server call to PeerLister.peers.
+// See server.Call for documentation.
+type PeerLister_peers struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c PeerLister_peers) Args() PeerLister_peers_Params {
+	return PeerLister_peers_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c PeerLister_peers) AllocResults() (PeerLister_peers_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return PeerLister_peers_Results(r), err
+}
+
+// PeerLister_List is a list of PeerLister.
+type PeerLister_List = capnp.CapList[PeerLister]
+
+// NewPeerLister creates a new list of PeerLister.
+func NewPeerLister_List(s *capnp.Segment, sz int32) (PeerLister_List, error) {
+	l, err := capnp.NewPointerList(s, sz)
+	return capnp.CapList[PeerLister](l), err
+}
+
+type PeerLister_peers_Params capnp.Struct
+
+// PeerLister_peers_Params_TypeID is the unique identifier for the type PeerLister_peers_Params.
+const PeerLister_peers_Params_TypeID = 0x86f74fa7a21af622
+
+func NewPeerLister_peers_Params(s *capnp.Segment) (PeerLister_peers_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return PeerLister_peers_Params(st), err
+}
+
+func NewRootPeerLister_peers_Params(s *capnp.Segment) (PeerLister_peers_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return PeerLister_peers_Params(st), err
+}
+
+func ReadRootPeerLister_peers_Params(msg *capnp.Message) (PeerLister_peers_Params, error) {
+	root, err := msg.Root()
+	return PeerLister_peers_Params(root.Struct()), err
+}
+
+func (s PeerLister_peers_Params) String() string {
+	str, _ := text.Marshal(0x86f74fa7a21af622, capnp.Struct(s))
+	return str
+}
+
+func (s PeerLister_peers_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (PeerLister_peers_Params) DecodeFromPtr(p capnp.Ptr) PeerLister_peers_Params {
+	return PeerLister_peers_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s PeerLister_peers_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s PeerLister_peers_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s PeerLister_peers_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s PeerLister_peers_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// PeerLister_peers_Params_List is a list of PeerLister_peers_Params.
+type PeerLister_peers_Params_List = capnp.StructList[PeerLister_peers_Params]
+
+// NewPeerLister_peers_Params creates a new list of PeerLister_peers_Params.
+func NewPeerLister_peers_Params_List(s *capnp.Segment, sz int32) (PeerLister_peers_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[PeerLister_peers_Params](l), err
+}
+
+// PeerLister_peers_Params_Future is a wrapper for a PeerLister_peers_Params promised by a client call.
+type PeerLister_peers_Params_Future struct{ *capnp.Future }
+
+func (f PeerLister_peers_Params_Future) Struct() (PeerLister_peers_Params, error) {
+	p, err := f.Future.Ptr()
+	return PeerLister_peers_Params(p.Struct()), err
+}
+
+type PeerLister_peers_Results capnp.Struct
+
+// PeerLister_peers_Results_TypeID is the unique identifier for the type PeerLister_peers_Results.
+const PeerLister_peers_Results_TypeID = 0xe6dd1edc1453a4c3
+
+func NewPeerLister_peers_Results(s *capnp.Segment) (PeerLister_peers_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return PeerLister_peers_Results(st), err
+}
+
+func NewRootPeerLister_peers_Results(s *capnp.Segment) (PeerLister_peers_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return PeerLister_peers_Results(st), err
+}
+
+func ReadRootPeerLister_peers_Results(msg *capnp.Message) (PeerLister_peers_Results, error) {
+	root, err := msg.Root()
+	return PeerLister_peers_Results(root.Struct()), err
+}
+
+func (s PeerLister_peers_Results) String() string {
+	str, _ := text.Marshal(0xe6dd1edc1453a4c3, capnp.Struct(s))
+	return str
+}
+
+func (s PeerLister_peers_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (PeerLister_peers_Results) DecodeFromPtr(p capnp.Ptr) PeerLister_peers_Results {
+	return PeerLister_peers_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s PeerLister_peers_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s PeerLister_peers_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s PeerLister_peers_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s PeerLister_peers_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s PeerLister_peers_Results) Session() (Session, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return Session(p.Struct()), err
+}
+
+func (s PeerLister_peers_Results) HasSession() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s PeerLister_peers_Results) SetSession(v Session) error {
+	return capnp.Struct(s).SetPtr(0, capnp.Struct(v).ToPtr())
+}
+
+// NewSession sets the session field to a newly
+// allocated Session struct, preferring placement in s's segment.
+func (s PeerLister_peers_Results) NewSession() (Session, error) {
+	ss, err := NewSession(capnp.Struct(s).Segment())
+	if err != nil {
+		return Session{}, err
+	}
+	err = capnp.Struct(s).SetPtr(0, capnp.Struct(ss).ToPtr())
+	return ss, err
+}
+
+// PeerLister_peers_Results_List is a list of PeerLister_peers_Results.
+type PeerLister_peers_Results_List = capnp.StructList[PeerLister_peers_Results]
+
+// NewPeerLister_peers_Results creates a new list of PeerLister_peers_Results.
+func NewPeerLister_peers_Results_List(s *capnp.Segment, sz int32) (PeerLister_peers_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[PeerLister_peers_Results](l), err
+}
+
+// PeerLister_peers_Results_Future is a wrapper for a PeerLister_peers_Results promised by a client call.
+type PeerLister_peers_Results_Future struct{ *capnp.Future }
+
+func (f PeerLister_peers_Results_Future) Struct() (PeerLister_peers_Results, error) {
+	p, err := f.Future.Ptr()
+	return PeerLister_peers_Results(p.Struct()), err
+}
+func (p PeerLister_peers_Results_Future) Session() Session_Future {
+	return Session_Future{Future: p.Future.Field(0, nil)}
+}
+
 type Session capnp.Struct
 type Session_local Session
 
@@ -759,6 +1076,26 @@ func (c Executor) BytecodeCache(ctx context.Context, params func(Executor_byteco
 
 }
 
+func (c Executor) DialPeer(ctx context.Context, params func(Executor_dialPeer_Params) error) (Executor_dialPeer_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0x804fe3440f678ff3,
+			MethodID:      4,
+			InterfaceName: "core.capnp:Executor",
+			MethodName:    "dialPeer",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 1}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Executor_dialPeer_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Executor_dialPeer_Results_Future{Future: ans.Future()}, release
+
+}
+
 func (c Executor) WaitStreaming() error {
 	return capnp.Client(c).WaitStreaming()
 }
@@ -839,6 +1176,8 @@ type Executor_Server interface {
 	Ps(context.Context, Executor_ps) error
 
 	BytecodeCache(context.Context, Executor_bytecodeCache) error
+
+	DialPeer(context.Context, Executor_dialPeer) error
 }
 
 // Executor_NewServer creates a new Server from an implementation of Executor_Server.
@@ -857,7 +1196,7 @@ func Executor_ServerToClient(s Executor_Server) Executor {
 // This can be used to create a more complicated Server.
 func Executor_Methods(methods []server.Method, s Executor_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 4)
+		methods = make([]server.Method, 0, 5)
 	}
 
 	methods = append(methods, server.Method{
@@ -905,6 +1244,18 @@ func Executor_Methods(methods []server.Method, s Executor_Server) []server.Metho
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
 			return s.BytecodeCache(ctx, Executor_bytecodeCache{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0x804fe3440f678ff3,
+			MethodID:      4,
+			InterfaceName: "core.capnp:Executor",
+			MethodName:    "dialPeer",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.DialPeer(ctx, Executor_dialPeer{call})
 		},
 	})
 
@@ -977,6 +1328,23 @@ func (c Executor_bytecodeCache) Args() Executor_bytecodeCache_Params {
 func (c Executor_bytecodeCache) AllocResults() (Executor_bytecodeCache_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
 	return Executor_bytecodeCache_Results(r), err
+}
+
+// Executor_dialPeer holds the state for a server call to Executor.dialPeer.
+// See server.Call for documentation.
+type Executor_dialPeer struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Executor_dialPeer) Args() Executor_dialPeer_Params {
+	return Executor_dialPeer_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Executor_dialPeer) AllocResults() (Executor_dialPeer_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_dialPeer_Results(r), err
 }
 
 // Executor_List is a list of Executor.
@@ -1733,6 +2101,179 @@ func (p Executor_bytecodeCache_Results_Future) Cache() process.BytecodeCache {
 	return process.BytecodeCache(p.Future.Field(0, nil).Client())
 }
 
+type Executor_dialPeer_Params capnp.Struct
+
+// Executor_dialPeer_Params_TypeID is the unique identifier for the type Executor_dialPeer_Params.
+const Executor_dialPeer_Params_TypeID = 0xbe2475e52b796657
+
+func NewExecutor_dialPeer_Params(s *capnp.Segment) (Executor_dialPeer_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_dialPeer_Params(st), err
+}
+
+func NewRootExecutor_dialPeer_Params(s *capnp.Segment) (Executor_dialPeer_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_dialPeer_Params(st), err
+}
+
+func ReadRootExecutor_dialPeer_Params(msg *capnp.Message) (Executor_dialPeer_Params, error) {
+	root, err := msg.Root()
+	return Executor_dialPeer_Params(root.Struct()), err
+}
+
+func (s Executor_dialPeer_Params) String() string {
+	str, _ := text.Marshal(0xbe2475e52b796657, capnp.Struct(s))
+	return str
+}
+
+func (s Executor_dialPeer_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Executor_dialPeer_Params) DecodeFromPtr(p capnp.Ptr) Executor_dialPeer_Params {
+	return Executor_dialPeer_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Executor_dialPeer_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Executor_dialPeer_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Executor_dialPeer_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Executor_dialPeer_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Executor_dialPeer_Params) PeerId() (string, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return p.Text(), err
+}
+
+func (s Executor_dialPeer_Params) HasPeerId() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Executor_dialPeer_Params) PeerIdBytes() ([]byte, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return p.TextBytes(), err
+}
+
+func (s Executor_dialPeer_Params) SetPeerId(v string) error {
+	return capnp.Struct(s).SetText(0, v)
+}
+
+// Executor_dialPeer_Params_List is a list of Executor_dialPeer_Params.
+type Executor_dialPeer_Params_List = capnp.StructList[Executor_dialPeer_Params]
+
+// NewExecutor_dialPeer_Params creates a new list of Executor_dialPeer_Params.
+func NewExecutor_dialPeer_Params_List(s *capnp.Segment, sz int32) (Executor_dialPeer_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[Executor_dialPeer_Params](l), err
+}
+
+// Executor_dialPeer_Params_Future is a wrapper for a Executor_dialPeer_Params promised by a client call.
+type Executor_dialPeer_Params_Future struct{ *capnp.Future }
+
+func (f Executor_dialPeer_Params_Future) Struct() (Executor_dialPeer_Params, error) {
+	p, err := f.Future.Ptr()
+	return Executor_dialPeer_Params(p.Struct()), err
+}
+
+type Executor_dialPeer_Results capnp.Struct
+
+// Executor_dialPeer_Results_TypeID is the unique identifier for the type Executor_dialPeer_Results.
+const Executor_dialPeer_Results_TypeID = 0x9dbddd0e637e25ac
+
+func NewExecutor_dialPeer_Results(s *capnp.Segment) (Executor_dialPeer_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_dialPeer_Results(st), err
+}
+
+func NewRootExecutor_dialPeer_Results(s *capnp.Segment) (Executor_dialPeer_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Executor_dialPeer_Results(st), err
+}
+
+func ReadRootExecutor_dialPeer_Results(msg *capnp.Message) (Executor_dialPeer_Results, error) {
+	root, err := msg.Root()
+	return Executor_dialPeer_Results(root.Struct()), err
+}
+
+func (s Executor_dialPeer_Results) String() string {
+	str, _ := text.Marshal(0x9dbddd0e637e25ac, capnp.Struct(s))
+	return str
+}
+
+func (s Executor_dialPeer_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Executor_dialPeer_Results) DecodeFromPtr(p capnp.Ptr) Executor_dialPeer_Results {
+	return Executor_dialPeer_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Executor_dialPeer_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Executor_dialPeer_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Executor_dialPeer_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Executor_dialPeer_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Executor_dialPeer_Results) Session() (Session, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return Session(p.Struct()), err
+}
+
+func (s Executor_dialPeer_Results) HasSession() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Executor_dialPeer_Results) SetSession(v Session) error {
+	return capnp.Struct(s).SetPtr(0, capnp.Struct(v).ToPtr())
+}
+
+// NewSession sets the session field to a newly
+// allocated Session struct, preferring placement in s's segment.
+func (s Executor_dialPeer_Results) NewSession() (Session, error) {
+	ss, err := NewSession(capnp.Struct(s).Segment())
+	if err != nil {
+		return Session{}, err
+	}
+	err = capnp.Struct(s).SetPtr(0, capnp.Struct(ss).ToPtr())
+	return ss, err
+}
+
+// Executor_dialPeer_Results_List is a list of Executor_dialPeer_Results.
+type Executor_dialPeer_Results_List = capnp.StructList[Executor_dialPeer_Results]
+
+// NewExecutor_dialPeer_Results creates a new list of Executor_dialPeer_Results.
+func NewExecutor_dialPeer_Results_List(s *capnp.Segment, sz int32) (Executor_dialPeer_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[Executor_dialPeer_Results](l), err
+}
+
+// Executor_dialPeer_Results_Future is a wrapper for a Executor_dialPeer_Results promised by a client call.
+type Executor_dialPeer_Results_Future struct{ *capnp.Future }
+
+func (f Executor_dialPeer_Results_Future) Struct() (Executor_dialPeer_Results, error) {
+	p, err := f.Future.Ptr()
+	return Executor_dialPeer_Results(p.Struct()), err
+}
+func (p Executor_dialPeer_Results_Future) Session() Session_Future {
+	return Session_Future{Future: p.Future.Field(0, nil)}
+}
+
 type ProcessInit capnp.Client
 
 // ProcessInit_TypeID is the unique identifier for the type ProcessInit.
@@ -2245,94 +2786,107 @@ func (f ProcessInit_events_Results_Future) Struct() (ProcessInit_events_Results,
 	return ProcessInit_events_Results(p.Struct()), err
 }
 
-const schema_e82706a772b0927b = "x\xda\x9cVml\x14U\x17>\xe7\xde\xddN\xfb\xd2" +
-	"2{w\x86\x97\xf7U\xcb\x06(\"M\xa8\xd0\x9a\x10" +
-	"j\xb4\x1b\xa4\xc164\xeem!\xa6\x8d$\x0c\xbb\xd7" +
-	"v\x93\xed\xec23\x85\x12\x15\xd4\x08\x02\x1a\x8d\x9f1" +
-	"\x10L\xc0\x80\xf8\x03\xfc\x88%B0\x91\x18I\xe0\x87" +
-	"\xa6\x9a(\xd1  \xa8\xd0\xc4H\xebW\xa2\xc0\x98;" +
-	"\xbb\xb3;K[\x88\xfe\xdaI\xee\xb9\xe79\xcfs\x9e" +
-	"s\xee.\xa8\xad\x88\x87\x16\xd6,\x9b\x01\xa4k5\x86" +
-	"+\xdc_\x9e\xefU\x97\x9e\x7f\xe0q`S\xa8\xfb\xc8" +
-	"\x8b\xefXoV\xcc\xbd\x08\x80Z\x95\xbaGc\xaa\x02" +
-	"\xd0T\xa3*\xa8\x0d\xc9O\xd7\xbcw\xdf[\x07;^" +
-	"x\x02\x98\x8e\x00a\x94\xc7\xbb\xd4f\x04\xd4\xf6\xaa-" +
-	"\x80\xee\xf25\xfb\xb8\xb5\xb1\xf6\x99|@H\x9e\x7f\xa2" +
-	"\xb6#\x84\xdc\xee\xd4\xf7g/\x9a\xd7\x9e\x1b\x07\xf4\xae" +
-	"zD;,\xb3kC\xea\xd3ZUD\x01\xb8\xf6\xe0" +
-	"\xee\xcf\xe3\xfb\xa7\xbd\x14@\x19U;%\xcaU\x0f\xe5" +
-	"\xe5]_m\xbc\xb4\xf5\xf5W\x81\xeb(#\xa8\x8c\xa8" +
-	"\x8d\x10\x1913\xf2#\xa0;s\xc3o\xaf\xf4\x1c<" +
-	"\xb83Xh\x15\x8b\xca\x00\xc6d\x0a\xfd\xd6\xce\xc3G" +
-	"w\xce~\x0f\xd8\xf4b\xc0B\xb6D\x06,\xf6\x02\xfe" +
-	"\xaf\x9d\x99\x85\x07\xea\x87\xca0V\xb1F\x19!\x98\xc4" +
-	"8}\xe7\xc8\\<5r\x08\x98\x86n\xf7\xd9C[" +
-	"Fg\xae<\x0ea\"\xa9\xb4EOj+\xa3\xf2\x8b" +
-	"G\xd7\x03\xba$s\xfa\xfd\xee\xa6\xf3G\x81k\x18\x08" +
-	"\x9eV\xa1 \x80v zR\x0a\x11}\x1b\xd0\xbd\xfa" +
-	"\xe1\x91\xab\xa3o\x1c\xfbh\x9cNm\xda\x1e\x8dk2" +
-	"e\x87\xb6L\x1b\x90_\xee)wx8\xbce\xf1\xf1" +
-	"<\x0bO\xeeUZ\xa3'\xb7\x0f\xc1\xa7 \x96\xf2\x84" +
-	"+d\x82Vm\x87\xd6\xa1M\x07hZ\xa9\xc5\x10\xd0" +
-	"m\xfb\xa9\xf1\xc2gc\x9bO\x06\xd5X\xa5\xd7{\\" +
-	"u\xa9\xc6\xe9\xbf\xbe=\xf1\xe8\x07w\x0f\x07\xf4\xd46" +
-	"\xeb\x7f\x02j\xdb\xbcseg[v\xed\x95\xd7\xbe\x0c" +
-	"\xea}X\xff\x8fLp\xcc\x0bx\xf2\x9b\xe9\xb7m\xfb" +
-	"o\xffH\xa0\xd2sz\xb3\xact\xea\xa2x\xef\xaf3" +
-	"\xba\xfe\x08^=\x91\xbf:\xec]%\xa7\xc8\xa2\xee\xd4" +
-	"\x19\xb7\xe4)mT\x1f\x03\x17\\\xb8\xec&\xb3\x96h" +
-	"H\x1a94s\xcd\xad\x83\"9\xa08Y+\x81\xc8" +
-	"#4\x0cPt\x0a\xfa\x05\xb2\xb5\xf5@\x98P\xb0\xd4" +
-	"a\xf4]\xcd\xba{\x800\xae )b\xa2O\x9c\xb5" +
-	"\xde\x02\x84-V\x90\x16=\x8e\xe0\xdbt\xbe\x05\x84\xcd" +
-	"QT1(\x92qt\xe5\xcf}F\xb2\x0f\xa8H\xc5" +
-	"\x91\xe6\xec8\xbak68\"\x99M\x09\x88\xc9\x13\x11" +
-	"\xc7\x04b\xb1x\xea\x17\xefd\xad\x06\xff\xb6H\xd5u" +
-	"\xb6\x08{ \xe3\xd8<DC\x00!\x04`5K\x00" +
-	"x%E\xae\x13\xdc\x94\xb3\xb2Ia\xdb\xc8\xdc\xa6\x8a" +
-	"9\xfb\xbf\xb8<\xfbk\x00D\x06\xa5\xcc\xa1`f\xbf" +
-	"\x06/{]\xc2\xb0\x8c~\x1b\xa0L\xc2\x84\xcc\xd8b" +
-	"\xdbmf\xda\x91*Vz*\xfa\xcdC\x7fj\xd8\xc2" +
-	"v l\x9eT\xd1\xb7\x0e\xfa^d\xb5\xcd@\x18S" +
-	"\\GX\xfdi\xd3\xc8\x00@\x1c[\xc4:a:v" +
-	"9\xef\x1bT\xd7\xe91\xc72\xea\x8d%\xea\xb1\xa4\x8c" +
-	"B\xe6:X\xf5;\xbd\xb0\xfc\x87\xeb\x89\x8f\x93\xd4\xe7" +
-	"\xcb#\xc5\x84\x86\xd4\xf2!\x8a\xbc\x8f C\xf4\xe6\x9c" +
-	"\x89v\x00\x9e\xa2\xc8s\x04\x91\xe8H\x00X\x7f=\x00" +
-	"\xef\xa3\xc8\x1d\x82\x8c\x12\x1d)\x804\x12\xf0\x0cE\xbe" +
-	"\x95\xe0&[\xd8v:kb\xa44x\x80\x18\x81@" +
-	"\xe3\x01\xb0\x06\x08\xd6\x00\xaa\xb9\\:\x85\x95@\xb0\x12" +
-	"P5\xac^\x1b\xa7\x02&(b5\x10\xf9Y\xc6b" +
-	"EA\xc6\x86L\xb67mN(L\xd0\x13\x93W\x12" +
-	"T=\x91w\x8els\x83\xdf\xa7Bj\x1b\x82\xa9\xa5" +
-	"\x1a\xd5\x14\xf9\xff\x08\x06\x1b\x8a\xac\xb4\xa8n\xa6|\xc1" +
-	"\xcc\x89\x98\xd7\x80\x9b\xea?\x0b\x80\xaf\xa6\xc83%\xfd" +
-	"\xd3\xf5\xa5\x9e\x14\xf5/6\xe5\xa9\x1b\xb1V\x92\xe9\xd4" +
-	"?\xd7\x9d\x98\xb9\xe6\xae|\xca\x86\xd6A\xc72\x00\xf2" +
-	"\xd3\xe0\x97>O\x82\xd7Q\xe4\x0b\x02\xa5\xcfo\x06\xe0" +
-	"wP\xe4w\x11TM\xa3_xy\xab\x01[\x92\x99" +
-	"\xb40\x1d\x8c\x86( F'\x01\xcad\x93R[^" +
-	"]Di\x95(q\x8a|9A\x1f\xa4M\x82,\xa5" +
-	"\xc8\x13\x04\x19\xc1\xbc@\x1d2\xf0~\x8a|\x05A5" +
-	"'\x84UD\xb6\x85\xb5NXX\x05\x04\xab\x00\xd5\xbe" +
-	"\xac\xed\xf8ge\x83\xef\xb9L1\x8d\x8c\xe4\x19\xf2\xa6" +
-	"\xde_\xcc\xe8?\xa6\x8c5\x02aa%\xe69q\xfc" +
-	"\x0a\x0b\x9a*?\xeeu\x9d\"\xe6y\xaa\x0c\xcb#L" +
-	"\xb3&\x0fa\xf0\x15\xc5\xc6\x98\xa75\xd7\xa5\x00\x18x" +
-	"4\xd9c\x12\x18\x0b\x8d\x17\xf5%\x870Bu\x0c\x8d" +
-	"\xb3HH\xc7\xb0\xb4H{aD\x07\x09\xb2PX\xc7" +
-	"\x0a\x006 \xd7H\x8e\"\x7f\x96`\xcc\xd3\\]\x97" +
-	"\x16\xeb\x91\xb9;\xea\xae\xf44]\xae\xdd^p\xb4\xb7" +
-	"\xce\x91\x95\xfe\"\xf9F7r]N\xd6\x12\xf918" +
-	"\xde\xfa\xf3\xf6-S\xf6~W8\x8d\x09I\xc1\xf7U" +
-	"\xa4D\x0fp\xdcdO\xa0W\xc2P\xbd!\x99d\xb8" +
-	"\xfb\x0c3\x95\x11\x162\xf7\xe15=b\xc9\xc8\xd0\xa5" +
-	"\xeb\xa7\x8f\x04\xa7/gO\xf8\x84\xf8{\xb4\x8e`L" +
-	">!v\xa9\xdc\xdb\xb7\xdf\xb3{o\xcb\xb4\x8f'*" +
-	"\xb7|\x9d\xfa\xcb\x02\xfe\xfd\xe3D'[D-\xf9]" +
-	"}\xa35\xe8\xbf^\x93\xa1\x1b\xc9dv\xc0t\x90\xb9" +
-	"G\xc7\x8e}\xba\xf4\xdc\xd8\xe8\xcd\x94*\xec\xa7\xbf\x03" +
-	"\x00\x00\xff\xff\x03\xf7\xfa\xf8"
+const schema_e82706a772b0927b = "x\xda\xacV\x7flTU\x16>\xe7\xbe\x99\xbe\x02-" +
+	"\xf3n\xdf\x9b\xb2\xcbn\x99P\xdae\xe9f\xbb\xb4\xdd" +
+	"\x84\xd0\xcd\xee\xcc\xb24\xec4m\x98\xd7BH\x1bI" +
+	"|\xcc\\\xdaI\xa63\xd3\xf7\xa6\xd0F\x051R\x11" +
+	"\x7f\x05\x15c 5\x01\xe5WT4\xc4\x12%`$" +
+	"$$\x90\xa8A\x13!h\x05\x85\"4!B\x15H" +
+	"\x14x\xe6\xbe\x997\xf3\x86\xfe\x8a\xd1\xbf\xfa\xd2{\xe6" +
+	"\x9c\xef\x9c\xef;\xdf\xbd\x0b\x07\x0a\x02\xae\x9a\xe2\xe5>" +
+	" \xad1t\x17\x98?\xbc\xd0\xe1Yzi\xf9\xe3@" +
+	"g\x08\xe6#/\xbe\xab\xef+\x98\x7f\x15\x00\xe5\xe7<" +
+	"\xbb\xe5\xed\x1e\x11\xa0n\x9bg\x19\xcaL\x12\x01\xcc\xf8" +
+	"\x7f\xf6\x1e8\xd8\xbcm\x13P\x05\x01\xdc\xc8\x8f\x9b\xa5" +
+	"z\x04\x94WJ~@\xb3\xfc\xf6\xec\xdd\xfb\x96\xdf\xe9" +
+	"\x07Z\x8a\x00.~\xde#\xcdFp\x99Mk\xf6\xaa" +
+	"\xfa\x86\xb2g\xd2?\xb5NVK\x8d\xfc\xa4\xeb\xec\x9b" +
+	"\xd3\x8f\x0f\x19\xcf\x8f\x81\x10\x94\x0e\xc9*\xaf+7K" +
+	"\xcb\xe4\x1e\x0bA[d\xf8\xe2\xd5\xf8\xfd\xb1\xc1\xab\xa5" +
+	"#i\x90\xb2&=%\x0f\xf2\xaf\xfb\xabv}\x16\xd8" +
+	"\xef}\xc9\x01v@j\xe1`\x0fX`_\x1e8\xbb" +
+	"\xe1\xda\x96\xd7^\x01UA\x1e!\xf0\x88S\x12\xe1\x11" +
+	"\x1fK\xdf\x01\x9as\xfbnmo?xp\xa7\xb3\xdf" +
+	"AZ\xc2\x03\x8eQ\x9e\xe2\xad\xca\x0d\xe1\x99C\xc7\x06" +
+	"\x9c\x01C\xb4\x8a\x07\x0c[\x01\xca\x9fZ>8\xbas" +
+	"\xde!\xa0\xb3\xb2\x01\xee\x92%<\xa0\xb8\x84\x07\xfcQ" +
+	"\xbeP\x8eoW\x0d\xe6\x81\xa8)\xa9\xe5\x11\x8bK8" +
+	"\x88\xa1\x7f\x8c\xcc\xc7s#\x87\x81\xcah\xb6]<\xdc" +
+	"\x7fs\xee\xca\x93\xe0&\xbc\xd72\xf9\xb4\xbc@\xe6_" +
+	"\x95\xf2z@\x93\xc4\x86\xdek\xab\xbbt\x14T\x19\x1d" +
+	"\xc1\xde\x02\x11\x01\xe4M\xf2i@y\xb3\xfc\x0e\xa0\xb9" +
+	"jm\xdf\xdf\x86{*>t\"/S\xcay\xd9J" +
+	"\x85\x03\xbbw\xec\xc8\xbd\x9b\xaf\x1f\xffh\xcc\xa4\x1b\x94" +
+	"\xddr\xb3\xc2k\x06\x95er7\xff2\xcf\x99g\xce" +
+	"\xb8\xfb\x17\x9fL\xb7i\xb1\xdb\xa6\xd4rv\xb3\x18\xd4" +
+	"\x19\x88\xb9<\xee\x02\x9e\xe0\xbf\xca\x0e9\xa8\xcc\x02\xa8" +
+	"S\x15\x1f\x02\x9a\xc1\xeb\xb5\x97?\x1d\xdd|\xda9\xae" +
+	"6\xaf5O\xcd\xcbQ\x0d\xfd\xfc\xf5\xa9G\xdf\xff\xd7" +
+	"\x19\x07ly\x93\xf7'\xde\x96u.\xee\x0c&\xba\xef" +
+	"\xbe\xfaE\x1ec\xde\xe9\x16cV\xc0\x897Z\x95\xaf" +
+	"\xe6\x0c]I+4\xc3\x98\xd7\xea{\xd8\x0ax\xe2\xcb" +
+	"Y\x7f~\xba\xb4k\xc4\xd1\x8a\xbb\xb4\x9e\xb72sQ" +
+	"\xa0\xe3\xc79\xadw\x9c\xb9\xaf\xa7s\xdf\xb2~J\xce" +
+	"\x91Em\x91\x0bfN\xe3\xb2\xb7t\x14L0\xe1\xbc" +
+	"\x19N\xe8\xac:\xac%1\x9e\xaco\xe8e\xe1\x1e1" +
+	"\x95\xd0C\x88\xaa\"\xb8\x01\xb2bD\xbb\x03\xba\xad\x0a" +
+	"\x08\xdd,bN#h\xef\x1f\xedk\x07B\xbbE$" +
+	"\xd9\x9ahO\x86\xb2\xd9@h\x9b\x88Bv\xe7\x10\xec" +
+	"Mh\xd6\x81\xd0\x06\x11]Y\xfe\xd1\x960]\xdc\x08" +
+	"\x84\xd6\x88\x1e\xd6\xcb\xc2\x014\xf9\x9f\xffi\xe1N\x10" +
+	"X$\x80B\xd2\x08\xa0\xb9\xa6/\xc5\xc2\x89\x08\x03\x1f" +
+	"?a\x014#Q-\x16bL\x07\x80\x00\x86\x10\xb3" +
+	"m\x0av\x9b\xa9\x84^m\xe7b\x91\x8a\x16?3z" +
+	"b)Cu\x09.\x00\x17\x02\xd0\xe2%\x00j\xa1\x80" +
+	"\xaaBpcRO\x84\x99a 5\xeb\x0a*\xf7\x7f" +
+	"~c\xdey\x00D\x0a\xf9\x99y\xc9\xa6\xa8\x91bz" +
+	"u\x921\xdd\xa8\x08i\xba&t\x19\xd9 \x97\xb3\xbc" +
+	"\x0d\xdb\x82`\x85v\x19\x00y\x8cX\x09}VF\xce" +
+	"\x89\xcb\xe2\xc4v3\xb4ECi-\x10\xea\x16}V" +
+	"\xd1\xfc\x86\xad,\x1c\xbc\xdf0\x82\xf1h\x8a\xa7)\xb4" +
+	"\xd2\xd8\x8aB\xdb\x0ch\x0d\x1f\xf5\x02N\xad-x\xb4" +
+	"7\x88\x96\xd5\x03\xa1T4SL\xef\x8a\xc6\xb5\x985" +
+	"Y?[\xc7\xe2\xa9\x07*N\xd2c\x8b5d\xcc\x9b" +
+	"rmn\xca\xbe0\x8fBj\xa6p\xdam\xe1r\xd3" +
+	"\x95\xf1f\x9c\xc7\x9e=5U\xca&\xd48m\x0f\x09" +
+	"\xa8v\x12\xa4\x88\x96}Q\xd6\x08\xa0F\x04T\x93\x04" +
+	"\x91(H\x00hW\x15\x80\xda)\xa0\x9a\"H\x05\xa2" +
+	"\xa0\x00@\xbb\xf9?c\x02\xaa[\x08n4\x98aD" +
+	"\x13q\x94rv\x01\x88\x128\x14\x07\x80\xc5@\xb0\x18" +
+	"\xd0\x93LF#X\x08\x04\x0b\x01=\x9a\xdea\xe0L" +
+	"\xc0\x90\x80X\x04\x84\x7f\xe6u\xb1\"3\xc6\xeaX\xa2" +
+	"#\x1a\x1fw0N\xf9M\x8cd\xdc\xd1\xd8\xf2\xe7y" +
+	"=\x93\xc9z\xea\xbc.[?i\xf9T\xdb\xfcg " +
+	"\x1b\xe0L\xcd\xa7\\$\xa0\xfa\x07\x82N\xa1 \xcd\xd9" +
+	"\xf6T\x8cf\xf61\xe4\xb3\x88\x9d\x92\xd7r\x00\xf5a" +
+	"\x01\xd5X\x8e\xd7hU\x8e\xeb,\xafY\xb2\x9f\x9c\xac" +
+	"k1\x1c\x8d\xfcz>I<Y\xdf\x9aNY\xdd\xd0" +
+	"\x9b\xd25\x80\xf4\x96\xd9\xd0\x17\xf0\xe2\x15\x02\xaa\x0b\x1d" +
+	"\xd0\xff^\x0f\xa0\xfeU@\xf5\x9f\x04=q\xad\x8bY" +
+	"y\x8b\x00\xfd\xe1X\x94\xc5SX\xe2\x12\x00\xb1d\x82" +
+	"B\xb1D\x98\xcfV-\xcaVi\xe0U\x02\x02\xaaM" +
+	"\x04\xed\"A^d\xa9\x80j\x88 %\x98\x1eP3" +
+	"\x0f\xfc\xbf\x80\xea\x0a\x82\x1en\x19\xd9\xca\x06\xd3\xd71" +
+	"\x1d\xa7\x01\xc1i\x80\x9e\xce\x84\x91\xb2\xcf\xa6\x10ZH" +
+	"\xd3E\xce\x97C\x0c\xf59\x9d\xf9y\x95`dL." +
+	"\xb47A\x8ck\xb1\x9c\xc1\xd97\x1a\xda\x0f\x9d\xac\xc1" +
+	"Y\xdb2\xd6\xd1\x9d\x02M[RE\x0b\xf3Y\xfa\xcc" +
+	"\xabe\x0dOH\xc4U\x17:\x1f0X\xeb\xb3xS" +
+	"\x15\x8e\x1e\x1d\xef\x15\xfa\x18/\x8c\x19\x11\xb1\xaa\x9c\xda" +
+	"(\x11\x14t\x8d\x91\x9bKA7\x97[c\xc6Fz" +
+	"\x09R\x97[\xc1\x02\x00\xda\xc3\xad.)\xa0\xfa,A" +
+	"\x9f\xc5\x9fg]\x94\xadGj\xee\xa8\xb8\xdb^w\xa3" +
+	"lkf;\xac\xbb\x0ei\xee\x15l/\x8d\x96lM" +
+	"%t\x96^\xa9\x93\x0d\xdfo\xed\x9f\xb1\xe7\xdb\xcc\xa9" +
+	"\x8f\xf1\x16l\x8dJ\xb9\xf6\x00\xc7\xb8\xcf8\xf3\x0ai" +
+	"\x1e\xfd\x01\x02\x9dF\xd1\xa9\xc5#1\xa6#5\xd7\xae" +
+	"igKF\x06\xaf=\xb8\xc9\xc4\xa9\x8b\xa41\xee\x8d" +
+	"j{}\x05A\x1f\xbfQ\x8d\x1c\xdc\xbfl\xfd\xf7\xae" +
+	"=~\xef\x89\xf1\xe0\xe6[\xbem<\xf0;\xdf\xd5<" +
+	"\xaf\xf8\x9b\xbcR\x98\xc8+\xfd\xe9kj\xb2\x1b\xc0\xbe" +
+	"\xfe'\xaa\xae\x85\xc3\x89\x9ex\x0a\xa9yt\xf4\xf8'" +
+	"K\xbf\x19\xbd9\x15\x01\x19\x0b\xfd%\x00\x00\xff\xffT" +
+	"\xfe\x9e\x00"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
@@ -2340,21 +2894,26 @@ func RegisterSchema(reg *schemas.Registry) {
 		Nodes: []uint64{
 			0x804fe3440f678ff3,
 			0x81914daea9a63e6e,
+			0x86f74fa7a21af622,
 			0x8b1d7e7251a6624c,
+			0x8e73ddc10aabd76d,
 			0x8efe6ee8e0e56459,
 			0x9315a840d2a15700,
 			0x969e88e97ed79d94,
 			0x9baeae5a95f57921,
+			0x9dbddd0e637e25ac,
 			0xb2239bbcb9521b14,
 			0xb52aad0122df1319,
 			0xb6ead80127ea2fdd,
 			0xbce33359b4dd6c02,
+			0xbe2475e52b796657,
 			0xc0c1a3f1fdbabdfd,
 			0xc6398605d1d1ffd8,
 			0xc65521f186b6e059,
 			0xca85f2cfe432ed49,
 			0xd13bb87cc9defbdd,
 			0xd698fc716f499b07,
+			0xe6dd1edc1453a4c3,
 			0xea6d16891c17db82,
 			0xf7531ef46740370e,
 			0xffdf64593702d802,

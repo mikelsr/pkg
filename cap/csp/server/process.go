@@ -12,6 +12,8 @@ import (
 	"github.com/wetware/pkg/cap/csp"
 )
 
+var nilEvents = api.Events{}
+
 type killFunc func(uint32)
 type procFetch func(uint32) (*process, bool)
 
@@ -29,7 +31,7 @@ type process struct {
 	localLinks *sync.Map
 	monitors   chan api.Process_monitor
 	procFetch
-	events *api.Events
+	events api.Events
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
@@ -148,7 +150,7 @@ func (p *process) releaseMonitors(ctx context.Context) {
 }
 
 func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
-	if p.events == nil {
+	if p.events == nilEvents {
 		return errors.New("event handler not initialized")
 	}
 
@@ -158,7 +160,7 @@ func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
 }
 
 func (p *process) Resume(ctx context.Context, call api.Process_resume) error {
-	if p.events == nil {
+	if p.events == nilEvents {
 		return errors.New("event handler not initialized")
 	}
 

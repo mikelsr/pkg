@@ -150,7 +150,23 @@ func colorDisabled() bool {
 }
 
 func bootstrapAddr() string {
-	return path.Join("/ip4/228.8.8.8/udp/8822/multicast", loopback())
+	return path.Join("/ip4/228.8.8.8/udp/8822/multicast", eth())
+}
+
+//	func bootstrapAddr() string {
+//		return path.Join("/ip4/228.8.8.8/udp/8822/multicast", loopback())
+//	}
+func eth() string {
+	switch runtime.GOOS {
+	case "darwin":
+		return "lo0"
+	default:
+		if runtime.GOARCH == "amd64" {
+			return "enp7s0"
+		} else {
+			return "enxb827eb6d6e99"
+		}
+	}
 }
 
 func loopback() string {

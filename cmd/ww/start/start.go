@@ -98,7 +98,7 @@ func serve(c *cli.Context) error {
 		Ambient:   ambient(dht),
 		Meta:      meta,
 		Auth:      auth.AllowAll,
-	}.Serve(c.Context, ec, sc)
+	}.Serve(c.Context, ec, sc, h)
 }
 
 func newBootstrap(c *cli.Context, h local.Host) (_ boot.Service, err error) {
