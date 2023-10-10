@@ -162,7 +162,12 @@ func eth() string {
 		return "lo0"
 	default:
 		if runtime.GOARCH == "amd64" {
-			return "enp7s0"
+			hostname, err := os.Hostname()
+			if err != nil || hostname != "labtop" {
+				return "enp7s0"
+			} else {
+				return "enp58s0f1"
+			}
 		} else {
 			return "enxb827eb6d6e99"
 		}
