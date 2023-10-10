@@ -28,10 +28,21 @@ func (p *testProc) Link(ctx context.Context, call api.Process_link) error {
 	return nil
 }
 
+func (p *testProc) LinkLocal(ctx context.Context, call api.Process_linkLocal) error {
+	return nil
+}
+
 func (p *testProc) Unlink(ctx context.Context, call api.Process_unlink) error {
 	return nil
 }
 
+func (p *testProc) UnlinkLocal(ctx context.Context, call api.Process_unlinkLocal) error {
+	return nil
+}
+
+func (p *testProc) Monitor(ctx context.Context, call api.Process_monitor) error {
+	return nil
+}
 func (p *testProc) Pause(ctx context.Context, call api.Process_pause) error {
 	return nil
 }

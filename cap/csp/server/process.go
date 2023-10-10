@@ -13,6 +13,7 @@ import (
 )
 
 type killFunc func(uint32)
+type procFetch func(uint32) (*process, bool)
 
 // process is the main implementation of the Process capability.
 type process struct {
@@ -24,25 +25,38 @@ type process struct {
 	cancel   context.CancelFunc
 	result   execResult
 
-	linked  *sync.Map
-	getProc func(uint32) (*process, bool)
-	events  *api.Events
+	links      *sync.Map
+	localLinks *sync.Map
+	monitors   chan api.Process_monitor
+	procFetch
+	events *api.Events
 }
 
 func (p *process) Kill(ctx context.Context, call api.Process_kill) error {
-	return p.kill()
+	return p.kill(ctx)
 }
 
-func (p *process) kill() error {
-	defer p.killLinked()
+func (p *process) kill(ctx context.Context) error {
+	defer p.killLocalLinks(ctx)
+	defer p.killLinks(ctx)
 	p.killFunc(p.Pid)
 	return nil
 }
 
-func (p *process) killLinked() error {
-	p.linked.Range(func(key, value any) bool {
+func (p *process) killLinks(ctx context.Context) error {
+	p.localLinks.Range(func(key, value any) bool {
 		if value != nil {
-			value.(*process).kill()
+			value.(api.Process).Kill(ctx, nil)
+		}
+		return true
+	})
+	return nil
+}
+
+func (p *process) killLocalLinks(ctx context.Context) error {
+	p.localLinks.Range(func(key, value any) bool {
+		if value != nil {
+			value.(*process).kill(ctx)
 		}
 		return true
 	})
@@ -73,12 +87,17 @@ func (p *process) Link(ctx context.Context, call api.Process_link) error {
 	return nil
 }
 
-func (p *process) link(pid uint32) error {
-	other, ok := p.getProc(pid)
+func (p *process) LinkLocal(ctx context.Context, call api.Process_linkLocal) error {
+	return nil
+}
+
+func (p *process) linkLocal(pid uint32) error {
+	other, ok := p.procFetch(pid)
 	if !ok {
 		return fmt.Errorf("process %d not found", pid)
 	}
-	p.linked.Store(other.Pid, other)
+	p.localLinks.Store(other.Pid, other)
+	other.localLinks.Store(p.Pid, p)
 	return nil
 }
 
@@ -86,9 +105,48 @@ func (p *process) Unlink(ctx context.Context, call api.Process_unlink) error {
 	return nil
 }
 
-func (p *process) unlink(pid uint32) {
-	p.linked.Delete(pid)
+func (p *process) UnlinkLocal(ctx context.Context, call api.Process_unlinkLocal) error {
+	return nil
 }
+
+func (p *process) unlink(ctx context.Context, op api.Process) error {
+	return nil
+}
+
+func (p *process) unlinkLocal(pid uint32) error {
+	other, ok := p.procFetch(pid)
+	if !ok {
+		return fmt.Errorf("process %d not found", pid)
+	}
+	other.localLinks.Delete(p.Pid)
+	p.localLinks.Delete(pid)
+	return nil
+}
+
+func (p *process) Monitor(ctx context.Context, call api.Process_monitor) error {
+	call.Go()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case p.monitors <- call:
+		res, err := call.AllocResults()
+		if err != nil {
+			return err
+		}
+		return res.SetEvent("process ended")
+	}
+}
+
+func (p *process) releaseMonitors(ctx context.Context) {
+	for len(p.monitors) > 0 {
+		select {
+		case <-ctx.Done():
+			return
+		case <-p.monitors:
+		}
+	}
+}
+
 func (p *process) Pause(ctx context.Context, call api.Process_pause) error {
 	if p.events == nil {
 		return errors.New("event handler not initialized")

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"log/slog"
@@ -236,12 +237,16 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 
 	killFunc := r.Tree.Kill
 	proc := &process{
-		Args:     c.args,
-		time:     time.Now().UnixMilli(),
-		killFunc: killFunc,
-		done:     done,
-		cancel:   c.cancel,
-		getProc:  r.getLocalProc,
+		Args:      c.args,
+		time:      time.Now().UnixMilli(),
+		killFunc:  killFunc,
+		done:      done,
+		cancel:    c.cancel,
+		procFetch: r.fetchLocalProc,
+
+		monitors:   make(chan proc_api.Process_monitor),
+		links:      &sync.Map{},
+		localLinks: &sync.Map{},
 	}
 
 	// Register new process.
@@ -250,8 +255,8 @@ func (r Runtime) spawn(fn wasm.Function, c components) *process {
 
 	go func() {
 		defer close(done)
-		defer c.cancel()  // stop the rpc provider
-		defer proc.kill() // terminate the process
+		defer c.cancel()       // stop the rpc provider
+		defer proc.kill(c.ctx) // terminate the process
 		vs, err := fn.Call(c.ctx)
 
 		done <- execResult{
@@ -358,7 +363,7 @@ func (r Runtime) BytecodeCache(ctx context.Context, call core_api.Executor_bytec
 	return res.SetCache(proc_api.BytecodeCache_ServerToClient(r.Cache))
 }
 
-func (r Runtime) getLocalProc(pid uint32) (*process, bool) {
+func (r Runtime) fetchLocalProc(pid uint32) (*process, bool) {
 	p, ok := r.Tree.Map.Load(pid)
 	if !ok {
 		return nil, ok

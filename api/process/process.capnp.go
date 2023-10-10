@@ -787,7 +787,7 @@ func (c Process) Link(ctx context.Context, params func(Process_link_Params) erro
 		},
 	}
 	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 0}
+		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 1}
 		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_link_Params(s)) }
 	}
 
@@ -807,7 +807,7 @@ func (c Process) Unlink(ctx context.Context, params func(Process_unlink_Params) 
 		},
 	}
 	if params != nil {
-		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 0}
+		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 1}
 		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_unlink_Params(s)) }
 	}
 
@@ -816,12 +816,72 @@ func (c Process) Unlink(ctx context.Context, params func(Process_unlink_Params) 
 
 }
 
-func (c Process) Pause(ctx context.Context, params func(Process_pause_Params) error) (Process_pause_Results_Future, capnp.ReleaseFunc) {
+func (c Process) LinkLocal(ctx context.Context, params func(Process_linkLocal_Params) error) (Process_linkLocal_Results_Future, capnp.ReleaseFunc) {
 
 	s := capnp.Send{
 		Method: capnp.Method{
 			InterfaceID:   0xda23f0d3a8250633,
 			MethodID:      4,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "linkLocal",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_linkLocal_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_linkLocal_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Process) UnlinkLocal(ctx context.Context, params func(Process_unlinkLocal_Params) error) (Process_unlinkLocal_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      5,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "unlinkLocal",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 8, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_unlinkLocal_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_unlinkLocal_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Process) Monitor(ctx context.Context, params func(Process_monitor_Params) error) (Process_monitor_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      6,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "monitor",
+		},
+	}
+	if params != nil {
+		s.ArgsSize = capnp.ObjectSize{DataSize: 0, PointerCount: 0}
+		s.PlaceArgs = func(s capnp.Struct) error { return params(Process_monitor_Params(s)) }
+	}
+
+	ans, release := capnp.Client(c).SendCall(ctx, s)
+	return Process_monitor_Results_Future{Future: ans.Future()}, release
+
+}
+
+func (c Process) Pause(ctx context.Context, params func(Process_pause_Params) error) (Process_pause_Results_Future, capnp.ReleaseFunc) {
+
+	s := capnp.Send{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      7,
 			InterfaceName: "process.capnp:Process",
 			MethodName:    "pause",
 		},
@@ -841,7 +901,7 @@ func (c Process) Resume(ctx context.Context, params func(Process_resume_Params) 
 	s := capnp.Send{
 		Method: capnp.Method{
 			InterfaceID:   0xda23f0d3a8250633,
-			MethodID:      5,
+			MethodID:      8,
 			InterfaceName: "process.capnp:Process",
 			MethodName:    "resume",
 		},
@@ -937,6 +997,12 @@ type Process_Server interface {
 
 	Unlink(context.Context, Process_unlink) error
 
+	LinkLocal(context.Context, Process_linkLocal) error
+
+	UnlinkLocal(context.Context, Process_unlinkLocal) error
+
+	Monitor(context.Context, Process_monitor) error
+
 	Pause(context.Context, Process_pause) error
 
 	Resume(context.Context, Process_resume) error
@@ -958,7 +1024,7 @@ func Process_ServerToClient(s Process_Server) Process {
 // This can be used to create a more complicated Server.
 func Process_Methods(methods []server.Method, s Process_Server) []server.Method {
 	if cap(methods) == 0 {
-		methods = make([]server.Method, 0, 6)
+		methods = make([]server.Method, 0, 9)
 	}
 
 	methods = append(methods, server.Method{
@@ -1014,6 +1080,42 @@ func Process_Methods(methods []server.Method, s Process_Server) []server.Method 
 			InterfaceID:   0xda23f0d3a8250633,
 			MethodID:      4,
 			InterfaceName: "process.capnp:Process",
+			MethodName:    "linkLocal",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.LinkLocal(ctx, Process_linkLocal{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      5,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "unlinkLocal",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.UnlinkLocal(ctx, Process_unlinkLocal{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      6,
+			InterfaceName: "process.capnp:Process",
+			MethodName:    "monitor",
+		},
+		Impl: func(ctx context.Context, call *server.Call) error {
+			return s.Monitor(ctx, Process_monitor{call})
+		},
+	})
+
+	methods = append(methods, server.Method{
+		Method: capnp.Method{
+			InterfaceID:   0xda23f0d3a8250633,
+			MethodID:      7,
+			InterfaceName: "process.capnp:Process",
 			MethodName:    "pause",
 		},
 		Impl: func(ctx context.Context, call *server.Call) error {
@@ -1024,7 +1126,7 @@ func Process_Methods(methods []server.Method, s Process_Server) []server.Method 
 	methods = append(methods, server.Method{
 		Method: capnp.Method{
 			InterfaceID:   0xda23f0d3a8250633,
-			MethodID:      5,
+			MethodID:      8,
 			InterfaceName: "process.capnp:Process",
 			MethodName:    "resume",
 		},
@@ -1102,6 +1204,57 @@ func (c Process_unlink) Args() Process_unlink_Params {
 func (c Process_unlink) AllocResults() (Process_unlink_Results, error) {
 	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
 	return Process_unlink_Results(r), err
+}
+
+// Process_linkLocal holds the state for a server call to Process.linkLocal.
+// See server.Call for documentation.
+type Process_linkLocal struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_linkLocal) Args() Process_linkLocal_Params {
+	return Process_linkLocal_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_linkLocal) AllocResults() (Process_linkLocal_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_linkLocal_Results(r), err
+}
+
+// Process_unlinkLocal holds the state for a server call to Process.unlinkLocal.
+// See server.Call for documentation.
+type Process_unlinkLocal struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_unlinkLocal) Args() Process_unlinkLocal_Params {
+	return Process_unlinkLocal_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_unlinkLocal) AllocResults() (Process_unlinkLocal_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_unlinkLocal_Results(r), err
+}
+
+// Process_monitor holds the state for a server call to Process.monitor.
+// See server.Call for documentation.
+type Process_monitor struct {
+	*server.Call
+}
+
+// Args returns the call's arguments.
+func (c Process_monitor) Args() Process_monitor_Params {
+	return Process_monitor_Params(c.Call.Args())
+}
+
+// AllocResults allocates the results struct.
+func (c Process_monitor) AllocResults() (Process_monitor_Results, error) {
+	r, err := c.Call.AllocResults(capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Process_monitor_Results(r), err
 }
 
 // Process_pause holds the state for a server call to Process.pause.
@@ -1420,12 +1573,12 @@ type Process_link_Params capnp.Struct
 const Process_link_Params_TypeID = 0xd22f75df06c187e8
 
 func NewProcess_link_Params(s *capnp.Segment) (Process_link_Params, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
 	return Process_link_Params(st), err
 }
 
 func NewRootProcess_link_Params(s *capnp.Segment) (Process_link_Params, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
 	return Process_link_Params(st), err
 }
 
@@ -1461,12 +1614,30 @@ func (s Process_link_Params) Message() *capnp.Message {
 func (s Process_link_Params) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
-func (s Process_link_Params) Other() uint32 {
-	return capnp.Struct(s).Uint32(0)
+func (s Process_link_Params) Other() Process {
+	p, _ := capnp.Struct(s).Ptr(0)
+	return Process(p.Interface().Client())
 }
 
-func (s Process_link_Params) SetOther(v uint32) {
-	capnp.Struct(s).SetUint32(0, v)
+func (s Process_link_Params) HasOther() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Process_link_Params) SetOther(v Process) error {
+	if !v.IsValid() {
+		return capnp.Struct(s).SetPtr(0, capnp.Ptr{})
+	}
+	seg := s.Segment()
+	in := capnp.NewInterface(seg, seg.Message().CapTable().Add(capnp.Client(v)))
+	return capnp.Struct(s).SetPtr(0, in.ToPtr())
+}
+
+func (s Process_link_Params) Roundtrip() bool {
+	return capnp.Struct(s).Bit(0)
+}
+
+func (s Process_link_Params) SetRoundtrip(v bool) {
+	capnp.Struct(s).SetBit(0, v)
 }
 
 // Process_link_Params_List is a list of Process_link_Params.
@@ -1474,7 +1645,7 @@ type Process_link_Params_List = capnp.StructList[Process_link_Params]
 
 // NewProcess_link_Params creates a new list of Process_link_Params.
 func NewProcess_link_Params_List(s *capnp.Segment, sz int32) (Process_link_Params_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1}, sz)
 	return capnp.StructList[Process_link_Params](l), err
 }
 
@@ -1484,6 +1655,9 @@ type Process_link_Params_Future struct{ *capnp.Future }
 func (f Process_link_Params_Future) Struct() (Process_link_Params, error) {
 	p, err := f.Future.Ptr()
 	return Process_link_Params(p.Struct()), err
+}
+func (p Process_link_Params_Future) Other() Process {
+	return Process(p.Future.Field(0, nil).Client())
 }
 
 type Process_link_Results capnp.Struct
@@ -1557,12 +1731,12 @@ type Process_unlink_Params capnp.Struct
 const Process_unlink_Params_TypeID = 0x86e3410d1abd406b
 
 func NewProcess_unlink_Params(s *capnp.Segment) (Process_unlink_Params, error) {
-	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
 	return Process_unlink_Params(st), err
 }
 
 func NewRootProcess_unlink_Params(s *capnp.Segment) (Process_unlink_Params, error) {
-	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1})
 	return Process_unlink_Params(st), err
 }
 
@@ -1598,12 +1772,30 @@ func (s Process_unlink_Params) Message() *capnp.Message {
 func (s Process_unlink_Params) Segment() *capnp.Segment {
 	return capnp.Struct(s).Segment()
 }
-func (s Process_unlink_Params) Other() uint32 {
-	return capnp.Struct(s).Uint32(0)
+func (s Process_unlink_Params) Other() Process {
+	p, _ := capnp.Struct(s).Ptr(0)
+	return Process(p.Interface().Client())
 }
 
-func (s Process_unlink_Params) SetOther(v uint32) {
-	capnp.Struct(s).SetUint32(0, v)
+func (s Process_unlink_Params) HasOther() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Process_unlink_Params) SetOther(v Process) error {
+	if !v.IsValid() {
+		return capnp.Struct(s).SetPtr(0, capnp.Ptr{})
+	}
+	seg := s.Segment()
+	in := capnp.NewInterface(seg, seg.Message().CapTable().Add(capnp.Client(v)))
+	return capnp.Struct(s).SetPtr(0, in.ToPtr())
+}
+
+func (s Process_unlink_Params) Roundtrip() bool {
+	return capnp.Struct(s).Bit(0)
+}
+
+func (s Process_unlink_Params) SetRoundtrip(v bool) {
+	capnp.Struct(s).SetBit(0, v)
 }
 
 // Process_unlink_Params_List is a list of Process_unlink_Params.
@@ -1611,7 +1803,7 @@ type Process_unlink_Params_List = capnp.StructList[Process_unlink_Params]
 
 // NewProcess_unlink_Params creates a new list of Process_unlink_Params.
 func NewProcess_unlink_Params_List(s *capnp.Segment, sz int32) (Process_unlink_Params_List, error) {
-	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 1}, sz)
 	return capnp.StructList[Process_unlink_Params](l), err
 }
 
@@ -1621,6 +1813,9 @@ type Process_unlink_Params_Future struct{ *capnp.Future }
 func (f Process_unlink_Params_Future) Struct() (Process_unlink_Params, error) {
 	p, err := f.Future.Ptr()
 	return Process_unlink_Params(p.Struct()), err
+}
+func (p Process_unlink_Params_Future) Other() Process {
+	return Process(p.Future.Field(0, nil).Client())
 }
 
 type Process_unlink_Results capnp.Struct
@@ -1688,10 +1883,431 @@ func (f Process_unlink_Results_Future) Struct() (Process_unlink_Results, error) 
 	return Process_unlink_Results(p.Struct()), err
 }
 
+type Process_linkLocal_Params capnp.Struct
+
+// Process_linkLocal_Params_TypeID is the unique identifier for the type Process_linkLocal_Params.
+const Process_linkLocal_Params_TypeID = 0xb72541d950858a60
+
+func NewProcess_linkLocal_Params(s *capnp.Segment) (Process_linkLocal_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	return Process_linkLocal_Params(st), err
+}
+
+func NewRootProcess_linkLocal_Params(s *capnp.Segment) (Process_linkLocal_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	return Process_linkLocal_Params(st), err
+}
+
+func ReadRootProcess_linkLocal_Params(msg *capnp.Message) (Process_linkLocal_Params, error) {
+	root, err := msg.Root()
+	return Process_linkLocal_Params(root.Struct()), err
+}
+
+func (s Process_linkLocal_Params) String() string {
+	str, _ := text.Marshal(0xb72541d950858a60, capnp.Struct(s))
+	return str
+}
+
+func (s Process_linkLocal_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_linkLocal_Params) DecodeFromPtr(p capnp.Ptr) Process_linkLocal_Params {
+	return Process_linkLocal_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_linkLocal_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_linkLocal_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_linkLocal_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_linkLocal_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Process_linkLocal_Params) Other() uint32 {
+	return capnp.Struct(s).Uint32(0)
+}
+
+func (s Process_linkLocal_Params) SetOther(v uint32) {
+	capnp.Struct(s).SetUint32(0, v)
+}
+
+// Process_linkLocal_Params_List is a list of Process_linkLocal_Params.
+type Process_linkLocal_Params_List = capnp.StructList[Process_linkLocal_Params]
+
+// NewProcess_linkLocal_Params creates a new list of Process_linkLocal_Params.
+func NewProcess_linkLocal_Params_List(s *capnp.Segment, sz int32) (Process_linkLocal_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
+	return capnp.StructList[Process_linkLocal_Params](l), err
+}
+
+// Process_linkLocal_Params_Future is a wrapper for a Process_linkLocal_Params promised by a client call.
+type Process_linkLocal_Params_Future struct{ *capnp.Future }
+
+func (f Process_linkLocal_Params_Future) Struct() (Process_linkLocal_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_linkLocal_Params(p.Struct()), err
+}
+
+type Process_linkLocal_Results capnp.Struct
+
+// Process_linkLocal_Results_TypeID is the unique identifier for the type Process_linkLocal_Results.
+const Process_linkLocal_Results_TypeID = 0xf589dc1668ea3d8f
+
+func NewProcess_linkLocal_Results(s *capnp.Segment) (Process_linkLocal_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_linkLocal_Results(st), err
+}
+
+func NewRootProcess_linkLocal_Results(s *capnp.Segment) (Process_linkLocal_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_linkLocal_Results(st), err
+}
+
+func ReadRootProcess_linkLocal_Results(msg *capnp.Message) (Process_linkLocal_Results, error) {
+	root, err := msg.Root()
+	return Process_linkLocal_Results(root.Struct()), err
+}
+
+func (s Process_linkLocal_Results) String() string {
+	str, _ := text.Marshal(0xf589dc1668ea3d8f, capnp.Struct(s))
+	return str
+}
+
+func (s Process_linkLocal_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_linkLocal_Results) DecodeFromPtr(p capnp.Ptr) Process_linkLocal_Results {
+	return Process_linkLocal_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_linkLocal_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_linkLocal_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_linkLocal_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_linkLocal_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_linkLocal_Results_List is a list of Process_linkLocal_Results.
+type Process_linkLocal_Results_List = capnp.StructList[Process_linkLocal_Results]
+
+// NewProcess_linkLocal_Results creates a new list of Process_linkLocal_Results.
+func NewProcess_linkLocal_Results_List(s *capnp.Segment, sz int32) (Process_linkLocal_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_linkLocal_Results](l), err
+}
+
+// Process_linkLocal_Results_Future is a wrapper for a Process_linkLocal_Results promised by a client call.
+type Process_linkLocal_Results_Future struct{ *capnp.Future }
+
+func (f Process_linkLocal_Results_Future) Struct() (Process_linkLocal_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_linkLocal_Results(p.Struct()), err
+}
+
+type Process_unlinkLocal_Params capnp.Struct
+
+// Process_unlinkLocal_Params_TypeID is the unique identifier for the type Process_unlinkLocal_Params.
+const Process_unlinkLocal_Params_TypeID = 0xf5c2d7ad2dde5570
+
+func NewProcess_unlinkLocal_Params(s *capnp.Segment) (Process_unlinkLocal_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	return Process_unlinkLocal_Params(st), err
+}
+
+func NewRootProcess_unlinkLocal_Params(s *capnp.Segment) (Process_unlinkLocal_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0})
+	return Process_unlinkLocal_Params(st), err
+}
+
+func ReadRootProcess_unlinkLocal_Params(msg *capnp.Message) (Process_unlinkLocal_Params, error) {
+	root, err := msg.Root()
+	return Process_unlinkLocal_Params(root.Struct()), err
+}
+
+func (s Process_unlinkLocal_Params) String() string {
+	str, _ := text.Marshal(0xf5c2d7ad2dde5570, capnp.Struct(s))
+	return str
+}
+
+func (s Process_unlinkLocal_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_unlinkLocal_Params) DecodeFromPtr(p capnp.Ptr) Process_unlinkLocal_Params {
+	return Process_unlinkLocal_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_unlinkLocal_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_unlinkLocal_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_unlinkLocal_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_unlinkLocal_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Process_unlinkLocal_Params) Other() uint32 {
+	return capnp.Struct(s).Uint32(0)
+}
+
+func (s Process_unlinkLocal_Params) SetOther(v uint32) {
+	capnp.Struct(s).SetUint32(0, v)
+}
+
+// Process_unlinkLocal_Params_List is a list of Process_unlinkLocal_Params.
+type Process_unlinkLocal_Params_List = capnp.StructList[Process_unlinkLocal_Params]
+
+// NewProcess_unlinkLocal_Params creates a new list of Process_unlinkLocal_Params.
+func NewProcess_unlinkLocal_Params_List(s *capnp.Segment, sz int32) (Process_unlinkLocal_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 8, PointerCount: 0}, sz)
+	return capnp.StructList[Process_unlinkLocal_Params](l), err
+}
+
+// Process_unlinkLocal_Params_Future is a wrapper for a Process_unlinkLocal_Params promised by a client call.
+type Process_unlinkLocal_Params_Future struct{ *capnp.Future }
+
+func (f Process_unlinkLocal_Params_Future) Struct() (Process_unlinkLocal_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_unlinkLocal_Params(p.Struct()), err
+}
+
+type Process_unlinkLocal_Results capnp.Struct
+
+// Process_unlinkLocal_Results_TypeID is the unique identifier for the type Process_unlinkLocal_Results.
+const Process_unlinkLocal_Results_TypeID = 0xeafb60603769c851
+
+func NewProcess_unlinkLocal_Results(s *capnp.Segment) (Process_unlinkLocal_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_unlinkLocal_Results(st), err
+}
+
+func NewRootProcess_unlinkLocal_Results(s *capnp.Segment) (Process_unlinkLocal_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_unlinkLocal_Results(st), err
+}
+
+func ReadRootProcess_unlinkLocal_Results(msg *capnp.Message) (Process_unlinkLocal_Results, error) {
+	root, err := msg.Root()
+	return Process_unlinkLocal_Results(root.Struct()), err
+}
+
+func (s Process_unlinkLocal_Results) String() string {
+	str, _ := text.Marshal(0xeafb60603769c851, capnp.Struct(s))
+	return str
+}
+
+func (s Process_unlinkLocal_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_unlinkLocal_Results) DecodeFromPtr(p capnp.Ptr) Process_unlinkLocal_Results {
+	return Process_unlinkLocal_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_unlinkLocal_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_unlinkLocal_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_unlinkLocal_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_unlinkLocal_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_unlinkLocal_Results_List is a list of Process_unlinkLocal_Results.
+type Process_unlinkLocal_Results_List = capnp.StructList[Process_unlinkLocal_Results]
+
+// NewProcess_unlinkLocal_Results creates a new list of Process_unlinkLocal_Results.
+func NewProcess_unlinkLocal_Results_List(s *capnp.Segment, sz int32) (Process_unlinkLocal_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_unlinkLocal_Results](l), err
+}
+
+// Process_unlinkLocal_Results_Future is a wrapper for a Process_unlinkLocal_Results promised by a client call.
+type Process_unlinkLocal_Results_Future struct{ *capnp.Future }
+
+func (f Process_unlinkLocal_Results_Future) Struct() (Process_unlinkLocal_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_unlinkLocal_Results(p.Struct()), err
+}
+
+type Process_monitor_Params capnp.Struct
+
+// Process_monitor_Params_TypeID is the unique identifier for the type Process_monitor_Params.
+const Process_monitor_Params_TypeID = 0xc7e357fd7b4cb277
+
+func NewProcess_monitor_Params(s *capnp.Segment) (Process_monitor_Params, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_monitor_Params(st), err
+}
+
+func NewRootProcess_monitor_Params(s *capnp.Segment) (Process_monitor_Params, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
+	return Process_monitor_Params(st), err
+}
+
+func ReadRootProcess_monitor_Params(msg *capnp.Message) (Process_monitor_Params, error) {
+	root, err := msg.Root()
+	return Process_monitor_Params(root.Struct()), err
+}
+
+func (s Process_monitor_Params) String() string {
+	str, _ := text.Marshal(0xc7e357fd7b4cb277, capnp.Struct(s))
+	return str
+}
+
+func (s Process_monitor_Params) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_monitor_Params) DecodeFromPtr(p capnp.Ptr) Process_monitor_Params {
+	return Process_monitor_Params(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_monitor_Params) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_monitor_Params) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_monitor_Params) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_monitor_Params) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+
+// Process_monitor_Params_List is a list of Process_monitor_Params.
+type Process_monitor_Params_List = capnp.StructList[Process_monitor_Params]
+
+// NewProcess_monitor_Params creates a new list of Process_monitor_Params.
+func NewProcess_monitor_Params_List(s *capnp.Segment, sz int32) (Process_monitor_Params_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0}, sz)
+	return capnp.StructList[Process_monitor_Params](l), err
+}
+
+// Process_monitor_Params_Future is a wrapper for a Process_monitor_Params promised by a client call.
+type Process_monitor_Params_Future struct{ *capnp.Future }
+
+func (f Process_monitor_Params_Future) Struct() (Process_monitor_Params, error) {
+	p, err := f.Future.Ptr()
+	return Process_monitor_Params(p.Struct()), err
+}
+
+type Process_monitor_Results capnp.Struct
+
+// Process_monitor_Results_TypeID is the unique identifier for the type Process_monitor_Results.
+const Process_monitor_Results_TypeID = 0xbb9ef870419ecb71
+
+func NewProcess_monitor_Results(s *capnp.Segment) (Process_monitor_Results, error) {
+	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Process_monitor_Results(st), err
+}
+
+func NewRootProcess_monitor_Results(s *capnp.Segment) (Process_monitor_Results, error) {
+	st, err := capnp.NewRootStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1})
+	return Process_monitor_Results(st), err
+}
+
+func ReadRootProcess_monitor_Results(msg *capnp.Message) (Process_monitor_Results, error) {
+	root, err := msg.Root()
+	return Process_monitor_Results(root.Struct()), err
+}
+
+func (s Process_monitor_Results) String() string {
+	str, _ := text.Marshal(0xbb9ef870419ecb71, capnp.Struct(s))
+	return str
+}
+
+func (s Process_monitor_Results) EncodeAsPtr(seg *capnp.Segment) capnp.Ptr {
+	return capnp.Struct(s).EncodeAsPtr(seg)
+}
+
+func (Process_monitor_Results) DecodeFromPtr(p capnp.Ptr) Process_monitor_Results {
+	return Process_monitor_Results(capnp.Struct{}.DecodeFromPtr(p))
+}
+
+func (s Process_monitor_Results) ToPtr() capnp.Ptr {
+	return capnp.Struct(s).ToPtr()
+}
+func (s Process_monitor_Results) IsValid() bool {
+	return capnp.Struct(s).IsValid()
+}
+
+func (s Process_monitor_Results) Message() *capnp.Message {
+	return capnp.Struct(s).Message()
+}
+
+func (s Process_monitor_Results) Segment() *capnp.Segment {
+	return capnp.Struct(s).Segment()
+}
+func (s Process_monitor_Results) Event() (string, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return p.Text(), err
+}
+
+func (s Process_monitor_Results) HasEvent() bool {
+	return capnp.Struct(s).HasPtr(0)
+}
+
+func (s Process_monitor_Results) EventBytes() ([]byte, error) {
+	p, err := capnp.Struct(s).Ptr(0)
+	return p.TextBytes(), err
+}
+
+func (s Process_monitor_Results) SetEvent(v string) error {
+	return capnp.Struct(s).SetText(0, v)
+}
+
+// Process_monitor_Results_List is a list of Process_monitor_Results.
+type Process_monitor_Results_List = capnp.StructList[Process_monitor_Results]
+
+// NewProcess_monitor_Results creates a new list of Process_monitor_Results.
+func NewProcess_monitor_Results_List(s *capnp.Segment, sz int32) (Process_monitor_Results_List, error) {
+	l, err := capnp.NewCompositeList(s, capnp.ObjectSize{DataSize: 0, PointerCount: 1}, sz)
+	return capnp.StructList[Process_monitor_Results](l), err
+}
+
+// Process_monitor_Results_Future is a wrapper for a Process_monitor_Results promised by a client call.
+type Process_monitor_Results_Future struct{ *capnp.Future }
+
+func (f Process_monitor_Results_Future) Struct() (Process_monitor_Results, error) {
+	p, err := f.Future.Ptr()
+	return Process_monitor_Results(p.Struct()), err
+}
+
 type Process_pause_Params capnp.Struct
 
 // Process_pause_Params_TypeID is the unique identifier for the type Process_pause_Params.
-const Process_pause_Params_TypeID = 0xb72541d950858a60
+const Process_pause_Params_TypeID = 0xe49628d0fca1d961
 
 func NewProcess_pause_Params(s *capnp.Segment) (Process_pause_Params, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
@@ -1709,7 +2325,7 @@ func ReadRootProcess_pause_Params(msg *capnp.Message) (Process_pause_Params, err
 }
 
 func (s Process_pause_Params) String() string {
-	str, _ := text.Marshal(0xb72541d950858a60, capnp.Struct(s))
+	str, _ := text.Marshal(0xe49628d0fca1d961, capnp.Struct(s))
 	return str
 }
 
@@ -1756,7 +2372,7 @@ func (f Process_pause_Params_Future) Struct() (Process_pause_Params, error) {
 type Process_pause_Results capnp.Struct
 
 // Process_pause_Results_TypeID is the unique identifier for the type Process_pause_Results.
-const Process_pause_Results_TypeID = 0xf589dc1668ea3d8f
+const Process_pause_Results_TypeID = 0xc09f176286f9e884
 
 func NewProcess_pause_Results(s *capnp.Segment) (Process_pause_Results, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
@@ -1774,7 +2390,7 @@ func ReadRootProcess_pause_Results(msg *capnp.Message) (Process_pause_Results, e
 }
 
 func (s Process_pause_Results) String() string {
-	str, _ := text.Marshal(0xf589dc1668ea3d8f, capnp.Struct(s))
+	str, _ := text.Marshal(0xc09f176286f9e884, capnp.Struct(s))
 	return str
 }
 
@@ -1821,7 +2437,7 @@ func (f Process_pause_Results_Future) Struct() (Process_pause_Results, error) {
 type Process_resume_Params capnp.Struct
 
 // Process_resume_Params_TypeID is the unique identifier for the type Process_resume_Params.
-const Process_resume_Params_TypeID = 0xf5c2d7ad2dde5570
+const Process_resume_Params_TypeID = 0xffd9ede88fe29780
 
 func NewProcess_resume_Params(s *capnp.Segment) (Process_resume_Params, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
@@ -1839,7 +2455,7 @@ func ReadRootProcess_resume_Params(msg *capnp.Message) (Process_resume_Params, e
 }
 
 func (s Process_resume_Params) String() string {
-	str, _ := text.Marshal(0xf5c2d7ad2dde5570, capnp.Struct(s))
+	str, _ := text.Marshal(0xffd9ede88fe29780, capnp.Struct(s))
 	return str
 }
 
@@ -1886,7 +2502,7 @@ func (f Process_resume_Params_Future) Struct() (Process_resume_Params, error) {
 type Process_resume_Results capnp.Struct
 
 // Process_resume_Results_TypeID is the unique identifier for the type Process_resume_Results.
-const Process_resume_Results_TypeID = 0xeafb60603769c851
+const Process_resume_Results_TypeID = 0xa57c12075589e51f
 
 func NewProcess_resume_Results(s *capnp.Segment) (Process_resume_Results, error) {
 	st, err := capnp.NewStruct(s, capnp.ObjectSize{DataSize: 0, PointerCount: 0})
@@ -1904,7 +2520,7 @@ func ReadRootProcess_resume_Results(msg *capnp.Message) (Process_resume_Results,
 }
 
 func (s Process_resume_Results) String() string {
-	str, _ := text.Marshal(0xeafb60603769c851, capnp.Struct(s))
+	str, _ := text.Marshal(0xa57c12075589e51f, capnp.Struct(s))
 	return str
 }
 
@@ -2725,84 +3341,103 @@ func (f Events_stop_Results_Future) Struct() (Events_stop_Results, error) {
 	return Events_stop_Results(p.Struct()), err
 }
 
-const schema_9a51e53177277763 = "x\xda\xacV]l\x14U\x14>\xe7\xce\xcc\xce\xa8\xdd" +
-	"\xae\xb7\xb3 \x12b\xa5\x16\x0d\xab\xb4\x14\x1e\x0c\x04\xec" +
-	"\x02i\x08\xc4\x87\x9d&<\x14\x03\xd9\xe92\xb0\x13\xda" +
-	"\xee\xb23\xdb\x82@B\x0d\x15Kl\xd4D\xa36m" +
-	"\xa8\x89\xd5\xc6\x88\x91*\xa2\x895\x11\x02\x15\x8d\x0f\x82" +
-	"\x09`QcQBKB4\xb15\xf5o\xcd\x9d\xd9" +
-	"\x99\x9d\xee\x8f5\xc4\x97\xa6\xb3\xe7\xdc\xef|\xe7\xe7~" +
-	"\xe7.\x8fpa\xbe\xce/\xde\x05D9$\xf82\x89" +
-	"o\xaf\x8e=\xd9\xff\xdbS@\xe7!\x00/\x02\xac\xd4" +
-	"\x85\x85\x08|fwxd\xa1\x7f\xdd\xb5\xa7A\x99\x8f" +
-	"\x8eI\x11\xaa\x10Pn\x12\xea\x013\x9f<V\x13\x0a" +
-	"T|\xf0\x02\xd0E\x08  s\xd8'\xacf\x0e\x9d" +
-	"\x96\xc3\xc3\xd1\x81c\x0df\xb4\x1f\xe8|\x07`\xd0\xc6" +
-	"\xae\xb9\x1c\xbbY;^\xfb\x86'j\x8fP\xc1,\x13" +
-	"7\xae\xf75\xef\xd4\xbd\x96\xb4m\xf9\x953\x9f8\xfb" +
-	"\xcb\xb9ao\xb8m\xc2z\x16N\xb3\xc2E\x8fvE" +
-	"\xae\xac[r\xca\x13\xae\xdb\x0ew\xb9\xf1\x0b\x7f\xf9\xc2" +
-	"\xc6\x0f=\xa0{l\xcb\x96\xbf\xfb6\x0d\xdd\xb3\xf5\xb4" +
-	"\x17\xb4\xc9\xceA\xb5@\x1f<\xba\xf6\xb5\xc1\xfayg" +
-	"@)G\x92\x89u<\xd4Q\xf7\x93\xd2\x0b\x02\x11\x01" +
-	"\xe4N\xa1W\xee\x16\xd8\x99.\xa1\x12\x013\xb7^\xfe" +
-	"\xda\x18\x8e\xd7\x9d\xf5f\xec\xb3\x02\xdd8\xf2\xa9\xef\xfb" +
-	"t\xed\x05o5{|\x15,\xd0K>\x16\xe8\xed\x8d" +
-	"\xcb\xab\x07\xde\x0f]\xf2:\x9cdgQ\x1e\xb1\x1c\xd6" +
-	"\x9c\xdf\xdf<\xd0\xbb\xe6\x8a\x07\xfb\x07_\x88a\xaf\xf4" +
-	"-\x19\xba\xf8\xf3\x03\xdf\x00-\xe7r\x14\x01\xe5\xf3\xbe" +
-	"a\xf9+\x1f\xf3\xfc\xd2w\x04\xe5\x11Q\x04\xc8\x98x" +
-	"\xc74\xf7\xe3\xe3\xd7\x0b\xbc\x07\xc5q\xf9\x04s\x91\x8f" +
-	"\x8b\xa3\xf2\x12\x899\x9f\xfax\xff\xe8\xddc\xcfOx" +
-	"*\xe7\x97\xaaX\xd0\x9d\xcd[\xb5\xf5\x93''\x0a`" +
-	"\xa6\xc4\xb7\xe4\xbf,\x98\x19qT\xdec\xc1(\x9f\xe9" +
-	"\x8fF\xa3\x7fLz\xb87I\x16\xf7\x8d\xdbj\xdf\xbd" +
-	"\xf7\x9d7oy,\xeb$\xab\xdf\xf1\x8f\xee\xff\xf3\xe2" +
-	"\xc1\xfb\xa6\xbc\xadY*Y\xfd\xae\x93XA\x9e[;" +
-	"\x19\x9f\x7f\xb5{\xcasT\xb1\xb9%\xb7|\xb7\xec\xf8" +
-	"\xa5\xd3^\xcb*\xdbr`\xe8f\xba\xaf\xe2\xc5i/" +
-	"\xe8b\xc9\xea\xf7R\x0b4\xb0}\xfa\xcc\x85G\xa23" +
-	"\xa0,r\xdb\xb0\xc9\x8e\xaaX\x0e\xd7\xde\x1b\x93\xc67" +
-	"\xeb3\x1e\xec=6\xe1ceK\xcfm\xff\xbc\xe1w" +
-	"O\xad\x9a\xa4;\x11\x96g\x92\xa9DL3\x8c\x1a." +
-	"\xa6&\xdb\x92\xab\x1b\xda\xb56\xd3\xa8I\xaaiC\xab" +
-	"n\xd4\x8ct\x0bg\x1a\xf9N\x91\xecg\xba\xadEo" +
-	"\xdb]\x1dQS\xa2\xdaj(<\xc7\x03\xf0\x08@\xfd" +
-	"+\x00\x14\x89C%H\xb02a\xc6\xb5\x14J@P" +
-	"\x02\xcc\x87Z\xbf\xcf\xd4b\x89\x1d\xda\x065\x16\xd7j" +
-	"\x92i\xb3\xba>\xa2\xa6\xf2\xd06\x03(e\x1c*\x0b" +
-	"\x08f\x9a\xb3\x07\x00\x00\xfd@\xd0_\x88\xe9\xd0\xb3\xc8" +
-	"\x95\xcaaV\xa2VH,\xe5c\x98\x89\xa4\x8dcz" +
-	"|\xf8b\x09\xec\xd2\xcc\xac\xa7\x01\xffC\x069v\\" +
-	"k)v)\xcdH\xb7\x96t\x9aM/\xae\x1a\xc5\xea" +
-	"[\x95\xeb\x96\x18\xd3w\x14\xb0B\x1bkS\x1b\xb73" +
-	"\x11AT\x82\xee\xd1\x83\xec\xe8^\x0e\x95\xc3\x04)b" +
-	"\x90\xcd%\xed\x0c\x01(\x078T\x9e!\x88$\x88\x04" +
-	"\x80v1\xc7C\x1c*\xcf\x12\xa4\x1c\x06\x91\x03\xa0\xdd" +
-	"\xcc\xf10\x87\xca\x00A\xcac\x10y\x00\xda\xcf~|" +
-	"\x85C\xe5u\x82bR\xdf\xe1LN \xe9\xf9\xf0\xd2" +
-	"\x0c\xa8\xa9]\xedX\x0e\x18\xe1\x10\xcb\x80\xb0\x7f\x03\xa6" +
-	"\xde\xaa\xa1\x00\x04\x85\xd2\xd5\xdd\xad\xb7\xb4\xcc9\xe3\xce" +
-	"\x84\xb3\xf9\xb8\xad\x09w\x80:T\xddt\xa3\x95\x9a\x0d" +
-	"m\xafnn\xc8\xce\xc6\x1cx\xd9\xcb\xd7\xa8\x19\x016" +
-	"n\xf9\xcd\x8a\xa4*\xado\xd6\xaf\x05\x9c\x00\xe0\xaa\x03" +
-	":rNO\x84\x80\xd0A\x11\xd1\x95:t\xb6\x04}" +
-	"\x95\xd9zD$\xeez@gg\xb2\x06\x13\x9a\x16\x91" +
-	"s\x171:\x1b\x80\xea\xab\x81\xd0m\"\xf2\xee\xceC" +
-	"G\x0c\xa9\xb2\x02\x08m\x10QpU\x10\x1d\xf5\xa5\xab" +
-	"\xd8\xb9eb\x80\x95)\x8c\x01\xd6\x9b0\x06X\x8aa" +
-	"\xac\xb7s\x0dc\xa5u!\xc2Xo\x0f}\x18#\x98" +
-	"\xab\x0f\xc9\x9fx1\x16\xd7X\xfaeV\xfa\xce\x93\x00" +
-	"\x1d\xf1\xa6J\x95M\x07]\xe9Eg\x91\xd3UU\x16" +
-	"\x1d$\xee\x1aFG~\xe9bf\x9b'\x8a\xc9\xb4\x19" +
-	"Fq\x97\xc6\xfe\xc6Uc6\x9b\xa2\x97\x94\xb5_," +
-	"\xd2\xac\x86\xf6\x00s\xcb\x91u\x1e!\xe8\xbc\x81\xdc\xda" +
-	"\xa1\xfbb@g\x01:\xb5C\xe2\xea<:o\x15\xba" +
-	"8d\x91-\xa8\\\x80\xa9ZQ\xca\xce\x80\xe58\xcf" +
-	"\x1e\xb0b\xb7(_@\xf9R\xea^L\x1c\xe7\x92\x9f" +
-	"\xa2\xa2XP\xca\xe2\xec\xb3\xbb\xe9\xdfe\x91\xa9\xf6m" +
-	"\xc8\"_Jb\xe7J2\xae\x1a\x88@\x10\xe7P\x8b" +
-	"\xff\xb0\x96l\xd6\x00\xff\x04\x00\x00\xff\xff\xc9B6\xf7"
+const schema_9a51e53177277763 = "x\xda\xbcV\x7fl\x14\xd5\x16>gfvgw\xd3" +
+	"\xed\xbe\xdb)\xf0\x1e\xe1\xbd>\xfa\xca{\x8f>hK" +
+	"\xc9\x8b\xd2\x80]J\x1a\x02)\xc9N\x93\xc6\x80\x81t" +
+	"\xba\x1d\xd8\x0d\xdb\xeevw\x96\x82@\x04\x03h\x89\x06" +
+	"MD\x90P(\x89(\x185RE$Zc!P" +
+	"+1Q\x90@\x055\x94\x1f)\x10\x88$\x16\xad\x82" +
+	"c\xee\xcc\xde\xe9\xb4\xbbk\x091\xfe\xb3\xc9\xec\xf9q" +
+	"\xbf\xf3\x9ds\xefw\xca\x0a\x05\xbf0\xc3;\xc1\x0b\x9c" +
+	"\xbc\xd3\xe1\xd4\xa3\xdf\\\xbc\xf0d\xfb\x8fO\x03\x19\x87" +
+	"\x00\x82\x080\xb3\xc59\x11A\xd0W\xfa\xbb&z\xe7" +
+	"^\xde\x02\xf2xD\x00\x07R\xdbbg!\x02J\x8a" +
+	"\xb3\x15P\xff\xf8\xb1\x92b_\xde\xfb/\x02\x99d9" +
+	"t;+\xa8C\xaf\xb3\x12P\xff_}\xc7\xdej\xad" +
+	"\xbe\x1d\xc8x\x96\xfc\x96\x99\xbc\xe0j[\x9d\x98\xb7n" +
+	"\xbf\xcdr\xd6YL-%\xe7\x837K\xfbK_\xb3" +
+	"\x01\xear\xe6Q\xcb\xf5\x81k\xbb\x1b\x96\x87\xed\x96\xfd" +
+	"\xa6\xe5\x07^{\xe2\xc4\x9d\x93\x9dv \xcf;\xab(" +
+	"\x90\xed\x06\x90\xfa\xad\x9b\x03}s\xa7\x1cI\xd5b\xc4" +
+	"\x1e5\x91v\x1b\x0e\xe7kOys'\xd6~`\xcb" +
+	"}\xc9D\xdarj\xcf\xdc\xd8O{>4\x91\x9a\xb9" +
+	"{\x9d\xe54\xf4K#t\xd3\xc0\xd0\x96\x86\x09{?" +
+	"\xb1\x95r\x87\xb2$\xe8u\xbf\xee^p`\xc2\x92c" +
+	"vX}\xe6\xa9\x97\x8c\xd0\x7fo\x9d\xb3o\x7f\xe5\xb8" +
+	"\xe3 \xe7\"\xa7\x07[\xff\xd3:\xe3\xaa\xbc\x0b\x1c\x9c" +
+	"\x08 \xa1\xb8Kr\x8b4\xc6!\x16 \xa0~{\xc7" +
+	"W\x89\xce\xd0\x8c\x13\xb6\x83\xa6\xb8\x0c\x8c\xad\x9d5k" +
+	"\xef?~\xb9\xc7f\xf1\xba\x0c6\x07\x9e\xe9v~\x97" +
+	",==\xa2\x89\x83b\x1e\xc5p_\xa4M|s~" +
+	"YQ\xc7{\xc5\xe7\xec\xd4,\xa5iQR]\x14\xe4" +
+	"\xec\xde\xb5\x0d\x1d\xbbf\xf7\xd9\x92\xb7\x99\xc9g:\xa7" +
+	"\x1c8\xf3\xfd\xbf\xbe\x06\x92\xcb\x0f\xa3\x07\x94Z\\\x9d" +
+	"\xd2\x1a\x17\xf5L\xba\xe6s\xd2U\xb7\x08\xa0+}\xfb" +
+	"\xee}\xf1\xdf\x97\xaf\xd8\xf2|\xee6\xe0k\xe8\xbe\xcb" +
+	"_\xa9\xb9\x96\x96\xe7\xb0\xbb_\xea\xa6\xc1R\x97\xbbG" +
+	"\xfa\xbf\x87\xa69\xf2\xd1\xda\x9e\xbf\\x\xe1\xba\xadS" +
+	"\x7f\xf7\x18t/oX\xa2V\xdd8|=-\x8d\xc3" +
+	"\xf3\x86\xe4\xa5\xc1\x92\xdb\xd3#m4\xd2\xc8\x9f\x86\x1f" +
+	"\xa9\xaf\xff\xe5\x86\x0dM\xd8SK\xd3\xcc_Z\xfa\xce" +
+	"\xdf\xde~\xfd\xb6\xcdR\xe71\xc6,t\xf4\x9f\xf7\xce" +
+	"\xac\xff\xc7\xa0\xbd\x9fs<\xc6\x98U{(U\xdb\xe6" +
+	"\xdc\x08\x8d\xbf\xd86h\x0bU\xa9]\xd0cu\xdfN" +
+	"\x7f\xeb\xdc\xb1A;\xcb\x8b<\x0bi\xe8b#t\xdd" +
+	"\x81\x9b\xc9\xddy/\xdd\xb5\xe7^\xe31fe\xa3\xe1" +
+	"\xe0[v\xf7\xf8\xe9i\xf5C O\xb22\xec3\x0f" +
+	"?h8\\~\xf7\x82\xab\x7fax\xc8vx\xaf\x89" +
+	"{o\xce\xd4\x93\xcb>\xab\xfe\xd9F\xd9!\x8f\x87Z" +
+	"6\xec\xe8\xdf6p\xabO\xb7\xc5\xbcB\xc9,\xd3c" +
+	"\xf1hPM$J\xf8\xa0\x12k\x8eUT\xafR\x9b" +
+	"\xb5DILI&\xd4\xa2Z5\x91\x8c\xf0Zb\xb4" +
+	"S \xf5\x99l\x8e\x84\x9bW\x16\x05\x94\xb8\xa84%" +
+	"d\x17/\x00\x08\x08@\xa6\x96\x03\xc8E<\xcae\x1c" +
+	"\"\xe6\xd3:\xc8\xf4Z\x00y\x1a\x8f\xf2\xa3\x1c\x16D" +
+	"\xb5\x90\x1aG2<Y\x80H\x00\xf5x4\xd9\xdc\xa8" +
+	"\xc5\xc3\x801D\xe0\x90^\x87Q\x87W\xad\xd1\xd4`" +
+	"\xb4Q\x9d\xa7\x04CjI,\xa9\x15U\x06\x948=" +
+	"_\xb0\xce\xf7.\x04\x90sx\x94\xff\xca\xa1\xde\x90\x0a" +
+	"\x00\x00\xf4\x02\x87\xde\xf4\x9c\xac \xa3\x9c\xb1\xaa\x8e\xab" +
+	"\x89d\x93A\x8e/\x19Iw\x1b\xc1\xa0\x81\x0c\xb3\xf9" +
+	"$\xb4h\xcc<N\xb3\xf9\x08\x99\xea\\\xa1j)\xcf" +
+	"\x04\xfcA\x85\xd6D\x83J$\x13y\xb4y.\x1e\xe5" +
+	"|\xabQ.\xe0\xd0\x95\x9e-UF\x8a\x10\x9a\x88o" +
+	"\xcaJ[S\xb49\xacE\xe3E\xb5j\x81QF\xb6" +
+	"\x13U\x9a\x14s\x80\xc3\x9c\xec\xf8\x87\xe7S\xcc\xd0\x82" +
+	"\x91\xd4\x85\x94D\xa6*\x0b\x87\xcf\x14\x83\xe1\xc64\xc6" +
+	"\xd0\xcc\xb5\xa0\x99_\x1e\x0d \xca\xf9V\xe8z\x1a\xba" +
+	"\x9aGy\x13\x87\x84\x8d\xf7\xc6b\x00y\x1d\x8f\xf2\xb3" +
+	"\x1c\"\x97\x8f\x1c\x00\xd9L\x1d7\xf0(?\xc7!\xe1" +
+	"1\x1fy\x00\xd2F\x1d7\xf1(wpH\x04\xccG" +
+	"\x01\x80\xb4\xd3?w\xf2(\xbf\xca\xa1\x18\x0b72\xc6" +
+	"}1\xdb\x87\x1d\xa6O\x89\xafX\x85\xb9\x80\x01\x1e\x0d" +
+	"\xb2r\x01}Z\xb8IE\x07p\xe8\xc8\xce\xdc\xcap" +
+	"$2\xe6\x88\xb3^\x05\x14\x1f\xa5\xedw\xafKj\xc4" +
+	"\xff\xa4\xdb\xcf\x8enU\xc2\x9aUF\xb6\x0b\xa1\xae\x0e" +
+	"k\xf3R\x17\"\xcb\x08\x8fz\xca\xd2.52\xb7\x02" +
+	"\xe3\x9b\x0eB\x11\xef\x00\xb0^ad\xba*\x11,\x06" +
+	"Nr\xa0\x88hi\x0b2-'C\xc5\xc0\x91[\"" +
+	"r\x96T#\xdb\x9a\xc8%j;+\"o\xedb\xc8" +
+	"\xc4\x98\xf4V\x00G\xbaD\x14\xac\xdd\x06\x99\xfa\x90C" +
+	"\xb5\xc0\x91\x83\":,\xd9A&w\xa4\xbd\x018\xb2" +
+	"]D\xa7\xb54 \xdbpH[\x15pd\xbd\x88\xa2" +
+	"\xa5\xd5\xc8\x96\x1b\xd2R\x0e\x1cQEtY\x9a\x81l" +
+	"\x87#\x8b)\x96E\xa2\x8f\x92\xefG\x1f\x1d%?\xfa" +
+	"(q~\xac4\x19\xf4\xa3\xce\xde\x16\xc0\x88\x1fu\xf3" +
+	"\xef\x9a(\x88A%\xe2\xc7\xa7R\xa3\xe5\xc7\x02\xe3\x0e" +
+	"\xfb\xb1\xd2|>\xfc\x18\xc01\xae\xfb\xe8\x07\x86\x1b}" +
+	"\xdb\xc5`H\xa5\x1d\xca1:\xc4\xb6VdrN\xe4" +
+	"B\xe0H5\xed\x0fSad\x1b%\x99Em\xd3i" +
+	"\x7f\xd86\x87L\x89\xc9dj\x1b'\x8a\xb1\xa4\xe6G" +
+	"q\x85J\x7fCJ\"#\xe4\x91ob\xda\x0b\x85\xcc" +
+	"\xcbG\xdd\x86\xc1\xb2m\x18\xd9\x9eN\xe4r\x06\x96\xed" +
+	"\xac\xc8V\"2\xab\x82\x81e\x92\x8fli&\x93\x8b" +
+	"\x0d\xb0i\xf4\xfa\xa8\xda\x8c\x84,d\xba\x03\xa6,\xa4" +
+	"\xa9R\xa6gd\xb4\xba\x09\xd9\x14:\x93r\x8d\xf5\xfe" +
+	"\xba\xb3)\x16K\xc6\x1c\xb3\x17a>\xfa\x00\x0f%n" +
+	"\xe9\xfa\xfb\x10\"\"d\x13\xa4\xb1\x18\x09)\x89\x07z" +
+	"\x02\x1f`\xc1`,\x8c\xb1\xcf\xa4\xb6\xb8\xdf\x02\x00\x00" +
+	"\xff\xff\x16\x95\x1e\x96"
 
 func RegisterSchema(reg *schemas.Registry) {
 	reg.Register(&schemas.Schema{
@@ -2812,18 +3447,23 @@ func RegisterSchema(reg *schemas.Registry) {
 			0x86e3410d1abd406b,
 			0x91b6120f2a2e3ebe,
 			0x9d6074459fa0602b,
+			0xa57c12075589e51f,
 			0xa62fe22feb63d82e,
 			0xa66966629ce6e8e9,
 			0xb2c6f1c55b7403f4,
 			0xb72541d950858a60,
 			0xb8521a0e0dcb52d8,
+			0xbb9ef870419ecb71,
+			0xc09f176286f9e884,
 			0xc25a17a8499cfe55,
 			0xc3153fa5a13d8a26,
 			0xc53168b273d497ee,
+			0xc7e357fd7b4cb277,
 			0xd22f75df06c187e8,
 			0xd72ab4a0243047ac,
 			0xd93c9aa0627bc93c,
 			0xda23f0d3a8250633,
+			0xe49628d0fca1d961,
 			0xe64ce403f6090174,
 			0xe990db10c77bbcb7,
 			0xe9b5ea42655a6266,
@@ -2836,6 +3476,7 @@ func RegisterSchema(reg *schemas.Registry) {
 			0xf9602cd2c3f65e0f,
 			0xf9694ae208dbb3e3,
 			0xfa45ca5ec6290c9f,
+			0xffd9ede88fe29780,
 		},
 		Compressed: true,
 	})

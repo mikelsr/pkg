@@ -25,15 +25,19 @@ interface Process {
     # Wait until a process finishes running.
     kill   @1 () -> ();
     # Kill the process.
-    link   @2 (other :Pid) -> ();
-    # TODO: replace (other :Pid) with (other :Process)
-    unlink @3 (other :Pid) -> ();
-
-    # linkExt   @4 (other :Process) -> ();
-    # unlinkExt @5 (other :Process) -> ();
-    pause  @4 () -> ();
+    link   @2 (other :Process, roundtrip :Bool) -> ();
+    # Link a process.
+    unlink @3 (other :Process, roundtrip :Bool) -> ();
+    # Unlink a process.
+    linkLocal   @4 (other :Pid) -> ();
+    # Link a local process.
+    unlinkLocal @5 (other :Pid) -> ();
+    # Unlink a local process.
+    monitor @6 () -> (event :Text);
+    # Monitor a process.
+    pause  @7 () -> ();
     # Pause a process.
-    resume @5 () -> ();
+    resume @8 () -> ();
     # Resume a paused process.
 }
 
